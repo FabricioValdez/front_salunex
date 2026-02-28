@@ -1,0 +1,153 @@
+.dashboard {
+  padding: 30px;
+}
+
+/* HEADER */
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 30px;
+}
+
+.search-box {
+  display: flex;
+  align-items: center;
+  background: #ffffff;
+  padding: 8px 15px;
+  border-radius: 10px;
+  width: 350px;
+  gap: 10px;
+}
+
+.search-box input {
+  border: none;
+  background: transparent;
+  outline: none;
+  width: 100%;
+}
+
+.primary-btn {
+  background: #3b82f6;
+  color: white;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
+/* TITULO */
+.dashboard-title h1 {
+  font-size: 28px;
+  margin-bottom: 5px;
+}
+
+.dashboard-title p {
+  color: gray;
+  margin-bottom: 25px;
+}
+
+/* CARDS */
+.card {
+  background: white;
+  border-radius: 15px;
+  padding: 20px;
+  margin-bottom: 25px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.tabs button {
+  border: none;
+  padding: 6px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  background: #eee;
+}
+
+.tabs .active {
+  background: #3b82f6;
+  color: white;
+}
+
+/* GRAFICA FALSA */
+.chart-placeholder {
+  height: 250px;
+  display: flex;
+  align-items: flex-end;
+}
+
+.bars {
+  display: flex;
+  gap: 25px;
+  width: 100%;
+  justify-content: space-around;
+}
+
+.bar-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.bar {
+  width: 20px;
+  border-radius: 5px;
+  margin-bottom: 5px;
+}
+
+.blue {
+  background: #2b9ed8;
+  height: 100px;
+}
+
+.gray {
+  background: #cfd4da;
+  height: 70px;
+}
+
+.tall { height: 140px; }
+.mid { height: 90px; }
+.small { height: 60px; }
+.very-tall { height: 160px; }
+
+/* ALERTAS */
+.alert-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 12px 0;
+  border-bottom: 1px solid #eee;
+}
+
+.badge {
+  background: #fee2e2;
+  color: red;
+  padding: 5px 10px;
+  border-radius: 50px;
+  font-size: 12px;
+}
+
+.danger {
+  color: red;
+  font-weight: 600;
+}
+
+.warning {
+  color: orange;
+  font-weight: 600;
+}
+
+.view-all {
+  text-align: center;
+  color: #3b82f6;
+  padding-top: 10px;
+  cursor: pointer;
+}
