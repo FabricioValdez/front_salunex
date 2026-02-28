@@ -1,30 +1,46 @@
 .layout {
   display: flex;
   height: 100vh;
-  width: 100%;
 }
 
-/* SIDEBAR */
 .sidebar {
   width: 250px;
   background-color: #f8f9fa;
+  transition: width 0.3s ease;
   display: flex;
   flex-direction: column;
-  padding: 20px 10px;
+  padding: 10px;
   border-right: 1px solid #ddd;
 }
 
-/* LOGO */
+.sidebar.collapsed {
+  width: 63px;
+}
+
 .top-section {
+  display: flex;
+  align-items: center;
+  gap: 10px;
   margin-bottom: 20px;
+  height: 40px;
+}
+
+.toggle-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .logo {
-  font-size: 20px;
+  font-size: 18px;
   font-weight: bold;
+  margin: 0;
+  line-height: 1; 
 }
 
-/* NAV */
 nav {
   flex: 1;
 }
@@ -50,7 +66,6 @@ nav {
   font-weight: bold;
 }
 
-/* PROFILE */
 .profile {
   display: flex;
   align-items: center;
@@ -63,7 +78,6 @@ nav {
   border-radius: 50%;
 }
 
-/* CONTENT */
 .content {
   flex: 1;
   padding: 20px;
