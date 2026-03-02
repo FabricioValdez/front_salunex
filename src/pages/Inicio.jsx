@@ -1,7 +1,8 @@
 import "../styles/inicio.css";
-import { Search, Plus, Bell } from "lucide-react";
+import { Plus, Bell } from "lucide-react";
 import InventoryChart from "../components/InventoryChart";
 import { useNavigate } from "react-router-dom";
+import SearchBar from "../components/ui/SearchBar";
 
 const Inicio = () => {
   const navigate = useNavigate();
@@ -11,13 +12,7 @@ const Inicio = () => {
 
       {/* HEADER SUPERIOR */}
       <div className="dashboard-header">
-        <div className="search-box">
-          <Search size={18} />
-          <input 
-            type="text" 
-            placeholder="Search Order ID, Pharmacies or ..."
-          />
-        </div>
+        <SearchBar placeholder="Search Order ID, Pharmacies or ..." />
 
         <button className="primary-btn">
           <Plus size={18} />
