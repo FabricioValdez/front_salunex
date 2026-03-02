@@ -8,6 +8,8 @@ import Inicio from "./pages/Inicio";
 import Farmacias from "./pages/Farmacias";
 import Ordenes from "./pages/Ordenes";
 import ControlDeCalidad from "./pages/ControlDeCalidad";
+import Inventario from "./pages/Inventario";
+import Dashboard from "./pages/Dashboard";
 
 function PrivateRoute({ children }) {
   const { user } = useContext(AuthContext);
@@ -45,6 +47,8 @@ function App() {
           <Route path="/farmacias" element={<Farmacias />} />
           <Route path="/ordenes" element={<Ordenes />} />
           <Route path="/control" element={<ControlDeCalidad />} />
+          <Route path="/inventario" element={<Inventario />} />
+          <Route path="/dashboard" element={<Dashboard />} />
         </Route>
       </Routes>
     </BrowserRouter>

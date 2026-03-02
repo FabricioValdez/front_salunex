@@ -1,0 +1,84 @@
+.page-content {
+  padding: 30px;
+}
+
+/* Header */
+.page-header h1 {
+  font-size: 26px;
+  font-weight: 600;
+  margin-bottom: 5px;
+}
+
+.page-header p {
+  color: #6c757d;
+  margin-bottom: 25px;
+}
+
+/* Card principal */
+.card-container {
+  background-color: #ffffff;
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+/* Topbar */
+.inventory-topbar {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  gap: 15px;
+}
+
+.search-input {
+  flex: 1;
+  padding: 10px 15px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+}
+
+/* Botones */
+.btn-primary {
+  background-color: #2563eb;
+  color: white;
+  padding: 10px 18px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.btn-primary:hover {
+  background-color: #1e4ed8;
+}
+
+.btn-secondary {
+  background-color: #e5e7eb;
+  padding: 10px 18px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+/* Tabla */
+.table-container table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+table thead {
+  background-color: #f9fafb;
+}
+
+table th,
+table td {
+  padding: 14px;
+  text-align: left;
+  border-bottom: 1px solid #eee;
+}
+
+.action-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  margin-right: 8px;
+}
