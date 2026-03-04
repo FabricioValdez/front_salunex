@@ -33,7 +33,7 @@ function Inventario() {
             <table>
               <thead>
                 <tr>
-                  <th>Nombre</th>
+                  <th>Nombre del medicamento</th>
                   <th>Lote</th>
                   <th>Fecha Exp.</th>
                   <th>Cantidad</th>

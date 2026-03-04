@@ -1,0 +1,80 @@
+.salunex-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+
+  padding: 10px 18px;
+  border-radius: 10px;
+  border: none;
+
+  font-size: 14px;
+  font-weight: 500;
+
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+/* ===== PRIMARY ===== */
+
+.salunex-btn-primary {
+  background: #3b82f6;
+  color: white;
+}
+
+.salunex-btn-primary:hover {
+  background: #2563eb;
+}
+
+/* ===== SECONDARY ===== */
+
+.salunex-btn-secondary {
+  background: #e5e7eb;
+  color: #111827;
+}
+
+.salunex-btn-secondary:hover {
+  background: #d1d5db;
+}
+
+/* ===== DANGER ===== */
+
+.salunex-btn-danger {
+  background: #dc2626;
+  color: white;
+}
+
+.salunex-btn-danger:hover {
+  background: #b91c1c;
+}
+
+/* ===== DISABLED ===== */
+
+.salunex-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btn-icon {
+  display: flex;
+  align-items: center;
+}
+
+/* ===== TAB ===== */
+
+.salunex-btn-tab {
+  background: #e5e7eb;
+  color: #374151;
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-weight: 500;
+}
+
+.salunex-btn-tab:hover {
+  background: #d1d5db;
+}
+
+.salunex-btn-tab.active {
+  background: #3b82f6;
+  color: white;
+}
