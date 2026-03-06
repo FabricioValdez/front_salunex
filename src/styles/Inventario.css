@@ -1,10 +1,7 @@
-.page-content {
-  padding: 30px;
-}
+/* ===== Header ===== */
 
-/* Header */
 .page-header h1 {
-  font-size: 26px;
+  font-size: 28px;
   font-weight: 600;
   margin-bottom: 5px;
 }
@@ -14,71 +11,123 @@
   margin-bottom: 25px;
 }
 
-/* Card principal */
-.card-container {
-  background-color: #ffffff;
-  padding: 25px;
-  border-radius: 12px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+
+/* ===== Actions (buscador + botones) ===== */
+
+.page-actions{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:20px;
+  margin-bottom:20px;
 }
 
-/* Topbar */
-.inventory-topbar {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 20px;
-  gap: 15px;
+.actions-right{
+  display:flex;
+  gap:10px;
 }
 
-.search-input {
-  flex: 1;
-  padding: 10px 15px;
-  border-radius: 8px;
-  border: 1px solid #ddd;
+
+/* ===== Botones ===== */
+
+.btn-primary{
+  background-color:#2563eb;
+  color:white;
+  padding:10px 18px;
+  border:none;
+  border-radius:8px;
+  cursor:pointer;
+  font-size:14px;
+  transition:all .2s;
 }
 
-/* Botones */
-.btn-primary {
-  background-color: #2563eb;
-  color: white;
-  padding: 10px 18px;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
+.btn-primary:hover{
+  background-color:#1e4ed8;
 }
 
-.btn-primary:hover {
-  background-color: #1e4ed8;
+
+.btn-secondary{
+  background-color:#e5e7eb;
+  color:#333;
+  padding:10px 18px;
+  border:none;
+  border-radius:8px;
+  cursor:pointer;
+  font-size:14px;
+  transition:all .2s;
 }
 
-.btn-secondary {
-  background-color: #e5e7eb;
-  padding: 10px 18px;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
+.btn-secondary:hover{
+  background:#d1d5db;
 }
 
-/* Tabla */
-.table-container table {
-  width: 100%;
-  border-collapse: collapse;
+
+/* ===== Tabla ===== */
+
+.table-container{
+  width:100%;
+  overflow-x:auto;
 }
 
-table thead {
-  background-color: #f9fafb;
+.table-container table{
+  width:100%;
+  border-collapse:collapse;
 }
+
+
+/* header tabla */
+
+table thead{
+  background:#f9fafb;
+}
+
+table th{
+  font-weight:600;
+  font-size:14px;
+  color:#555;
+}
+
+
+/* celdas */
 
 table th,
-table td {
-  padding: 14px;
-  text-align: left;
-  border-bottom: 1px solid #eee;
+table td{
+  padding:14px;
+  text-align:left;
+  border-bottom:1px solid #eee;
 }
 
-.action-btn {
-  background: none;
-  border: none;
-  cursor: pointer;
-  margin-right: 8px;
+
+/* hover fila */
+
+table tbody tr:hover{
+  background:#f7f9fc;
+}
+
+
+/* ===== botones acciones ===== */
+
+.actions-cell{
+  display:flex;
+  gap:8px;
+}
+
+.action-btn{
+  border:none;
+  background:none;
+  cursor:pointer;
+  font-size:16px;
+  transition:transform .1s;
+}
+
+.action-btn:hover{
+  transform:scale(1.15);
+}
+
+.action-btn.edit:hover{
+  color:#2563eb;
+}
+
+.action-btn.delete:hover{
+  color:#dc2626;
 }
