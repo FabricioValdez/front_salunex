@@ -5,6 +5,8 @@ import {
   Building2,
   ClipboardList,
   ShoppingCart,
+  Package,
+  LayoutDashboard,
   Menu
 } from "lucide-react";
 
@@ -37,9 +39,19 @@ const Sidebar = () => {
           {!collapsed && <span>Órdenes</span>}
         </NavLink>
 
+        <NavLink to="/inventario" className="nav-item">
+          <Package size={20} />
+          {!collapsed && <span>Inventario</span>}
+        </NavLink>
+
         <NavLink to="/control" className="nav-item">
           <ClipboardList size={20} />
           {!collapsed && <span>Control de calidad</span>}
+        </NavLink>
+
+        <NavLink to="/dashboard" className="nav-item">
+          <LayoutDashboard size={20} />
+          {!collapsed && <span>Dashboard</span>}
         </NavLink>
       </nav>
 

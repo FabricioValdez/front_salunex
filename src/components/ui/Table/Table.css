@@ -1,0 +1,73 @@
+.table-container{
+  width:100%;
+}
+
+.salunex-table{
+  width:100%;
+  border-collapse:collapse;
+}
+
+.salunex-table th{
+  text-align:left;
+  padding:12px;
+  font-size:14px;
+  color:#6b7280;
+  border-bottom:1px solid #eee;
+}
+
+.salunex-table td{
+  padding:12px;
+  border-bottom:1px solid #f3f4f6;
+}
+
+.salunex-table tbody tr:hover{
+  background:#f9fafb;
+}
+
+.table-search{
+  margin-bottom:10px;
+}
+
+.table-search input{
+  width:100%;
+  padding:8px 10px;
+  border-radius:8px;
+  border:1px solid #ddd;
+}
+
+.table-pagination{
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  gap:15px;
+  margin-top:15px;
+}
+
+.table-pagination button{
+  padding:5px 10px;
+  border-radius:6px;
+  border:1px solid #ddd;
+  background:white;
+  cursor:pointer;
+}
+
+.table-pagination button:disabled{
+  opacity:.4;
+  cursor:not-allowed;
+}
+
+.table-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.action-btn {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  padding: 4px;
+}
+
+.action-btn:hover {
+  opacity: 0.7;
+}

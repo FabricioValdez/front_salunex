@@ -1,9 +1,9 @@
 import React from "react";
 import ReactApexChart from "react-apexcharts";
 
-const InventoryChart = () => {
+const InventoryChart = ({ periodo }) => {
 
-  const series = [
+  const seriesSemana = [
     {
       name: "Entradas",
       data: [44, 55, 57, 56, 61, 58, 63]
@@ -13,6 +13,23 @@ const InventoryChart = () => {
       data: [35, 41, 36, 26, 45, 48, 52]
     }
   ];
+
+  const seriesMes = [
+    {
+      name: "Entradas",
+      data: [300, 400, 250, 380]
+    },
+    {
+      name: "Salidas",
+      data: [200, 320, 300, 280]
+    }
+  ];
+
+  const categoriesSemana = ["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"];
+  const categoriesMes = ["Semana 1", "Semana 2", "Semana 3", "Semana 4"];
+
+  const series = periodo === "mes" ? seriesMes : seriesSemana;
+  const categories = periodo === "mes" ? categoriesMes : categoriesSemana;
 
   const options = {
     chart: {
@@ -37,7 +54,7 @@ const InventoryChart = () => {
       colors: ["transparent"]
     },
     xaxis: {
-      categories: ["Lun", "Mar", "Mié", "Jue", "Vie", "Sáb", "Dom"]
+      categories: categories
     },
     yaxis: {
       title: {

@@ -1,135 +1,275 @@
 import "../styles/ControlCalidad.css";
-import { Trash2, AlertCircle, Clock } from "lucide-react";
+
+import { Trash2, AlertCircle, Clock, DollarSign } from "lucide-react";
+
+import PageContainer from "../components/ui/PageContainer";
+import DataCard from "../components/ui/DataCard";
+import Button from "../components/ui/Button";
+import SummaryCard from "../components/ui/SummaryCard";
+
+import { useContext, useMemo } from "react";
+
+import InventoryContext from "../context/InventoryContext";
 
 const ControlCalidad = () => {
+
+  const { inventario } = useContext(InventoryContext);
+
+  const hoy = new Date();
+
+  const { expirados, proximos } = useMemo(() => {
+
+    const expirados = [];
+    const proximos = [];
+
+    inventario.forEach((med) => {
+
+      const fecha = new Date(med.fechaExp);
+
+      const diff = Math.ceil(
+        (fecha - hoy) / (1000 * 60 * 60 * 24)
+      );
+
+      if (diff < 0) {
+
+        expirados.push({
+          ...med,
+          dias: diff
+        });
+
+      }
+
+      if (diff >= 0 && diff <= 90) {
+
+        proximos.push({
+          ...med,
+          dias: diff
+        });
+
+      }
+
+    });
+
+    return { expirados, proximos };
+
+  }, [inventario]);
+
+
+
+  /* =========================
+     NIVEL DE RIESGO
+  ========================= */
+
+  const getRisk = (dias) => {
+
+    if (dias <= 15) return "alto";
+    if (dias <= 45) return "medio";
+    return "bajo";
+
+  };
+
+
+
   return (
-    <div className="control-container">
-      <h1>Control de calidad y caducidad</h1>
-      <p className="subtitle">
-        Revisar los lotes marcados, gestionar la fecha de vencimiento e
-        inspeccionar el estado del empaque para garantizar el cumplimiento.
-      </p>
+    <PageContainer>
 
-      {/* RESUMEN CARDS */}
+      {/* HEADER */}
+
+      <div className="dashboard-title">
+        <h1>Control de calidad y caducidad</h1>
+
+        <p>
+          Revisar los lotes marcados, gestionar la fecha de vencimiento e inspeccionar
+          el estado del empaque para garantizar el cumplimiento.
+        </p>
+      </div>
+
+
+
+      {/* RESUMEN */}
+
       <div className="summary-cards">
-        <div className="card danger">
-          <p>Total expirados</p>
-          <h2>4 artículos</h2>
-        </div>
 
-        <div className="card warning">
-          <p>Pronto a expirar</p>
-          <h2>10 artículos</h2>
-        </div>
+        <SummaryCard
+          title="Total expirados"
+          value={`${expirados.length} artículos`}
+          icon={<AlertCircle size={26} />}
+          variant="red"
+        />
 
-        <div className="card neutral">
-          <p>Pérdida potencial</p>
-          <h2>$12,500</h2>
-        </div>
+        <SummaryCard
+          title="Pronto a expirar"
+          value={`${proximos.length} artículos`}
+          icon={<Clock size={26} />}
+          variant="yellow"
+        />
+
+        <SummaryCard
+          title="Pérdida potencial"
+          value={`$${expirados.length * 2500}`}
+          icon={<DollarSign size={26} />}
+          variant="blue"
+        />
+
       </div>
 
       {/* EXPIRADOS */}
-      <div className="table-section danger-section">
+
+      <DataCard className="danger-section">
+
         <div className="section-header">
+
           <div className="title">
-            <AlertCircle size={18} />
+            <AlertCircle size={18} color="#ef4444" />
             <h3>Medicamentos expirados (Crítico)</h3>
           </div>
-          <button className="btn danger-btn">
-            <Trash2 size={16} /> Retirar y desechar
-          </button>
+
+          <Button variant="danger" icon={Trash2}>
+            Retirar y desechar
+          </Button>
+
         </div>
 
+
+
         <table>
+
           <thead>
+
             <tr>
               <th></th>
-              <th>Nombre del medicamento</th>
-              <th>Número de lote</th>
-              <th>Fecha de caducidad</th>
+              <th>Nombre</th>
+              <th>Lote</th>
+              <th>Fecha caducidad</th>
               <th>Estatus</th>
               <th>Acción</th>
             </tr>
+
           </thead>
+
           <tbody>
-            <tr>
-              <td><input type="checkbox" /></td>
-              <td>
-                <strong>Amoxicilina 500mg</strong>
-                <span>antibiótico</span>
-              </td>
-              <td>#A102-442</td>
-              <td>OCT-13-2023</td>
-              <td className="expired">Expirado (-14 días)</td>
-              <td><Trash2 size={16} /></td>
-            </tr>
 
-            <tr>
-              <td><input type="checkbox" /></td>
-              <td>
-                <strong>Insulina glargina</strong>
-                <span>cuidado de la diabetes</span>
-              </td>
-              <td>#B99-X502</td>
-              <td>OCT-23-2023</td>
-              <td className="expired">Expirado (-6 días)</td>
-              <td><Trash2 size={16} /></td>
-            </tr>
+            {expirados.map((med) => (
+
+              <tr key={med.id}>
+
+                <td>
+                  <input type="checkbox" />
+                </td>
+
+                <td>
+                  <strong>{med.nombre}</strong>
+                  <span>{med.ubicacion}</span>
+                </td>
+
+                <td>#{med.lote}</td>
+
+                <td>{med.fechaExp}</td>
+
+                <td className="expired">
+                  Expirado ({Math.abs(med.dias)} días)
+                </td>
+
+                <td>
+                  <Trash2 size={16} />
+                </td>
+
+              </tr>
+
+            ))}
+
           </tbody>
-        </table>
-      </div>
 
-      {/* PRÓXIMOS A EXPIRAR */}
-      <div className="table-section warning-section">
+        </table>
+
+      </DataCard>
+
+
+
+      {/* PROXIMOS */}
+
+      <DataCard className="warning-section">
+
         <div className="section-header">
+
           <div className="title">
-            <Clock size={18} />
+            <Clock size={18} color="#f59e0b" />
             <h3>Próximos a expirar (Sig 30-90 días)</h3>
           </div>
-          <button className="btn warning-btn">
-            <Trash2 size={16} /> Retirar del almacén
-          </button>
+
+          <Button variant="warning" icon={Trash2}>
+            Retirar del almacén
+          </Button>
+
         </div>
 
+
+
         <table>
+
           <thead>
+
             <tr>
               <th></th>
-              <th>Nombre del medicamento</th>
-              <th>Número de lote</th>
+              <th>Nombre</th>
+              <th>Lote</th>
               <th>Días restantes</th>
               <th>Nivel de riesgo</th>
               <th>Acción</th>
             </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td><input type="checkbox" /></td>
-              <td>
-                <strong>Amoxicilina 500mg</strong>
-                <span>antibiótico</span>
-              </td>
-              <td>#A102-442</td>
-              <td className="days warning-text">14 días restantes</td>
-              <td><span className="badge high">Riesgo alto</span></td>
-              <td><Trash2 size={16} /></td>
-            </tr>
 
-            <tr>
-              <td><input type="checkbox" /></td>
-              <td>
-                <strong>Penicilina 500mg</strong>
-                <span>antibiótico</span>
-              </td>
-              <td>#P087-406</td>
-              <td className="days safe-text">70 días restantes</td>
-              <td><span className="badge medium">Riesgo medio</span></td>
-              <td><Trash2 size={16} /></td>
-            </tr>
+          </thead>
+
+          <tbody>
+
+            {proximos.map((med) => {
+
+              const riesgo = getRisk(med.dias);
+
+              return (
+
+                <tr key={med.id}>
+
+                  <td>
+                    <input type="checkbox" />
+                  </td>
+
+                  <td>
+                    <strong>{med.nombre}</strong>
+                    <span>{med.ubicacion}</span>
+                  </td>
+
+                  <td>#{med.lote}</td>
+
+                  <td className="days">
+                    {med.dias} días restantes
+                  </td>
+
+                  <td>
+
+                    <span className={`badge ${riesgo}`}>
+                      Riesgo {riesgo}
+                    </span>
+
+                  </td>
+
+                  <td>
+                    <Trash2 size={16} />
+                  </td>
+
+                </tr>
+
+              );
+
+            })}
+
           </tbody>
+
         </table>
-      </div>
-    </div>
+
+      </DataCard>
+
+    </PageContainer>
   );
 };
 
