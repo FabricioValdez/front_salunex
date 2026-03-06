@@ -1,9 +1,4 @@
-.dashboard {
-  padding: 30px;
-}
-
 /* ================= HEADER ================= */
-
 .dashboard-header {
   display: flex;
   align-items: center;
@@ -47,24 +42,16 @@
 
 .dashboard-title h1 {
   font-size: 28px;
+  font-weight: 600;
   margin-bottom: 5px;
 }
 
 .dashboard-title p {
-  color: #6b7280;
+  color: #6c757d;
   margin-bottom: 25px;
-  font-size: 14px;
 }
 
 /* ================= CARDS ================= */
-
-.card {
-  background: white;
-  border-radius: 15px;
-  padding: 20px;
-  margin-bottom: 25px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
-}
 
 .card-header {
   display: flex;

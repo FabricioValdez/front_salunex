@@ -3,9 +3,11 @@ import { Plus, Bell } from "lucide-react";
 import InventoryChart from "../components/InventoryChart";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
+import PageContainer from "../components/ui/PageContainer";
 import SearchBar from "../components/ui/SearchBar";
 import Button from "../components/ui/Button";
 import Modal from "../components/ui/Modal";
+import DataCard from "../components/ui/DataCard";
 
 const Inicio = () => {
   const navigate = useNavigate();
@@ -56,7 +58,7 @@ const Inicio = () => {
         </div>
       </Modal>
 
-      <div className="dashboard">
+      <PageContainer>
 
         {/* HEADER SUPERIOR */}
         <div className="dashboard-header">
@@ -80,7 +82,7 @@ const Inicio = () => {
         </div>
 
         {/* CARD GRÁFICA */}
-        <div className="card">
+        <DataCard>
           <div className="card-header">
             <h3>Movimiento de inventario</h3>
 
@@ -106,10 +108,10 @@ const Inicio = () => {
           <div>
             <InventoryChart periodo={periodo} />
           </div>
-        </div>
+        </DataCard>
 
         {/* ALERTAS */}
-        <div className="card">
+        <DataCard>
           <div className="card-header">
             <h3 className="card-title">
               <Bell size={20} className="bell-icon" />
@@ -160,9 +162,8 @@ const Inicio = () => {
           >
             Ver todas las alertas
           </div>
-        </div>
-
-      </div>
+        </DataCard>
+      </PageContainer>
     </>
   );
 };
