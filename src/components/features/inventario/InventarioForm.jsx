@@ -10,7 +10,8 @@ function InventarioForm({ onSubmit, initialData }) {
       lote: "",
       fechaExp: "",
       cantidad: "",
-      ubicacion: ""
+      categoria: "", // Reemplazamos ubicacion por categoria
+      precio: ""     // Nuevo campo
     }
   );
 
@@ -24,9 +25,11 @@ function InventarioForm({ onSubmit, initialData }) {
   const handleSubmit = (e) => {
     e.preventDefault();
 
+    // Convertimos cantidad y precio a número
     onSubmit({
       ...formData,
-      cantidad: Number(formData.cantidad)
+      cantidad: Number(formData.cantidad),
+      precio: Number(formData.precio)
     });
   };
 
@@ -66,11 +69,29 @@ function InventarioForm({ onSubmit, initialData }) {
         required
       />
 
-      <input
-        name="ubicacion"
-        placeholder="Ubicación"
-        value={formData.ubicacion}
+      <select
+        name="categoria"
+        value={formData.categoria}
         onChange={handleChange}
+        required
+      >
+        <option value="">Selecciona categoría</option>
+        <option value="Antibiótico">Antibiótico</option>
+        <option value="Antiinflamatorio">Antiinflamatorio</option>
+        <option value="Antihistamínico">Antihistamínico</option>
+        <option value="Antiácido">Antiácido</option>
+        <option value="Hormona">Hormona</option>
+        <option value="Antidiabético">Antidiabético</option>
+      </select>
+
+      <input
+        type="number"
+        name="precio"
+        placeholder="Precio"
+        value={formData.precio}
+        onChange={handleChange}
+        step="0.01"
+        min="0"
         required
       />
 

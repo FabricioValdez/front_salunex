@@ -47,9 +47,9 @@ function App() {
           {/* MODULOS */}
           <Route path="inventario" element={<Inventario />} />
           <Route path="ordenes" element={<Ordenes />} />
-          <Route path="farmacias" element={<Farmacias />} />
+          {/* <Route path="farmacias" element={<Farmacias />} /> */}
           <Route path="control" element={<ControlDeCalidad />} />
-          <Route path="dashboard" element={<Dashboard />} />
+          <Route path="dashboard" element={<Dashboard />} /> 
 
         </Route>
 

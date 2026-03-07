@@ -36,26 +36,49 @@ const Ordenes = () => {
 
   const [ordenes, setOrdenes] = useState([
     {
-      id: "OC-2026-001",
-      proveedor: "AstraZeneca Pharma",
-      fecha: "2026-10-12",
+      id: "ORD-001",
+      proveedor: "Pfizer",
+      fecha: "2026-03-01",
       estatus: "completado",
-      total: 50000,
+      productos: [
+        {
+          id: 1,
+          nombre: "Paracetamol",
+          precio: 45,
+          cantidad: 10
+        },
+        {
+          id: 2,
+          nombre: "Ibuprofeno",
+          precio: 60,
+          cantidad: 5
+        }
+      ],
+      total: 750
     },
     {
-      id: "OC-2026-002",
-      proveedor: "Pfizer Labs",
-      fecha: "2026-10-28",
+      id: "ORD-002",
+      proveedor: "Bayer",
+      fecha: "2026-03-04",
       estatus: "enviado",
-      total: 46784,
+      productos: [
+        {
+          id: 3,
+          nombre: "Amoxicilina",
+          precio: 120,
+          cantidad: 3
+        }
+      ],
+      total: 360
     },
     {
-      id: "OC-2026-003",
-      proveedor: "Bayer México",
-      fecha: "2026-11-10",
+      id: "ORD-003",
+      proveedor: "Genfar",
+      fecha: "2026-03-05",
       estatus: "cancelado",
-      total: 50000,
-    },
+      productos: [],
+      total: 0
+    }
   ]);
 
   const ordenesFiltradas = ordenes.filter((orden) => {
@@ -100,18 +123,9 @@ const Ordenes = () => {
     setOrdenes((prev) => [...prev, nueva]);
   };
 
-  const hoy = new Date();
-
   const pendientes = ordenes.filter(o => o.estatus === "enviado").length;
 
-  const vencidas = ordenes.filter(o => {
-    const fechaOrden = new Date(o.fecha);
-
-    return (
-      o.estatus !== "completado" &&
-      fechaOrden < hoy
-    );
-  }).length;
+  const vencidas = ordenes.filter(o => o.estatus === "cancelado").length;
 
   const valorTotal = ordenes
     .filter(o => o.estatus === "completado")
@@ -128,7 +142,7 @@ const Ordenes = () => {
       <Modal
         isOpen={openModal}
         onClose={() => setOpenModal(false)}
-        title="Registrar nueva Orden de Compra"
+        title="Orden de Compra"
       >
         <OrdenForm
           onSubmit={agregarOrden}

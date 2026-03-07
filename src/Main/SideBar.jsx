@@ -29,10 +29,7 @@ const Sidebar = () => {
           {!collapsed && <span>Inicio</span>}
         </NavLink>
 
-        <NavLink to="/farmacias" className="nav-item">
-          <Building2 size={20} />
-          {!collapsed && <span>Farmacias</span>}
-        </NavLink>
+
 
         <NavLink to="/ordenes" className="nav-item">
           <ShoppingCart size={20} />
