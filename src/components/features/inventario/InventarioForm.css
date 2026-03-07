@@ -4,10 +4,13 @@
   gap:12px;
 }
 
-.inventario-form input{
+.inventario-form input,
+.inventario-form select{
   padding:10px;
   border-radius:6px;
   border:1px solid #ccc;
+  font-size:14px;
+  outline:none;
 }
 
 .form-actions{

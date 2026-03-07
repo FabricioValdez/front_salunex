@@ -31,16 +31,23 @@ function Inventario() {
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [deleteId, setDeleteId] = useState(null);
 
+  const [filtro, setFiltro] = useState("todos");
+  const [categoriaFiltro, setCategoriaFiltro] = useState("");
+
   const columns = [
     "Nombre",
     "Lote",
     "Fecha Exp.",
     "Cantidad",
-    "Ubicación",
+    "Categoría",
+    "Precio",
     "Acciones"
   ];
 
+  // ===============================
   // AGREGAR / EDITAR
+  // ===============================
+
   const handleAddMedicamento = (medicamento) => {
 
     if (editData) {
@@ -61,7 +68,10 @@ function Inventario() {
     setOpenModal(false);
   };
 
+  // ===============================
   // EDITAR
+  // ===============================
+
   const handleEdit = (item) => {
 
     setEditData(item);
@@ -69,7 +79,10 @@ function Inventario() {
 
   };
 
-  // CLICK ELIMINAR
+  // ===============================
+  // ELIMINAR
+  // ===============================
+
   const handleDeleteClick = (item) => {
 
     setDeleteId(item.id);
@@ -77,7 +90,6 @@ function Inventario() {
 
   };
 
-  // CONFIRMAR ELIMINACIÓN
   const confirmDeleteMedicamento = () => {
 
     eliminarMedicamento(deleteId);
@@ -86,12 +98,44 @@ function Inventario() {
     setDeleteId(null);
   };
 
-  // BUSCADOR
-  const filteredInventario = inventario.filter((item) =>
-    item.nombre.toLowerCase().includes(search.toLowerCase()) ||
-    item.lote.toLowerCase().includes(search.toLowerCase()) ||
-    item.ubicacion.toLowerCase().includes(search.toLowerCase())
-  );
+  // ===============================
+  // FILTROS
+  // ===============================
+
+  const hoy = new Date();
+
+  const filteredInventario = inventario.filter((item) => {
+
+    const matchSearch =
+      item.nombre.toLowerCase().includes(search.toLowerCase()) ||
+      item.lote.toLowerCase().includes(search.toLowerCase());
+
+    if (!matchSearch) return false;
+
+    if (filtro === "categoria") {
+
+      if (!categoriaFiltro) return true;
+
+      return item.categoria === categoriaFiltro;
+    }
+
+    if (filtro === "vencimiento") {
+
+      const fechaExp = new Date(item.fechaExp);
+
+      const diferenciaDias = Math.ceil(
+        (fechaExp - hoy) / (1000 * 60 * 60 * 24)
+      );
+
+      return diferenciaDias <= 90 && diferenciaDias >= 0;
+    }
+
+    if (filtro === "existencias") {
+      return item.cantidad <= 200;
+    }
+
+    return true;
+  });
 
   const medicamentoEliminar = inventario.find(
     (m) => m.id === deleteId
@@ -101,15 +145,21 @@ function Inventario() {
     <PageContainer>
 
       {/* HEADER */}
+
       <div className="page-header">
+
         <h1>Mercancía e inventario diario</h1>
+
         <p>
           Gestione las entradas diarias de existencias, haga seguimiento
           de fechas de vencimiento y monitoree niveles en tiempo real.
         </p>
+
       </div>
 
+
       {/* ACCIONES */}
+
       <div className="page-actions">
 
         <SearchBar
@@ -138,7 +188,71 @@ function Inventario() {
 
       </div>
 
+
+      {/* FILTROS */}
+
+      <div className="inventario-filtros">
+
+        <button
+          className={filtro === "todos" ? "filtro-btn active" : "filtro-btn"}
+          onClick={() => {
+            setFiltro("todos");
+            setCategoriaFiltro("");
+          }}
+        >
+          Todos
+        </button>
+
+
+        {/* FILTRO CATEGORIA */}
+
+        <div className="categoria-wrapper">
+
+          <button
+            className={filtro === "categoria" ? "filtro-btn active" : "filtro-btn"}
+          >
+            Categoría {categoriaFiltro && `: ${categoriaFiltro}`}
+          </button>
+
+          <select
+            className="categoria-overlay-select"
+            value={categoriaFiltro}
+            onChange={(e) => {
+              setCategoriaFiltro(e.target.value);
+              setFiltro("categoria");
+            }}
+          >
+            <option value="">Todas</option>
+            <option value="Antibiótico">Antibiótico</option>
+            <option value="Antiinflamatorio">Antiinflamatorio</option>
+            <option value="Antihistamínico">Antihistamínico</option>
+            <option value="Antiácido">Antiácido</option>
+            <option value="Hormona">Hormona</option>
+            <option value="Antidiabético">Antidiabético</option>
+          </select>
+
+        </div>
+
+
+        <button
+          className={filtro === "vencimiento" ? "filtro-btn active" : "filtro-btn"}
+          onClick={() => setFiltro("vencimiento")}
+        >
+          Próximos a vencer
+        </button>
+
+        <button
+          className={filtro === "existencias" ? "filtro-btn active" : "filtro-btn"}
+          onClick={() => setFiltro("existencias")}
+        >
+          Bajo stock
+        </button>
+
+      </div>
+
+
       {/* TABLA */}
+
       <DataCard>
 
         <Table
@@ -158,7 +272,9 @@ function Inventario() {
 
       </DataCard>
 
+
       {/* MODAL AGREGAR / EDITAR */}
+
       <Modal
         isOpen={openModal}
         title={editData ? "Editar medicamento" : "Agregar medicamento"}
@@ -172,7 +288,9 @@ function Inventario() {
 
       </Modal>
 
+
       {/* MODAL ELIMINAR */}
+
       <Modal
         isOpen={confirmDelete}
         title="Eliminar medicamento"
@@ -180,9 +298,11 @@ function Inventario() {
       >
 
         <p>
+
           Se eliminará el medicamento
           <strong> {medicamentoEliminar?.nombre} </strong>
           del inventario.
+
         </p>
 
         <p style={{ marginTop: "8px" }}>

@@ -13,7 +13,8 @@ export const InventoryProvider = ({ children }) => {
             lote: "A102-442",
             fechaExp: "2024-01-10",
             cantidad: 25,
-            ubicacion: "Estante A"
+            categoria: "Antibiótico",
+            precio: 120.5
         },
         {
             id: 2,
@@ -21,7 +22,8 @@ export const InventoryProvider = ({ children }) => {
             lote: "B99-X502",
             fechaExp: "2024-02-01",
             cantidad: 12,
-            ubicacion: "Refrigerador"
+            categoria: "Hormona",
+            precio: 450.0
         },
 
         // PRÓXIMOS A EXPIRAR (menos de 90 días)
@@ -31,7 +33,8 @@ export const InventoryProvider = ({ children }) => {
             lote: "P44-210",
             fechaExp: "2026-03-12",
             cantidad: 40,
-            ubicacion: "Estante B"
+            categoria: "Antiinflamatorio",
+            precio: 35.0
         },
         {
             id: 4,
@@ -39,7 +42,8 @@ export const InventoryProvider = ({ children }) => {
             lote: "I77-332",
             fechaExp: "2026-04-20",
             cantidad: 30,
-            ubicacion: "Estante B"
+            categoria: "Antiinflamatorio",
+            precio: 42.0
         },
         {
             id: 5,
@@ -47,7 +51,8 @@ export const InventoryProvider = ({ children }) => {
             lote: "O21-119",
             fechaExp: "2026-05-10",
             cantidad: 18,
-            ubicacion: "Estante C"
+            categoria: "Antiácido",
+            precio: 55.0
         },
 
         // FUTURO (NO DEBEN APARECER EN CONTROL DE CALIDAD)
@@ -57,7 +62,8 @@ export const InventoryProvider = ({ children }) => {
             lote: "M88-441",
             fechaExp: "2027-01-15",
             cantidad: 50,
-            ubicacion: "Estante D"
+            categoria: "Antidiabético",
+            precio: 80.0
         },
         {
             id: 7,
@@ -65,7 +71,8 @@ export const InventoryProvider = ({ children }) => {
             lote: "L33-990",
             fechaExp: "2027-03-10",
             cantidad: 22,
-            ubicacion: "Estante D"
+            categoria: "Antihistamínico",
+            precio: 35.0
         }
 
     ]);
