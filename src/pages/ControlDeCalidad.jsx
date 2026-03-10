@@ -75,9 +75,8 @@ const ControlCalidad = () => {
 
       {/* HEADER */}
 
-      <div className="dashboard-title">
+      <div className="page-title">
         <h1>Control de calidad y caducidad</h1>
-
         <p>
           Revisar los lotes marcados, gestionar la fecha de vencimiento e inspeccionar
           el estado del empaque para garantizar el cumplimiento.

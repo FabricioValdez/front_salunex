@@ -74,7 +74,7 @@ const Inicio = () => {
         </div>
 
         {/* DESCRIPCIÓN */}
-        <div className="dashboard-title">
+        <div className="page-title">
           <h1>Descripción general</h1>
           <p>
             Actualizaciones logísticas y métricas de inventario en tiempo real.
