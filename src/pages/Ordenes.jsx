@@ -164,7 +164,7 @@ const Ordenes = () => {
 
       <PageContainer>
 
-        <div className="page-title">
+        <div className="dashboard-title">
           <h1>Órdenes</h1>
           <p>
             Gestionar los flujos de trabajo de reposición y adquisición de proveedores.
