@@ -41,67 +41,82 @@ function Login() {
   };
 
   return (
-    <Container
-      fluid
-      className="vh-100 d-flex align-items-center justify-content-center"
-      style={{ backgroundColor: "#e1e3e6" }}
-    >
-      <Row className="w-100 justify-content-center">
-        <Col xs={11} sm={7} md={4} lg={3}>
-          <div className="text-center mb-4">
-            <div
-              className="mx-auto mb-3 d-flex align-items-center justify-content-center"
-              style={{
-                width: "80px",
-                height: "80px",
-                backgroundColor: "#5c7cfa",
-                borderRadius: "20px",
-                color: "white",
-                fontSize: "35px",
-              }}
-            >
-              👤
+  <div className="login-page">
+    <div className="login-overlay"></div>
+
+    <Container fluid className="vh-100 d-flex align-items-center">
+      <Row className="w-100 align-items-center">
+
+        {/* LADO IZQUIERDO */}
+        <Col md={6} className="text-center text-md-start text-white ps-md-5">
+          <div className="brand-container">
+            <div className="brand-icon">👤</div>
+            <div>
+              <h1 className="brand-title">SALUNEX</h1>
+              <p className="brand-subtitle">
+                Sistema de gestión de almacén
+              </p>
             </div>
-            <h3 className="fw-bold">SALUNEX</h3>
-            <p className="text-muted">Sistema de gestión de almacén</p>
           </div>
+        </Col>
 
-          <Card className="p-4 shadow-sm border-0 rounded-4">
-            <Form onSubmit={handleSubmit}>
-              <Form.Group className="mb-3">
-                <Form.Label>Usuario o email</Form.Label>
-                <Form.Control
-                  type="text"
-                  placeholder="Ingresa tu usuario o email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                />
-              </Form.Group>
+        {/* LADO DERECHO */}
+        <Col md={6} className="d-flex justify-content-center">
+          <Card className="login-card shadow-lg border-0">
+            <Card.Body className="p-4">
 
-              <Form.Group className="mb-3">
-                <Form.Label>Contraseña</Form.Label>
-                <Form.Control
-                  type="password"
-                  placeholder="Ingresa tu contraseña"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                />
-              </Form.Group>
+              <h4 className="text-center mb-4 fw-bold">
+                Iniciar sesión
+              </h4>
 
-              <Button
-                type="submit"
-                variant="primary"
-                className="w-100 d-flex justify-content-center align-items-center"
-                disabled={loading}
-              >
-                {loading ? <span className="loader"></span> : "Iniciar Sesión"}
-              </Button>
-            </Form>
+              <Form onSubmit={handleSubmit}>
+                <Form.Group className="mb-3">
+                  <Form.Label>Usuario o email</Form.Label>
+                  <Form.Control
+                    type="text"
+                    placeholder="Ingresa tu usuario o email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                  />
+                </Form.Group>
+
+                <Form.Group className="mb-3">
+                  <Form.Label>Contraseña</Form.Label>
+                  <Form.Control
+                    type="password"
+                    placeholder="Ingresa tu contraseña"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                  />
+                </Form.Group>
+
+                <div className="login-buttons">
+                  <Button
+                    type="submit"
+                    className="login-btn w-100"
+                    disabled={loading}
+                  >
+                    {loading ? <span className="loader"></span> : "Iniciar Sesión"}
+                  </Button>
+
+                  <Button
+                    type="button"
+                    className="register-btn w-100"
+                    onClick={() => navigate("/register")}
+                  >
+                    Registrarse
+                  </Button>
+                </div>
+              </Form>
+
+            </Card.Body>
           </Card>
         </Col>
+
       </Row>
     </Container>
-  );
+  </div>
+);
 }
 
 export default Login;
