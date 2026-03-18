@@ -146,12 +146,15 @@ function Inventario() {
 
       {/* HEADER */}
 
-      <div className="page-title">
+      <div className="page-header">
+
         <h1>Mercancía e inventario diario</h1>
+
         <p>
           Gestione las entradas diarias de existencias, haga seguimiento
           de fechas de vencimiento y monitoree niveles en tiempo real.
         </p>
+
       </div>
 
 
