@@ -1,155 +1,278 @@
-/* FORMULARIO */
-
-.orden-form{
-  display:flex;
-  flex-direction:column;
-  gap:18px;
+.orden-form {
+  width: 100%;
 }
 
-/* GRUPOS */
-
-.form-group{
-  display:flex;
-  flex-direction:column;
-  gap:6px;
+/* ── Grid de dos columnas ── */
+.orden-form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+  min-height: 480px;
 }
 
-.orden-form label{
-  font-size:13px;
-  font-weight:600;
-  color:#374151;
+/* ── Columna izquierda ── */
+.orden-col-left {
+  padding-right: 24px;
+  border-right: 1px solid #e5e7eb;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 
-/* INPUTS */
-
-.orden-form input,
-.orden-form select{
-  padding:12px 14px;
-  border-radius:8px;
-  border:1px solid #d1d5db;
-  font-size:14px;
-  background:#fafafa;
-  transition:all 0.2s ease;
+/* ── Columna derecha ── */
+.orden-col-right {
+  padding-left: 24px;
+  display: flex;
+  flex-direction: column;
 }
 
-.orden-form input:hover,
-.orden-form select:hover{
-  border-color:#9ca3af;
+/* ── Grupos de formulario ── */
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 14px;
 }
 
-.orden-form input:focus,
-.orden-form select:focus{
-  outline:none;
-  border-color:#3b82f6;
-  background:white;
-  box-shadow:0 0 0 2px rgba(59,130,246,0.15);
+.form-group label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #374151;
 }
 
-/* TITULOS DE SECCION */
-
-.section-title{
-  font-size:15px;
-  font-weight:600;
-  margin-top:6px;
+.form-group input,
+.form-group select {
+  padding: 9px 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 13.5px;
+  font-family: inherit;
+  color: #111827;
+  background: #f9fafb;
+  transition: border-color 0.15s;
 }
 
-/* LISTA DE MEDICAMENTOS */
-
-.med-list{
-  border:1px solid #e5e7eb;
-  border-radius:8px;
-  background:white;
+.form-group input:focus,
+.form-group select:focus {
+  outline: none;
+  border-color: #2563eb;
+  background: #fff;
 }
 
-/* ITEM MEDICAMENTO */
-
-.med-item{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-
-  padding:10px 12px;
-  border-bottom:1px solid #f1f1f1;
+/* ── Lista de búsqueda ── */
+.med-list {
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  overflow: hidden;
+  flex: 1;
 }
 
-.med-item:last-child{
-  border-bottom:none;
+.med-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  border-bottom: 1px solid #f3f4f6;
+  transition: background 0.1s;
 }
 
-.med-item span{
-  display:flex;
-  flex-direction:column;
-  font-size:14px;
+.med-item:last-child {
+  border-bottom: none;
 }
 
-.med-item small{
-  color:#6b7280;
+.med-item:hover {
+  background: #f9fafb;
 }
 
-/* BOTON AGREGAR */
-
-.add-btn{
-  background:#3b82f6;
-  color:white;
-  border:none;
-  padding:6px 12px;
-  border-radius:6px;
-  cursor:pointer;
-  font-size:12px;
-  transition:0.2s;
+.med-item-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
 }
 
-.add-btn:hover{
-  background:#2563eb;
+.med-nombre {
+  font-size: 13.5px;
+  font-weight: 500;
+  color: #111827;
 }
 
-/* PRODUCTOS */
-
-.producto-row{
-  display:grid;
-  grid-template-columns: 1fr 70px 100px;
-
-  align-items:center;
-  gap:10px;
-
-  padding:10px 0;
-  border-bottom:1px solid #f3f4f6;
+.med-precio {
+  font-size: 12px;
+  color: #6b7280;
 }
 
-.producto-row:last-child{
-  border-bottom:none;
+.med-empty {
+  padding: 14px;
+  font-size: 13px;
+  color: #9ca3af;
+  text-align: center;
 }
 
-.producto-row input{
-  padding:6px;
-  border-radius:6px;
-  border:1px solid #d1d5db;
-  text-align:center;
+.add-btn {
+  padding: 5px 12px;
+  background: #2563eb;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-size: 12px;
+  font-family: inherit;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s;
 }
 
-.producto-subtotal{
-  text-align:right;
-  font-weight:500;
+.add-btn:hover {
+  background: #1d4ed8;
 }
 
-.empty-products{
-  color:#6b7280;
-  font-size:14px;
+/* ── Columna derecha: productos ── */
+.productos-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
 }
 
-/* TOTAL */
-
-.orden-total{
-  margin-top:6px;
-  font-size:18px;
-  font-weight:600;
+.productos-header h4 {
+  font-size: 14px;
+  font-weight: 600;
+  color: #111827;
+  margin: 0;
 }
 
-/* BOTONES */
+.productos-count {
+  font-size: 12px;
+  color: #6b7280;
+  background: #f3f4f6;
+  padding: 2px 8px;
+  border-radius: 20px;
+}
 
-.form-actions{
-  display:flex;
-  justify-content:flex-end;
-  gap:10px;
-  margin-top:10px;
+.productos-lista {
+  flex: 1;
+  overflow-y: auto;
+  min-height: 300px;
+  max-height: 300px;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  margin-bottom: 16px;
+}
+
+.productos-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  gap: 4px;
+  padding: 40px 0;
+}
+
+.productos-empty p {
+  font-size: 13.5px;
+  font-weight: 500;
+  color: #6b7280;
+  margin: 0;
+}
+
+.productos-empty span {
+  font-size: 12px;
+  color: #9ca3af;
+}
+
+/* ── Filas de producto ── */
+.producto-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.producto-row:last-child {
+  border-bottom: none;
+}
+
+.producto-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+}
+
+.producto-nombre {
+  font-size: 13px;
+  font-weight: 500;
+  color: #111827;
+}
+
+.producto-info small {
+  font-size: 11px;
+  color: #9ca3af;
+}
+
+.producto-controles {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.cantidad-input {
+  width: 52px;
+  padding: 5px 8px;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  font-size: 13px;
+  text-align: center;
+  font-family: inherit;
+}
+
+.producto-subtotal {
+  font-size: 13px;
+  font-weight: 600;
+  color: #111827;
+  min-width: 64px;
+  text-align: right;
+}
+
+.delete-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #9ca3af;
+  display: flex;
+  align-items: center;
+  padding: 4px;
+  border-radius: 4px;
+  transition: color 0.15s, background 0.15s;
+}
+
+.delete-btn:hover {
+  color: #dc2626;
+  background: #fee2e2;
+}
+
+/* ── Total ── */
+.orden-total-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  border-top: 1px solid #e5e7eb;
+  margin-bottom: 16px;
+  font-size: 14px;
+  color: #374151;
+}
+
+.orden-total-row strong {
+  font-size: 18px;
+  font-weight: 700;
+  color: #111827;
+}
+
+/* ── Acciones ── */
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
 }
