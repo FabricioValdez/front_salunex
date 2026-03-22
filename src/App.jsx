@@ -12,6 +12,7 @@ import Ordenes from "./pages/Ordenes";
 import ControlDeCalidad from "./pages/ControlDeCalidad";
 import Inventario from "./pages/Inventario";
 import Dashboard from "./pages/Dashboard";
+import Suscripcion from "./pages/Suscripcion";
 
 /* ================= PROTEGER RUTAS ================= */
 
@@ -49,8 +50,8 @@ function App() {
           <Route path="ordenes" element={<Ordenes />} />
           {/* <Route path="farmacias" element={<Farmacias />} /> */}
           <Route path="control" element={<ControlDeCalidad />} />
-          <Route path="dashboard" element={<Dashboard />} /> 
-
+          <Route path="dashboard" element={<Dashboard />} />
+          <Route path="suscripcion" element={<Suscripcion />} />
         </Route>
 
       </Routes>

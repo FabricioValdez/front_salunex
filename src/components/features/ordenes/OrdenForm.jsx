@@ -1,6 +1,7 @@
 import { useState, useContext } from "react";
 import InventoryContext from "../../../context/InventoryContext";
 import SearchBar from "../../ui/SearchBar";
+import { Trash2 } from "lucide-react";
 import "./OrdenForm.css";
 
 const OrdenForm = ({ onSubmit, onClose }) => {
@@ -12,18 +13,13 @@ const OrdenForm = ({ onSubmit, onClose }) => {
   const [busqueda, setBusqueda] = useState("");
   const [productos, setProductos] = useState([]);
 
-  // Filtrar medicamentos
   const medicamentosFiltrados = inventario.filter((med) =>
     med.nombre.toLowerCase().includes(busqueda.toLowerCase())
   );
 
-  // Agregar medicamento
   const agregarProducto = (med) => {
-
     const existe = productos.find(p => p.id === med.id);
-
     if (existe) {
-
       setProductos(
         productos.map(p =>
           p.id === med.id
@@ -31,178 +27,170 @@ const OrdenForm = ({ onSubmit, onClose }) => {
             : p
         )
       );
-
     } else {
-
       setProductos([
         ...productos,
-        {
-          id: med.id,
-          nombre: med.nombre,
-          precio: med.precio,
-          cantidad: 1
-        }
+        { id: med.id, nombre: med.nombre, precio: med.precio, cantidad: 1 }
       ]);
-
     }
   };
 
-  // Cambiar cantidad
   const cambiarCantidad = (id, cantidad) => {
-
     setProductos(
       productos.map(p =>
-        p.id === id
-          ? { ...p, cantidad: Number(cantidad) }
-          : p
+        p.id === id ? { ...p, cantidad: Number(cantidad) } : p
       )
     );
-
   };
 
-  // Calcular total
+  const eliminarProducto = (id) => {
+    setProductos(productos.filter(p => p.id !== id));
+  };
+
   const total = productos.reduce(
-    (acc, p) => acc + p.precio * p.cantidad,
-    0
+    (acc, p) => acc + p.precio * p.cantidad, 0
   );
 
   const handleSubmit = (e) => {
-
     e.preventDefault();
-
-    const nuevaOrden = {
-      proveedor,
-      fecha: new Date().toISOString().split("T")[0],
-      estatus,
-      productos,
-      total
-    };
-
-    onSubmit(nuevaOrden);
+    onSubmit({ proveedor, fecha: new Date().toISOString().split("T")[0], estatus, productos, total });
     onClose();
   };
 
   return (
-
     <form onSubmit={handleSubmit} className="orden-form">
 
-      <div className="form-group">
-        <label>Proveedor</label>
-        <input
-          type="text"
-          value={proveedor}
-          onChange={(e) => setProveedor(e.target.value)}
-          placeholder="Nombre del proveedor"
-          required
-        />
-      </div>
+      <div className="orden-form-grid">
 
-      <div className="form-group">
-        <label>Buscar medicamento</label>
+        {/* ── Columna izquierda: datos generales ── */}
+        <div className="orden-col orden-col-left">
 
-        <SearchBar
-          placeholder="Buscar medicamento..."
-          value={busqueda}
-          onChange={(e) => setBusqueda(e.target.value)}
-        />
-      </div>
+          <div className="form-group">
+            <label>Farmacia</label>
+            <input
+              type="text"
+              value={proveedor}
+              onChange={(e) => setProveedor(e.target.value)}
+              placeholder="Nombre del proveedor"
+              required
+            />
+          </div>
 
-      {busqueda && (
-        <div className="med-list">
+          <div className="form-group">
+            <label>Estatus</label>
+            <select
+              value={estatus}
+              onChange={(e) => setEstatus(e.target.value)}
+            >
+              <option value="enviado">Enviado</option>
+              <option value="completado">Completado</option>
+              <option value="cancelado">Cancelado</option>
+            </select>
+          </div>
 
-          {medicamentosFiltrados.slice(0, 5).map((med) => (
+          <div className="form-group">
+            <label>Buscar medicamento</label>
+            <SearchBar
+              placeholder="Buscar medicamento..."
+              value={busqueda}
+              onChange={(e) => setBusqueda(e.target.value)}
+            />
+          </div>
 
-            <div key={med.id} className="med-item">
-
-              <span>
-                {med.nombre}
-                <small>${med.precio}</small>
-              </span>
-
-              <button
-                type="button"
-                className="add-btn"
-                onClick={() => agregarProducto(med)}
-              >
-                Agregar
-              </button>
-
+          {/* Lista de resultados de búsqueda */}
+          {busqueda && (
+            <div className="med-list">
+              {medicamentosFiltrados.length === 0 ? (
+                <p className="med-empty">Sin resultados para "{busqueda}"</p>
+              ) : (
+                medicamentosFiltrados.slice(0, 6).map((med) => (
+                  <div key={med.id} className="med-item">
+                    <div className="med-item-info">
+                      <span className="med-nombre">{med.nombre}</span>
+                      <small className="med-precio">${med.precio} MXN</small>
+                    </div>
+                    <button
+                      type="button"
+                      className="add-btn"
+                      onClick={() => agregarProducto(med)}
+                    >
+                      + Agregar
+                    </button>
+                  </div>
+                ))
+              )}
             </div>
-
-          ))}
-
-        </div>
-      )}
-
-      <h4 className="section-title">Productos seleccionados</h4>
-
-      {productos.length === 0 && (
-        <p className="empty-products">
-          No hay medicamentos agregados
-        </p>
-      )}
-
-      {productos.map((p) => (
-
-        <div key={p.id} className="producto-row">
-
-          <span className="producto-nombre">
-            {p.nombre}
-          </span>
-
-          <input
-            type="number"
-            min="1"
-            value={p.cantidad}
-            onChange={(e) =>
-              cambiarCantidad(p.id, e.target.value)
-            }
-          />
-
-          <span className="producto-subtotal">
-            ${(p.precio * p.cantidad).toFixed(2)}
-          </span>
+          )}
 
         </div>
 
-      ))}
+        {/* ── Columna derecha: productos seleccionados ── */}
+        <div className="orden-col orden-col-right">
 
-      <h3 className="orden-total">
-        Total: ${total.toFixed(2)}
-      </h3>
+          <div className="productos-header">
+            <h4>Productos seleccionados</h4>
+            {productos.length > 0 && (
+              <span className="productos-count">{productos.length} ítem{productos.length > 1 ? "s" : ""}</span>
+            )}
+          </div>
 
-      <div className="form-group">
+          <div className="productos-lista">
+            {productos.length === 0 ? (
+              <div className="productos-empty">
+                <p>Busca y agrega medicamentos</p>
+                <span>Los productos aparecerán aquí</span>
+              </div>
+            ) : (
+              productos.map((p) => (
+                <div key={p.id} className="producto-row">
 
-        <label>Estatus</label>
+                  <div className="producto-info">
+                    <span className="producto-nombre">{p.nombre}</span>
+                    <small>${p.precio} MXN c/u</small>
+                  </div>
 
-        <select
-          value={estatus}
-          onChange={(e) => setEstatus(e.target.value)}
-        >
-          <option value="enviado">Enviado</option>
-          <option value="completado">Completado</option>
-          <option value="cancelado">Cancelado</option>
-        </select>
+                  <div className="producto-controles">
+                    <input
+                      type="number"
+                      min="1"
+                      value={p.cantidad}
+                      onChange={(e) => cambiarCantidad(p.id, e.target.value)}
+                      className="cantidad-input"
+                    />
+                    <span className="producto-subtotal">
+                      ${(p.precio * p.cantidad).toLocaleString()}
+                    </span>
+                    <button
+                      type="button"
+                      className="delete-btn"
+                      onClick={() => eliminarProducto(p.id)}
+                    >
+                      <Trash2 size={14} />
+                    </button>
+                  </div>
 
-      </div>
+                </div>
+              ))
+            )}
+          </div>
 
-      <div className="form-actions">
+          {/* Total */}
+          <div className="orden-total-row">
+            <span>Total</span>
+            <strong>${total.toLocaleString()} MXN</strong>
+          </div>
 
-        <button
-          type="button"
-          onClick={onClose}
-          className="secondary-btn"
-        >
-          Cancelar
-        </button>
+          {/* Acciones */}
+          <div className="form-actions">
+            <button type="button" onClick={onClose} className="secondary-btn">
+              Cancelar
+            </button>
+            <button type="submit" className="primary-btn">
+              Guardar Orden
+            </button>
+          </div>
 
-        <button
-          type="submit"
-          className="primary-btn"
-        >
-          Guardar Orden
-        </button>
-
+        </div>
       </div>
 
     </form>

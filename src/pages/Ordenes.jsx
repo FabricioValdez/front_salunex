@@ -143,6 +143,7 @@ const Ordenes = () => {
         isOpen={openModal}
         onClose={() => setOpenModal(false)}
         title="Orden de Compra"
+        className="orden-modal-wide"
       >
         <OrdenForm
           onSubmit={agregarOrden}
