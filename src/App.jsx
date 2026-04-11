@@ -14,6 +14,7 @@ import Usuarios from "./pages/admin/Usuarios";
 import Empresas from "./pages/admin/Empresas";
 import Farmacias from "./pages/admin/Farmacias";
 import Almacenes from "./pages/admin/Almacenes";
+import Productos from "./pages/admin/Productos";
 import CategoriaProducto from "./pages/admin/CategoriaProducto";
 import ClasificacionProducto from "./pages/admin/ClasificacionProducto";
 import PresentacionProducto from "./pages/admin/PresentacionProducto";
@@ -71,6 +72,7 @@ function App() {
           <Route path="empresas" element={<Empresas />} />
           <Route path="farmacias" element={<Farmacias />} />
           <Route path="almacenes" element={<Almacenes />} />
+          <Route path="productos" element={<Productos />} />
           <Route path="categorias-producto" element={<CategoriaProducto />} />
           <Route path="clasificaciones-producto" element={<ClasificacionProducto />} />
           <Route path="presentaciones-producto" element={<PresentacionProducto />} />

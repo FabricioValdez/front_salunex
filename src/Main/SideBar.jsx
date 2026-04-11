@@ -2,8 +2,8 @@ import { useState, useContext } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import {
   House, ClipboardList, ShoppingCart, Package,
-  LayoutDashboard, Menu, Settings,
-  Users, Building2, Pill, Tag, Layers, FlaskConical, Syringe, ArrowLeftRight
+  LayoutDashboard, Menu, Settings, Tablets,
+  Users, Building2, Pill, Tag, Layers, FlaskConical, Syringe, ArrowLeftRight,
 } from "lucide-react";
 import AuthContext from "../context/AuthContext";
 import { logout } from "../services/authService";
@@ -22,6 +22,7 @@ const menuPorRol = {
     { to: "/admin/empresas", icon: Building2, label: "Empresas" },
     { to: "/admin/farmacias", icon: Pill, label: "Farmacias" },
     { to: "/admin/almacenes", icon: Package, label: "Almacenes" },
+    { to: "/admin/productos", icon: Tablets, label: "Productos" },
     { to: "/admin/categorias-producto", icon: Tag, label: "Categorías" },
     { to: "/admin/clasificaciones-producto", icon: Layers, label: "Clasificaciones" },
     { to: "/admin/presentaciones-producto", icon: FlaskConical, label: "Presentaciones" },

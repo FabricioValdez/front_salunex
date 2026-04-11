@@ -9,6 +9,7 @@ export function CatalogosProvider({ children }) {
     const [empresas, setEmpresas] = useState([]);
     const [farmacias, setFarmacias] = useState([]);
     const [almacenes, setAlmacenes] = useState([]);
+    const [productos, setProductos] = useState([]);
     const [categoriasProducto, setCategoriasProducto] = useState([]);
     const [clasificacionesProducto, setClasificacionesProducto] = useState([]);
     const [presentacionesProducto, setPresentacionesProducto] = useState([]);
@@ -30,6 +31,7 @@ export function CatalogosProvider({ children }) {
                 empresasRes,
                 farmaciasRes,
                 almacenesRes,
+                productosRes,
                 categoriasRes,
                 clasificacionesRes,
                 presentacionesRes,
@@ -40,6 +42,7 @@ export function CatalogosProvider({ children }) {
                 api.get('/empresas'),
                 api.get('/farmacias'),
                 api.get('/almacenes'),
+                api.get('/productos'),
                 api.get('/categorias-producto'),
                 api.get('/clasificaciones-producto'),
                 api.get('/presentaciones-producto'),
@@ -50,6 +53,7 @@ export function CatalogosProvider({ children }) {
             setEmpresas(empresasRes.data);
             setFarmacias(farmaciasRes.data);
             setAlmacenes(almacenesRes.data);
+            setProductos(productosRes.data);
             setCategoriasProducto(categoriasRes.data);
             setClasificacionesProducto(clasificacionesRes.data);
             setPresentacionesProducto(presentacionesRes.data);
@@ -68,6 +72,7 @@ export function CatalogosProvider({ children }) {
             empresas: setEmpresas,
             farmacias: setFarmacias,
             almacenes: setAlmacenes,
+            productos: setProductos,
             categoriasProducto: setCategoriasProducto,
             clasificacionesProducto: setClasificacionesProducto,
             presentacionesProducto: setPresentacionesProducto,
@@ -85,6 +90,7 @@ export function CatalogosProvider({ children }) {
             empresas: '/empresas',
             farmacias: '/farmacias',
             almacenes: '/almacenes',
+            productos: '/productos',
             categoriasProducto: '/categorias-producto',
             clasificacionesProducto: '/clasificaciones-producto',
             presentacionesProducto: '/presentaciones-producto',
@@ -106,6 +112,7 @@ export function CatalogosProvider({ children }) {
             empresas,
             farmacias,
             almacenes,
+            productos,
             categoriasProducto,
             clasificacionesProducto,
             presentacionesProducto,
