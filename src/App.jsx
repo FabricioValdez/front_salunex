@@ -20,6 +20,10 @@ import ClasificacionProducto from "./pages/admin/ClasificacionProducto";
 import PresentacionProducto from "./pages/admin/PresentacionProducto";
 import ViaAdministracion from "./pages/admin/ViaAdministracion";
 import TipoMovimiento from "./pages/admin/TipoMovimiento";
+import OrdenesDeCompra from "./pages/farmacia/OrdenesDeCompra";
+import InventarioFarmacia from "./pages/farmacia/InventarioFarmacia";
+import ControlCalidadFarmacia from "./pages/farmacia/ControlCalidadFarmacia";
+import RecepcionAlmacen from "./pages/farmacia/RecepcionAlmacen";
 
 // 🔒 Protege por autenticación
 function PrivateRoute({ children }) {
@@ -104,6 +108,10 @@ function App() {
               <h2>💊 Panel Farmacia</h2>
             </div>
           } />
+          <Route path="ordenes" element={<OrdenesDeCompra />} />
+          <Route path="inventario" element={<InventarioFarmacia />} />
+          <Route path="control-calidad" element={<ControlCalidadFarmacia />} />
+          <Route path="recepcion-almacen" element={<RecepcionAlmacen />} />
         </Route>
 
       </Routes>

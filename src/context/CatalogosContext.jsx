@@ -5,17 +5,19 @@ import AuthContext from "./AuthContext";
 const CatalogosContext = createContext();
 
 export function CatalogosProvider({ children }) {
-    const [roles, setRoles] = useState([]);
-    const [empresas, setEmpresas] = useState([]);
-    const [farmacias, setFarmacias] = useState([]);
-    const [almacenes, setAlmacenes] = useState([]);
-    const [productos, setProductos] = useState([]);
-    const [categoriasProducto, setCategoriasProducto] = useState([]);
+    const [roles, setRoles]                                     = useState([]);
+    const [empresas, setEmpresas]                               = useState([]);
+    const [farmacias, setFarmacias]                             = useState([]);
+    const [almacenes, setAlmacenes]                             = useState([]);
+    const [productos, setProductos]                             = useState([]);
+    const [movimientos, setMovimientos]                         = useState([]);
+    const [inventario, setInventario]                           = useState([]);
+    const [categoriasProducto, setCategoriasProducto]           = useState([]);
     const [clasificacionesProducto, setClasificacionesProducto] = useState([]);
-    const [presentacionesProducto, setPresentacionesProducto] = useState([]);
-    const [viasAdministracion, setViasAdministracion] = useState([]);
-    const [tiposMovimiento, setTiposMovimiento] = useState([]);
-    const [loading, setLoading] = useState(false);
+    const [presentacionesProducto, setPresentacionesProducto]   = useState([]);
+    const [viasAdministracion, setViasAdministracion]           = useState([]);
+    const [tiposMovimiento, setTiposMovimiento]                 = useState([]);
+    const [loading, setLoading]                                 = useState(false);
 
     const { user } = useContext(AuthContext);
 
@@ -32,6 +34,8 @@ export function CatalogosProvider({ children }) {
                 farmaciasRes,
                 almacenesRes,
                 productosRes,
+                movimientosRes,
+                inventarioRes,
                 categoriasRes,
                 clasificacionesRes,
                 presentacionesRes,
@@ -43,6 +47,8 @@ export function CatalogosProvider({ children }) {
                 api.get('/farmacias'),
                 api.get('/almacenes'),
                 api.get('/productos'),
+                api.get('/movimientos'),
+                api.get('/inventario'),
                 api.get('/categorias-producto'),
                 api.get('/clasificaciones-producto'),
                 api.get('/presentaciones-producto'),
@@ -54,6 +60,8 @@ export function CatalogosProvider({ children }) {
             setFarmacias(farmaciasRes.data);
             setAlmacenes(almacenesRes.data);
             setProductos(productosRes.data);
+            setMovimientos(movimientosRes.data);
+            setInventario(inventarioRes.data);
             setCategoriasProducto(categoriasRes.data);
             setClasificacionesProducto(clasificacionesRes.data);
             setPresentacionesProducto(presentacionesRes.data);
@@ -68,16 +76,18 @@ export function CatalogosProvider({ children }) {
 
     const refreshCatalogo = async (catalogo, nuevosDatos = null) => {
         const setters = {
-            roles: setRoles,
-            empresas: setEmpresas,
-            farmacias: setFarmacias,
-            almacenes: setAlmacenes,
-            productos: setProductos,
-            categoriasProducto: setCategoriasProducto,
+            roles:                   setRoles,
+            empresas:                setEmpresas,
+            farmacias:               setFarmacias,
+            almacenes:               setAlmacenes,
+            productos:               setProductos,
+            movimientos:             setMovimientos,
+            inventario:              setInventario,
+            categoriasProducto:      setCategoriasProducto,
             clasificacionesProducto: setClasificacionesProducto,
-            presentacionesProducto: setPresentacionesProducto,
-            viasAdministracion: setViasAdministracion,
-            tiposMovimiento: setTiposMovimiento,
+            presentacionesProducto:  setPresentacionesProducto,
+            viasAdministracion:      setViasAdministracion,
+            tiposMovimiento:         setTiposMovimiento,
         };
 
         if (nuevosDatos) {
@@ -86,16 +96,18 @@ export function CatalogosProvider({ children }) {
         }
 
         const endpoints = {
-            roles: '/roles',
-            empresas: '/empresas',
-            farmacias: '/farmacias',
-            almacenes: '/almacenes',
-            productos: '/productos',
-            categoriasProducto: '/categorias-producto',
+            roles:                   '/roles',
+            empresas:                '/empresas',
+            farmacias:               '/farmacias',
+            almacenes:               '/almacenes',
+            productos:               '/productos',
+            movimientos:             '/movimientos',
+            inventario:              '/inventario',
+            categoriasProducto:      '/categorias-producto',
             clasificacionesProducto: '/clasificaciones-producto',
-            presentacionesProducto: '/presentaciones-producto',
-            viasAdministracion: '/vias-administracion',
-            tiposMovimiento: '/tipos-movimiento',
+            presentacionesProducto:  '/presentaciones-producto',
+            viasAdministracion:      '/vias-administracion',
+            tiposMovimiento:         '/tipos-movimiento',
         };
 
         try {
@@ -113,6 +125,8 @@ export function CatalogosProvider({ children }) {
             farmacias,
             almacenes,
             productos,
+            movimientos,
+            inventario,
             categoriasProducto,
             clasificacionesProducto,
             presentacionesProducto,

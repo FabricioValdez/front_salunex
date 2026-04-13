@@ -2,6 +2,7 @@ import { useState, useContext } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import {
   House, ClipboardList, ShoppingCart, Package,
+  PackageCheck, ClipboardCheck,
   LayoutDashboard, Menu, Settings, Tablets,
   Users, Building2, Pill, Tag, Layers, FlaskConical, Syringe, ArrowLeftRight,
 } from "lucide-react";
@@ -37,6 +38,8 @@ const menuPorRol = {
     { to: "/farmacia", icon: Pill, label: "Inicio" },
     { to: "/farmacia/inventario", icon: Package, label: "Mi inventario" },
     { to: "/farmacia/ordenes", icon: ShoppingCart, label: "Mis órdenes" },
+    { to: "/farmacia/control-calidad", icon: ClipboardCheck, label: "Control de calidad" },
+    { to: "/farmacia/recepcion-almacen", icon: PackageCheck, label: "Recepción de almacén" },
   ],
 };
 
