@@ -8,57 +8,37 @@ import Modal from "../../components/ui/Modal";
 import SearchBar from "../../components/ui/SearchBar";
 import { useCatalogos } from "../../context/CatalogosContext";
 import api from "../../services/api";
+import "../../styles/admin/Catalogos.css";
 
-// ── Formulario ──
 function EmpresaForm({ form, setForm, onSubmit, onClose, loading, error }) {
     return (
         <>
-            {error && (
-                <div className="alert alert-danger py-2 text-center mb-3">
-                    {error}
-                </div>
-            )}
+            {error && <div className="alert alert-danger py-2 text-center mb-3">{error}</div>}
             <div className="mb-3">
                 <label className="form-label">Nombre</label>
-                <input
-                    type="text"
-                    className="form-control"
-                    value={form.nombre}
+                <input type="text" className="form-control" value={form.nombre}
                     onChange={(e) => setForm({ ...form, nombre: e.target.value })}
-                    placeholder="Nombre de la empresa"
-                />
+                    placeholder="Nombre de la empresa" />
             </div>
             <div className="mb-3">
                 <label className="form-label">Dirección</label>
-                <input
-                    type="text"
-                    className="form-control"
-                    value={form.direccion}
+                <input type="text" className="form-control" value={form.direccion}
                     onChange={(e) => setForm({ ...form, direccion: e.target.value })}
-                    placeholder="Dirección"
-                />
+                    placeholder="Dirección" />
             </div>
             <div className="mb-3">
                 <label className="form-label">Teléfono</label>
-                <input
-                    type="text"
-                    className="form-control"
-                    value={form.telefono}
+                <input type="text" className="form-control" value={form.telefono}
                     onChange={(e) => setForm({ ...form, telefono: e.target.value })}
-                    placeholder="Teléfono"
-                />
+                    placeholder="Teléfono" />
             </div>
             <div className="mb-4">
                 <label className="form-label">Email</label>
-                <input
-                    type="email"
-                    className="form-control"
-                    value={form.email}
+                <input type="email" className="form-control" value={form.email}
                     onChange={(e) => setForm({ ...form, email: e.target.value })}
-                    placeholder="correo@empresa.com"
-                />
+                    placeholder="correo@empresa.com" />
             </div>
-            <div className="d-flex gap-2 justify-content-end">
+            <div className="form-actions">
                 <Button variant="secondary" onClick={onClose}>Cancelar</Button>
                 <Button variant="primary" onClick={onSubmit} disabled={loading}>
                     {loading ? "Guardando..." : "Guardar"}
@@ -68,14 +48,13 @@ function EmpresaForm({ form, setForm, onSubmit, onClose, loading, error }) {
     );
 }
 
-// ── Modal eliminar ──
-function DeleteModal({ isOpen, onClose, onConfirm, loading, empresa }) {
+function DeleteModal({ isOpen, onClose, onConfirm, loading, item }) {
     return (
         <Modal isOpen={isOpen} onClose={onClose} title="Eliminar empresa">
             <p style={{ color: "#4b5563", marginBottom: 20 }}>
-                ¿Estás seguro de eliminar la empresa <strong>{empresa?.nombre}</strong>? Esta acción no se puede deshacer.
+                ¿Estás seguro de eliminar la empresa <strong>{item?.nombre}</strong>? Esta acción no se puede deshacer.
             </p>
-            <div className="d-flex gap-2 justify-content-end">
+            <div className="form-actions">
                 <Button variant="secondary" onClick={onClose}>Cancelar</Button>
                 <Button variant="danger" onClick={onConfirm} disabled={loading}>
                     {loading ? "Eliminando..." : "Eliminar"}
@@ -85,24 +64,20 @@ function DeleteModal({ isOpen, onClose, onConfirm, loading, empresa }) {
     );
 }
 
-// ── Página principal ──
 function Empresas() {
-    const { empresas, refreshCatalogo } = useCatalogos(); // 👈 Del context
+    const { empresas, refreshCatalogo } = useCatalogos();
     const [search, setSearch]             = useState("");
     const [loading, setLoading]           = useState(false);
     const [error, setError]               = useState("");
-
     const [modalOpen, setModalOpen]       = useState(false);
     const [isEdit, setIsEdit]             = useState(false);
     const [editId, setEditId]             = useState(null);
     const [form, setForm]                 = useState({ nombre: "", direccion: "", telefono: "", email: "" });
-
     const [deleteOpen, setDeleteOpen]     = useState(false);
     const [deleteTarget, setDeleteTarget] = useState(null);
 
-    const empresasFiltradas = empresas.filter((e) =>
-        e.nombre.toLowerCase().includes(search.toLowerCase()) ||
-        (e.email && e.email.toLowerCase().includes(search.toLowerCase()))
+    const filtrados = empresas.filter((e) =>
+        e.nombre.toLowerCase().includes(search.toLowerCase())
     );
 
     const handleNuevo = () => {
@@ -113,21 +88,16 @@ function Empresas() {
         setModalOpen(true);
     };
 
-    const handleEditar = (empresa) => {
-        setForm({
-            nombre:    empresa.nombre,
-            direccion: empresa.direccion ?? "",
-            telefono:  empresa.telefono  ?? "",
-            email:     empresa.email     ?? "",
-        });
+    const handleEditar = (item) => {
+        setForm({ nombre: item.nombre, direccion: item.direccion, telefono: item.telefono, email: item.email });
         setIsEdit(true);
-        setEditId(empresa.id);
+        setEditId(item.id);
         setError("");
         setModalOpen(true);
     };
 
-    const handleEliminar = (empresa) => {
-        setDeleteTarget(empresa);
+    const handleEliminar = (item) => {
+        setDeleteTarget(item);
         setDeleteOpen(true);
     };
 
@@ -137,11 +107,14 @@ function Empresas() {
         try {
             if (isEdit) {
                 await api.put(`/empresas/${editId}`, form);
+                refreshCatalogo('empresas', empresas.map((e) =>
+                    e.id === editId ? { ...e, ...form } : e
+                ));
             } else {
-                await api.post('/empresas', form);
+                const res = await api.post('/empresas', form);
+                refreshCatalogo('empresas', [...empresas, res.data.empresa]);
             }
             setModalOpen(false);
-            refreshCatalogo('empresas'); // 👈 Refresca el context
         } catch (e) {
             setError(e.response?.data?.message || e.message);
         } finally {
@@ -153,9 +126,9 @@ function Empresas() {
         setLoading(true);
         try {
             await api.delete(`/empresas/${deleteTarget.id}`);
+            refreshCatalogo('empresas', empresas.filter((e) => e.id !== deleteTarget.id));
             setDeleteOpen(false);
             setDeleteTarget(null);
-            refreshCatalogo('empresas'); // 👈 Refresca el context
         } catch (e) {
             console.error(e);
         } finally {
@@ -163,16 +136,11 @@ function Empresas() {
         }
     };
 
-    const columns = ["#", "Nombre", "Dirección", "Teléfono", "Email", "Acciones"];
-
     return (
         <PageContainer>
             <div className="dashboard-header">
-                <SearchBar
-                    placeholder="Buscar por nombre o email..."
-                    value={search}
-                    onChange={(e) => setSearch(e.target.value)}
-                />
+                <SearchBar placeholder="Buscar empresa..." value={search}
+                    onChange={(e) => setSearch(e.target.value)} />
                 <Button variant="primary" icon={Plus} onClick={handleNuevo}>
                     Nueva empresa
                 </Button>
@@ -185,21 +153,21 @@ function Empresas() {
 
             <DataCard>
                 <Table
-                    columns={columns}
-                    data={empresasFiltradas}
-                    renderRow={(empresa, index) => (
-                        <tr key={empresa.id}>
+                    columns={["#", "Nombre", "Dirección", "Teléfono", "Email", "Acciones"]}
+                    data={filtrados}
+                    renderRow={(item, index) => (
+                        <tr key={item.id}>
                             <td>{index + 1}</td>
-                            <td><strong>{empresa.nombre}</strong></td>
-                            <td>{empresa.direccion ?? "—"}</td>
-                            <td>{empresa.telefono  ?? "—"}</td>
-                            <td>{empresa.email     ?? "—"}</td>
+                            <td><strong>{item.nombre}</strong></td>
+                            <td>{item.direccion}</td>
+                            <td>{item.telefono}</td>
+                            <td>{item.email}</td>
                             <td>
                                 <div className="table-actions">
-                                    <button className="action-btn" onClick={() => handleEditar(empresa)}>
+                                    <button className="action-btn" onClick={() => handleEditar(item)}>
                                         <Pencil size={16} color="#3b82f6" />
                                     </button>
-                                    <button className="action-btn" onClick={() => handleEliminar(empresa)}>
+                                    <button className="action-btn" onClick={() => handleEliminar(item)}>
                                         <Trash2 size={16} color="#ef4444" />
                                     </button>
                                 </div>
@@ -209,28 +177,14 @@ function Empresas() {
                 />
             </DataCard>
 
-            <Modal
-                isOpen={modalOpen}
-                onClose={() => setModalOpen(false)}
-                title={isEdit ? "Editar empresa" : "Nueva empresa"}
-            >
-                <EmpresaForm
-                    form={form}
-                    setForm={setForm}
-                    onSubmit={handleSubmit}
-                    onClose={() => setModalOpen(false)}
-                    loading={loading}
-                    error={error}
-                />
+            <Modal isOpen={modalOpen} onClose={() => setModalOpen(false)}
+                title={isEdit ? "Editar empresa" : "Nueva empresa"}>
+                <EmpresaForm form={form} setForm={setForm} onSubmit={handleSubmit}
+                    onClose={() => setModalOpen(false)} loading={loading} error={error} />
             </Modal>
 
-            <DeleteModal
-                isOpen={deleteOpen}
-                onClose={() => setDeleteOpen(false)}
-                onConfirm={handleConfirmDelete}
-                loading={loading}
-                empresa={deleteTarget}
-            />
+            <DeleteModal isOpen={deleteOpen} onClose={() => setDeleteOpen(false)}
+                onConfirm={handleConfirmDelete} loading={loading} item={deleteTarget} />
         </PageContainer>
     );
 }

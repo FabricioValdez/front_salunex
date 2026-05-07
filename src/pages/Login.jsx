@@ -3,7 +3,7 @@ import { Container, Row, Col, Card, Form, Button } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import AuthContext from "../context/AuthContext";
 import { login } from "../services/authService";
-import "../styles/Login.css";
+import "../styles/auth/Login.css";
 
 function Login() {
   const [email, setEmail] = useState("");

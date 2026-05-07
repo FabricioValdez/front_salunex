@@ -1,4 +1,4 @@
-import "../styles/Ordenes.css";
+import "../styles/almacen/Ordenes.css";
 import { Search, Plus, Clock, AlertTriangle, DollarSign } from "lucide-react";
 import { useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";

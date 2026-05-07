@@ -1,0 +1,77 @@
+/* ── Buscador y botón ── */
+.inventario-actions {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 16px;
+    align-items: center;
+}
+
+.inventario-search {
+    flex: 1;
+    position: relative;
+}
+
+.inventario-search input {
+    width: 100%;
+    padding: 10px 36px 10px 12px;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    font-size: 14px;
+    font-family: inherit;
+}
+
+.inventario-search input:focus {
+    outline: none;
+    border-color: #3b82f6;
+}
+
+.inventario-search-icon {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #9ca3af;
+}
+
+/* ── Tabla ── */
+.inventario-tabla {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.inventario-tabla th {
+    padding: 12px 16px;
+    text-align: left;
+    font-size: 13px;
+    color: #6b7280;
+    font-weight: 500;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.inventario-tabla td {
+    padding: 14px 16px;
+    border-bottom: 1px solid #f3f4f6;
+}
+
+.inventario-tabla tr:last-child td {
+    border-bottom: none;
+}
+
+.inventario-nombre p {
+    margin: 0;
+    font-weight: 600;
+}
+
+.inventario-nombre span {
+    font-size: 12px;
+    color: #6b7280;
+}
+
+.inventario-cantidad strong {
+    display: block;
+}
+
+.inventario-cantidad span {
+    font-size: 12px;
+    color: #6b7280;
+}

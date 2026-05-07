@@ -1,0 +1,129 @@
+/* ── Layout principal ── */
+.editar-usuario-header {
+    margin-bottom: 24px;
+}
+
+.editar-usuario-back {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #6b7280;
+    font-size: 14px;
+    margin-bottom: 12px;
+    padding: 0;
+}
+
+.editar-usuario-back:hover {
+    color: #374151;
+}
+
+.editar-usuario-header h1 {
+    margin: 0;
+    font-size: 24px;
+    font-weight: 700;
+}
+
+.editar-usuario-header p {
+    margin: 4px 0 0;
+    color: #6b7280;
+}
+
+.editar-usuario-grid {
+    display: grid;
+    grid-template-columns: 300px 1fr;
+    gap: 24px;
+    align-items: start;
+}
+
+/* ── Info card ── */
+.usuario-info-card {
+    background: white;
+    border-radius: 12px;
+    border: 1px solid #e5e7eb;
+    padding: 24px;
+    position: sticky;
+    top: 20px;
+}
+
+.usuario-info-card h3 {
+    margin: 0 0 20px;
+    font-size: 15px;
+    font-weight: 600;
+}
+
+/* ── Permisos ── */
+.permisos-card {
+    background: white;
+    border-radius: 12px;
+    border: 1px solid #e5e7eb;
+    overflow: hidden;
+}
+
+.permisos-card-header {
+    padding: 16px 20px;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.permisos-card-header h3 {
+    margin: 0;
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.permisos-card-header p {
+    margin: 4px 0 0;
+    font-size: 13px;
+    color: #6b7280;
+}
+
+/* ── Tabla permisos ── */
+.permisos-tabla {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.permisos-tabla th {
+    padding: 12px 16px;
+    text-align: left;
+    font-size: 13px;
+    color: #6b7280;
+    font-weight: 500;
+    background: #f9fafb;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.permisos-tabla th.center,
+.permisos-tabla td.center {
+    text-align: center;
+}
+
+.permisos-tabla td {
+    padding: 14px 16px;
+    border-bottom: 1px solid #f3f4f6;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.permisos-tabla tr:last-child td {
+    border-bottom: none;
+}
+
+/* ── Checkbox ── */
+.permiso-checkbox {
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+    accent-color: #3b82f6;
+}
+
+/* ── Th Todo ── */
+.th-todo {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    font-size: 11px;
+}

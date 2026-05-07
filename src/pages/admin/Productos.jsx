@@ -8,159 +8,97 @@ import Modal from "../../components/ui/Modal";
 import SearchBar from "../../components/ui/SearchBar";
 import { useCatalogos } from "../../context/CatalogosContext";
 import api from "../../services/api";
+import "../../styles/admin/Catalogos.css";
 
 function ProductoForm({ form, setForm, empresas, categoriasProducto, clasificacionesProducto, presentacionesProducto, viasAdministracion, onSubmit, onClose, loading, error }) {
     return (
         <>
             {error && <div className="alert alert-danger py-2 text-center mb-3">{error}</div>}
-
             <div className="row">
-                {/* ── Columna izquierda ── */}
                 <div className="col-6">
                     <div className="mb-3">
                         <label className="form-label">Nombre</label>
-                        <input
-                            type="text"
-                            className="form-control"
-                            value={form.nombre}
+                        <input type="text" className="form-control" value={form.nombre}
                             onChange={(e) => setForm({ ...form, nombre: e.target.value })}
-                            placeholder="Nombre del producto"
-                        />
+                            placeholder="Nombre del producto" />
                     </div>
-
                     <div className="mb-3">
                         <label className="form-label">Código interno</label>
-                        <input
-                            type="text"
-                            className="form-control"
-                            value={form.codigo_interno}
+                        <input type="text" className="form-control" value={form.codigo_interno}
                             onChange={(e) => setForm({ ...form, codigo_interno: e.target.value })}
-                            placeholder="Código interno"
-                        />
+                            placeholder="Código interno" />
                     </div>
-
                     <div className="mb-3">
                         <label className="form-label">Precio</label>
-                        <input
-                            type="number"
-                            className="form-control"
-                            value={form.precio}
+                        <input type="number" className="form-control" value={form.precio}
                             onChange={(e) => setForm({ ...form, precio: e.target.value })}
-                            placeholder="0.00"
-                        />
+                            placeholder="0.00" />
                     </div>
-
                     <div className="mb-3">
                         <label className="form-label">Descripción</label>
-                        <textarea
-                            className="form-control"
-                            value={form.descripcion}
+                        <textarea className="form-control" value={form.descripcion}
                             onChange={(e) => setForm({ ...form, descripcion: e.target.value })}
-                            placeholder="Descripción del producto"
-                            rows={4}
-                        />
+                            placeholder="Descripción del producto" rows={4} />
                     </div>
-
                     <div className="row">
                         <div className="col">
                             <label className="form-label">Cantidad concentración</label>
-                            <input
-                                type="number"
-                                className="form-control"
-                                value={form.cantidad_concentracion}
+                            <input type="number" className="form-control" value={form.cantidad_concentracion}
                                 onChange={(e) => setForm({ ...form, cantidad_concentracion: e.target.value })}
-                                placeholder="Ej. 500"
-                            />
+                                placeholder="Ej. 500" />
                         </div>
                         <div className="col">
                             <label className="form-label">Unidad</label>
-                            <input
-                                type="text"
-                                className="form-control"
-                                value={form.unidad_concentracion}
+                            <input type="text" className="form-control" value={form.unidad_concentracion}
                                 onChange={(e) => setForm({ ...form, unidad_concentracion: e.target.value })}
-                                placeholder="Ej. mg, ml..."
-                            />
+                                placeholder="Ej. mg, ml..." />
                         </div>
                     </div>
                 </div>
-
-                {/* ── Columna derecha ── */}
                 <div className="col-6">
                     <div className="mb-3">
                         <label className="form-label">Empresa</label>
-                        <select
-                            className="form-select"
-                            value={form.id_empresa}
-                            onChange={(e) => setForm({ ...form, id_empresa: e.target.value })}
-                        >
+                        <select className="form-select" value={form.id_empresa}
+                            onChange={(e) => setForm({ ...form, id_empresa: e.target.value })}>
                             <option value="">Selecciona una empresa</option>
-                            {empresas.map((e) => (
-                                <option key={e.id} value={e.id}>{e.nombre}</option>
-                            ))}
+                            {empresas.map((e) => <option key={e.id} value={e.id}>{e.nombre}</option>)}
                         </select>
                     </div>
-
                     <div className="mb-3">
                         <label className="form-label">Categoría</label>
-                        <select
-                            className="form-select"
-                            value={form.id_categoria_producto}
-                            onChange={(e) => setForm({ ...form, id_categoria_producto: e.target.value })}
-                        >
+                        <select className="form-select" value={form.id_categoria_producto}
+                            onChange={(e) => setForm({ ...form, id_categoria_producto: e.target.value })}>
                             <option value="">Selecciona una categoría</option>
-                            {categoriasProducto.map((c) => (
-                                <option key={c.id} value={c.id}>{c.categoria}</option>
-                            ))}
+                            {categoriasProducto.map((c) => <option key={c.id} value={c.id}>{c.categoria}</option>)}
                         </select>
                     </div>
-
                     <div className="mb-3">
                         <label className="form-label">Clasificación</label>
-                        <select
-                            className="form-select"
-                            value={form.id_clasificacion_producto}
-                            onChange={(e) => setForm({ ...form, id_clasificacion_producto: e.target.value })}
-                        >
+                        <select className="form-select" value={form.id_clasificacion_producto}
+                            onChange={(e) => setForm({ ...form, id_clasificacion_producto: e.target.value })}>
                             <option value="">Selecciona una clasificación</option>
-                            {clasificacionesProducto.map((c) => (
-                                <option key={c.id} value={c.id}>{c.clasificacion}</option>
-                            ))}
+                            {clasificacionesProducto.map((c) => <option key={c.id} value={c.id}>{c.clasificacion}</option>)}
                         </select>
                     </div>
-
                     <div className="mb-3">
                         <label className="form-label">Presentación</label>
-                        <select
-                            className="form-select"
-                            value={form.id_presentacion_producto}
-                            onChange={(e) => setForm({ ...form, id_presentacion_producto: e.target.value })}
-                        >
+                        <select className="form-select" value={form.id_presentacion_producto}
+                            onChange={(e) => setForm({ ...form, id_presentacion_producto: e.target.value })}>
                             <option value="">Selecciona una presentación</option>
-                            {presentacionesProducto.map((p) => (
-                                <option key={p.id} value={p.id}>{p.presentacion}</option>
-                            ))}
+                            {presentacionesProducto.map((p) => <option key={p.id} value={p.id}>{p.presentacion}</option>)}
                         </select>
                     </div>
-
                     <div className="mb-3">
                         <label className="form-label">Vía de administración</label>
-                        <select
-                            className="form-select"
-                            value={form.id_via_administracion}
-                            onChange={(e) => setForm({ ...form, id_via_administracion: e.target.value })}
-                        >
+                        <select className="form-select" value={form.id_via_administracion}
+                            onChange={(e) => setForm({ ...form, id_via_administracion: e.target.value })}>
                             <option value="">Selecciona una vía</option>
-                            {viasAdministracion.map((v) => (
-                                <option key={v.id} value={v.id}>{v.administracion}</option>
-                            ))}
+                            {viasAdministracion.map((v) => <option key={v.id} value={v.id}>{v.administracion}</option>)}
                         </select>
                     </div>
                 </div>
             </div>
-
-            {/* ── Botones ── */}
-            <div className="d-flex gap-2 justify-content-end mt-3">
+            <div className="form-actions mt-3">
                 <Button variant="secondary" onClick={onClose}>Cancelar</Button>
                 <Button variant="primary" onClick={onSubmit} disabled={loading}>
                     {loading ? "Guardando..." : "Guardar"}
@@ -176,7 +114,7 @@ function DeleteModal({ isOpen, onClose, onConfirm, loading, item }) {
             <p style={{ color: "#4b5563", marginBottom: 20 }}>
                 ¿Estás seguro de eliminar el producto <strong>{item?.nombre}</strong>? Esta acción no se puede deshacer.
             </p>
-            <div className="d-flex gap-2 justify-content-end">
+            <div className="form-actions">
                 <Button variant="secondary" onClick={onClose}>Cancelar</Button>
                 <Button variant="danger" onClick={onConfirm} disabled={loading}>
                     {loading ? "Eliminando..." : "Eliminar"}
@@ -187,38 +125,24 @@ function DeleteModal({ isOpen, onClose, onConfirm, loading, item }) {
 }
 
 const formVacio = {
-    nombre: "",
-    codigo_interno: "",
-    precio: "",
-    descripcion: "",
-    cantidad_concentracion: "",
-    unidad_concentracion: "",
-    id_empresa: "",
-    id_categoria_producto: "",
-    id_clasificacion_producto: "",
-    id_presentacion_producto: "",
-    id_via_administracion: "",
+    nombre: "", codigo_interno: "", precio: "", descripcion: "",
+    cantidad_concentracion: "", unidad_concentracion: "", id_empresa: "",
+    id_categoria_producto: "", id_clasificacion_producto: "",
+    id_presentacion_producto: "", id_via_administracion: "",
 };
 
 function Productos() {
-    const {
-        productos,
-        empresas,
-        categoriasProducto,
-        clasificacionesProducto,
-        presentacionesProducto,
-        viasAdministracion,
-        refreshCatalogo,
-    } = useCatalogos();
+    const { productos, empresas, categoriasProducto, clasificacionesProducto,
+        presentacionesProducto, viasAdministracion, refreshCatalogo } = useCatalogos();
 
-    const [search, setSearch] = useState("");
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState("");
-    const [modalOpen, setModalOpen] = useState(false);
-    const [isEdit, setIsEdit] = useState(false);
-    const [editId, setEditId] = useState(null);
-    const [form, setForm] = useState(formVacio);
-    const [deleteOpen, setDeleteOpen] = useState(false);
+    const [search, setSearch]             = useState("");
+    const [loading, setLoading]           = useState(false);
+    const [error, setError]               = useState("");
+    const [modalOpen, setModalOpen]       = useState(false);
+    const [isEdit, setIsEdit]             = useState(false);
+    const [editId, setEditId]             = useState(null);
+    const [form, setForm]                 = useState(formVacio);
+    const [deleteOpen, setDeleteOpen]     = useState(false);
     const [deleteTarget, setDeleteTarget] = useState(null);
 
     const filtrados = productos.filter((p) =>
@@ -237,10 +161,8 @@ function Productos() {
 
     const handleEditar = (item) => {
         setForm({
-            nombre: item.nombre,
-            codigo_interno: item.codigo_interno,
-            precio: item.precio,
-            descripcion: item.descripcion,
+            nombre: item.nombre, codigo_interno: item.codigo_interno,
+            precio: item.precio, descripcion: item.descripcion,
             cantidad_concentracion: item.cantidad_concentracion,
             unidad_concentracion: item.unidad_concentracion,
             id_empresa: item.id_empresa,
@@ -266,10 +188,9 @@ function Productos() {
         try {
             if (isEdit) {
                 await api.put(`/productos/${editId}`, form);
-                const actualizados = productos.map((p) =>
+                refreshCatalogo('productos', productos.map((p) =>
                     p.id === editId ? { ...p, ...form } : p
-                );
-                refreshCatalogo('productos', actualizados);
+                ));
             } else {
                 const res = await api.post('/productos', form);
                 refreshCatalogo('productos', [...productos, res.data.producto]);
@@ -286,8 +207,7 @@ function Productos() {
         setLoading(true);
         try {
             await api.delete(`/productos/${deleteTarget.id}`);
-            const actualizados = productos.filter((p) => p.id !== deleteTarget.id);
-            refreshCatalogo('productos', actualizados);
+            refreshCatalogo('productos', productos.filter((p) => p.id !== deleteTarget.id));
             setDeleteOpen(false);
             setDeleteTarget(null);
         } catch (e) {
@@ -297,16 +217,11 @@ function Productos() {
         }
     };
 
-    const columns = ["#", "Nombre", "Código", "Precio", "Categoría", "Empresa", "Acciones"];
-
     return (
         <PageContainer>
             <div className="dashboard-header">
-                <SearchBar
-                    placeholder="Buscar por nombre, código o empresa..."
-                    value={search}
-                    onChange={(e) => setSearch(e.target.value)}
-                />
+                <SearchBar placeholder="Buscar por nombre, código o empresa..." value={search}
+                    onChange={(e) => setSearch(e.target.value)} />
                 <Button variant="primary" icon={Plus} onClick={handleNuevo}>
                     Nuevo producto
                 </Button>
@@ -319,7 +234,7 @@ function Productos() {
 
             <DataCard>
                 <Table
-                    columns={columns}
+                    columns={["#", "Nombre", "Código", "Precio", "Categoría", "Empresa", "Acciones"]}
                     data={filtrados}
                     renderRow={(item, index) => (
                         <tr key={item.id}>
@@ -344,15 +259,11 @@ function Productos() {
                 />
             </DataCard>
 
-            <Modal
-                isOpen={modalOpen}
-                onClose={() => setModalOpen(false)}
+            <Modal isOpen={modalOpen} onClose={() => setModalOpen(false)}
                 title={isEdit ? "Editar producto" : "Nuevo producto"}
-                className="modal-lg"
-            >
+                className="modal-lg">
                 <ProductoForm
-                    form={form}
-                    setForm={setForm}
+                    form={form} setForm={setForm}
                     empresas={empresas}
                     categoriasProducto={categoriasProducto}
                     clasificacionesProducto={clasificacionesProducto}
@@ -360,18 +271,11 @@ function Productos() {
                     viasAdministracion={viasAdministracion}
                     onSubmit={handleSubmit}
                     onClose={() => setModalOpen(false)}
-                    loading={loading}
-                    error={error}
-                />
+                    loading={loading} error={error} />
             </Modal>
 
-            <DeleteModal
-                isOpen={deleteOpen}
-                onClose={() => setDeleteOpen(false)}
-                onConfirm={handleConfirmDelete}
-                loading={loading}
-                item={deleteTarget}
-            />
+            <DeleteModal isOpen={deleteOpen} onClose={() => setDeleteOpen(false)}
+                onConfirm={handleConfirmDelete} loading={loading} item={deleteTarget} />
         </PageContainer>
     );
 }

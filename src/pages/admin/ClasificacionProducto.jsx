@@ -9,21 +9,17 @@ import SearchBar from "../../components/ui/SearchBar";
 import { useCatalogos } from "../../context/CatalogosContext";
 import api from "../../services/api";
 
-function ClasificacionForm({ form, setForm, onSubmit, onClose, loading, error }) {
+function CatalogoForm({ label, campo, form, setForm, onSubmit, onClose, loading, error }) {
     return (
         <>
             {error && <div className="alert alert-danger py-2 text-center mb-3">{error}</div>}
             <div className="mb-4">
-                <label className="form-label">Clasificación</label>
-                <input
-                    type="text"
-                    className="form-control"
-                    value={form.clasificacion}
-                    onChange={(e) => setForm({ ...form, clasificacion: e.target.value })}
-                    placeholder="Nombre de la clasificación"
-                />
+                <label className="form-label">{label}</label>
+                <input type="text" className="form-control" value={form[campo]}
+                    onChange={(e) => setForm({ ...form, [campo]: e.target.value })}
+                    placeholder={`Nombre de la ${label.toLowerCase()}`} />
             </div>
-            <div className="d-flex gap-2 justify-content-end">
+            <div className="form-actions">
                 <Button variant="secondary" onClick={onClose}>Cancelar</Button>
                 <Button variant="primary" onClick={onSubmit} disabled={loading}>
                     {loading ? "Guardando..." : "Guardar"}
@@ -33,13 +29,13 @@ function ClasificacionForm({ form, setForm, onSubmit, onClose, loading, error })
     );
 }
 
-function DeleteModal({ isOpen, onClose, onConfirm, loading, item }) {
+function DeleteModal({ isOpen, onClose, onConfirm, loading, nombre }) {
     return (
-        <Modal isOpen={isOpen} onClose={onClose} title="Eliminar clasificación">
+        <Modal isOpen={isOpen} onClose={onClose} title="Eliminar registro">
             <p style={{ color: "#4b5563", marginBottom: 20 }}>
-                ¿Estás seguro de eliminar la clasificación <strong>{item?.clasificacion}</strong>? Esta acción no se puede deshacer.
+                ¿Estás seguro de eliminar <strong>{nombre}</strong>? Esta acción no se puede deshacer.
             </p>
-            <div className="d-flex gap-2 justify-content-end">
+            <div className="form-actions">
                 <Button variant="secondary" onClick={onClose}>Cancelar</Button>
                 <Button variant="danger" onClick={onConfirm} disabled={loading}>
                     {loading ? "Eliminando..." : "Eliminar"}
@@ -51,14 +47,14 @@ function DeleteModal({ isOpen, onClose, onConfirm, loading, item }) {
 
 function ClasificacionProducto() {
     const { clasificacionesProducto, refreshCatalogo } = useCatalogos();
-    const [search, setSearch]       = useState("");
-    const [loading, setLoading]     = useState(false);
-    const [error, setError]         = useState("");
+    const [search, setSearch] = useState("");
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState("");
     const [modalOpen, setModalOpen] = useState(false);
-    const [isEdit, setIsEdit]       = useState(false);
-    const [editId, setEditId]       = useState(null);
-    const [form, setForm]           = useState({ clasificacion: "" });
-    const [deleteOpen, setDeleteOpen]     = useState(false);
+    const [isEdit, setIsEdit] = useState(false);
+    const [editId, setEditId] = useState(null);
+    const [form, setForm] = useState({ clasificacion: "" });
+    const [deleteOpen, setDeleteOpen] = useState(false);
     const [deleteTarget, setDeleteTarget] = useState(null);
 
     const filtrados = clasificacionesProducto.filter((c) =>
@@ -67,35 +63,21 @@ function ClasificacionProducto() {
 
     const handleNuevo = () => {
         setForm({ clasificacion: "" });
-        setIsEdit(false);
-        setEditId(null);
-        setError("");
-        setModalOpen(true);
+        setIsEdit(false); setEditId(null); setError(""); setModalOpen(true);
     };
 
     const handleEditar = (item) => {
         setForm({ clasificacion: item.clasificacion });
-        setIsEdit(true);
-        setEditId(item.id);
-        setError("");
-        setModalOpen(true);
-    };
-
-    const handleEliminar = (item) => {
-        setDeleteTarget(item);
-        setDeleteOpen(true);
+        setIsEdit(true); setEditId(item.id); setError(""); setModalOpen(true);
     };
 
     const handleSubmit = async () => {
-        setLoading(true);
-        setError("");
+        setLoading(true); setError("");
         try {
             if (isEdit) {
                 await api.put(`/clasificaciones-producto/${editId}`, form);
-                const actualizados = clasificacionesProducto.map((c) =>
-                    c.id === editId ? { ...c, ...form } : c
-                );
-                refreshCatalogo('clasificacionesProducto', actualizados);
+                refreshCatalogo('clasificacionesProducto', clasificacionesProducto.map((c) =>
+                    c.id === editId ? { ...c, ...form } : c));
             } else {
                 const res = await api.post('/clasificaciones-producto', form);
                 refreshCatalogo('clasificacionesProducto', [...clasificacionesProducto, res.data.clasificacion]);
@@ -103,46 +85,32 @@ function ClasificacionProducto() {
             setModalOpen(false);
         } catch (e) {
             setError(e.response?.data?.message || e.message);
-        } finally {
-            setLoading(false);
-        }
+        } finally { setLoading(false); }
     };
 
     const handleConfirmDelete = async () => {
         setLoading(true);
         try {
             await api.delete(`/clasificaciones-producto/${deleteTarget.id}`);
-            const actualizados = clasificacionesProducto.filter((c) => c.id !== deleteTarget.id);
-            refreshCatalogo('clasificacionesProducto', actualizados);
-            setDeleteOpen(false);
-            setDeleteTarget(null);
-        } catch (e) {
-            console.error(e);
-        } finally {
-            setLoading(false);
-        }
+            refreshCatalogo('clasificacionesProducto', clasificacionesProducto.filter((c) => c.id !== deleteTarget.id));
+            setDeleteOpen(false); setDeleteTarget(null);
+        } catch (e) { console.error(e); }
+        finally { setLoading(false); }
     };
 
     return (
         <PageContainer>
             <div className="dashboard-header">
-                <SearchBar
-                    placeholder="Buscar clasificación..."
-                    value={search}
-                    onChange={(e) => setSearch(e.target.value)}
-                />
-                <Button variant="primary" icon={Plus} onClick={handleNuevo}>
-                    Nueva clasificación
-                </Button>
+                <SearchBar placeholder="Buscar clasificación..." value={search}
+                    onChange={(e) => setSearch(e.target.value)} />
+                <Button variant="primary" icon={Plus} onClick={handleNuevo}>Nueva clasificación</Button>
             </div>
             <div className="dashboard-title">
                 <h1>Clasificaciones de Producto</h1>
                 <p>Administra las clasificaciones registradas en el sistema.</p>
             </div>
             <DataCard>
-                <Table
-                    columns={["#", "Clasificación", "Acciones"]}
-                    data={filtrados}
+                <Table columns={["#", "Clasificación", "Acciones"]} data={filtrados}
                     renderRow={(item, index) => (
                         <tr key={item.id}>
                             <td>{index + 1}</td>
@@ -152,19 +120,21 @@ function ClasificacionProducto() {
                                     <button className="action-btn" onClick={() => handleEditar(item)}>
                                         <Pencil size={16} color="#3b82f6" />
                                     </button>
-                                    <button className="action-btn" onClick={() => handleEliminar(item)}>
+                                    <button className="action-btn" onClick={() => { setDeleteTarget(item); setDeleteOpen(true); }}>
                                         <Trash2 size={16} color="#ef4444" />
                                     </button>
                                 </div>
                             </td>
                         </tr>
-                    )}
-                />
+                    )} />
             </DataCard>
-            <Modal isOpen={modalOpen} onClose={() => setModalOpen(false)} title={isEdit ? "Editar clasificación" : "Nueva clasificación"}>
-                <ClasificacionForm form={form} setForm={setForm} onSubmit={handleSubmit} onClose={() => setModalOpen(false)} loading={loading} error={error} />
+            <Modal isOpen={modalOpen} onClose={() => setModalOpen(false)}
+                title={isEdit ? "Editar clasificación" : "Nueva clasificación"}>
+                <CatalogoForm label="Clasificación" campo="clasificacion" form={form} setForm={setForm}
+                    onSubmit={handleSubmit} onClose={() => setModalOpen(false)} loading={loading} error={error} />
             </Modal>
-            <DeleteModal isOpen={deleteOpen} onClose={() => setDeleteOpen(false)} onConfirm={handleConfirmDelete} loading={loading} item={deleteTarget} />
+            <DeleteModal isOpen={deleteOpen} onClose={() => setDeleteOpen(false)}
+                onConfirm={handleConfirmDelete} loading={loading} nombre={deleteTarget?.clasificacion} />
         </PageContainer>
     );
 }

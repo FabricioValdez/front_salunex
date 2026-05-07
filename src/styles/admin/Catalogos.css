@@ -1,0 +1,20 @@
+/* ── Tabla con join (nombre + subtítulo) ── */
+.tabla-nombre-sub p {
+    margin: 0;
+    font-weight: 600;
+}
+
+.tabla-nombre-sub span {
+    font-size: 12px;
+    color: #6b7280;
+}
+
+/* ── Concentración (cantidad + unidad) ── */
+.tabla-concentracion strong {
+    display: block;
+}
+
+.tabla-concentracion span {
+    font-size: 12px;
+    color: #6b7280;
+}

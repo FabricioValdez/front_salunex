@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Pencil, Trash2, Plus } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import PageContainer from "../../components/ui/PageContainer";
 import DataCard from "../../components/ui/DataCard";
 import Table from "../../components/ui/Table/Table";
@@ -9,14 +10,12 @@ import SearchBar from "../../components/ui/SearchBar";
 import { useCatalogos } from "../../context/CatalogosContext";
 import api from "../../services/api";
 
-// ── Formulario ──
-function UsuarioForm({ form, setForm, roles, onSubmit, onClose, loading, error, isEdit }) {
+// ── Formulario nuevo usuario ──
+function UsuarioForm({ form, setForm, roles, onSubmit, onClose, loading, error }) {
     return (
         <>
             {error && (
-                <div className="alert alert-danger py-2 text-center mb-3">
-                    {error}
-                </div>
+                <div className="alert alert-danger py-2 text-center mb-3">{error}</div>
             )}
             <div className="mb-3">
                 <label className="form-label">Email</label>
@@ -29,9 +28,7 @@ function UsuarioForm({ form, setForm, roles, onSubmit, onClose, loading, error, 
                 />
             </div>
             <div className="mb-3">
-                <label className="form-label">
-                    Contraseña {isEdit && <span className="text-muted" style={{ fontSize: 12 }}>(dejar vacío para no cambiar)</span>}
-                </label>
+                <label className="form-label">Contraseña</label>
                 <input
                     type="password"
                     className="form-control"
@@ -56,7 +53,7 @@ function UsuarioForm({ form, setForm, roles, onSubmit, onClose, loading, error, 
             <div className="d-flex gap-2 justify-content-end">
                 <Button variant="secondary" onClick={onClose}>Cancelar</Button>
                 <Button variant="primary" onClick={onSubmit} disabled={loading}>
-                    {loading ? "Guardando..." : isEdit ? "Actualizar" : "Crear usuario"}
+                    {loading ? "Guardando..." : "Crear usuario"}
                 </Button>
             </div>
         </>
@@ -82,21 +79,18 @@ function DeleteModal({ isOpen, onClose, onConfirm, loading, usuario }) {
 
 // ── Página principal ──
 function Usuarios() {
-    const { roles } = useCatalogos(); // 👈 Roles del context
-    const [usuarios, setUsuarios] = useState([]);
-    const [search, setSearch] = useState("");
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState("");
+    const { roles } = useCatalogos();
+    const navigate  = useNavigate();
 
+    const [usuarios, setUsuarios]   = useState([]);
+    const [search, setSearch]       = useState("");
+    const [loading, setLoading]     = useState(false);
+    const [error, setError]         = useState("");
     const [modalOpen, setModalOpen] = useState(false);
-    const [isEdit, setIsEdit] = useState(false);
-    const [editId, setEditId] = useState(null);
-    const [form, setForm] = useState({ email: "", password: "", idrol: "" });
-
-    const [deleteOpen, setDeleteOpen] = useState(false);
+    const [form, setForm]           = useState({ email: "", password: "", idrol: "" });
+    const [deleteOpen, setDeleteOpen]     = useState(false);
     const [deleteTarget, setDeleteTarget] = useState(null);
 
-    // 👇 Cargar usuarios con Axios
     const fetchUsuarios = async () => {
         try {
             const res = await api.get('/usuarios');
@@ -106,9 +100,7 @@ function Usuarios() {
         }
     };
 
-    useEffect(() => {
-        fetchUsuarios();
-    }, []);
+    useEffect(() => { fetchUsuarios(); }, []);
 
     const usuariosFiltrados = usuarios.filter((u) =>
         u.email.toLowerCase().includes(search.toLowerCase()) ||
@@ -117,18 +109,12 @@ function Usuarios() {
 
     const handleNuevo = () => {
         setForm({ email: "", password: "", idrol: "" });
-        setIsEdit(false);
-        setEditId(null);
         setError("");
         setModalOpen(true);
     };
 
     const handleEditar = (usuario) => {
-        setForm({ email: usuario.email, password: "", idrol: usuario.idrol });
-        setIsEdit(true);
-        setEditId(usuario.id);
-        setError("");
-        setModalOpen(true);
+        navigate(`/admin/usuarios/${usuario.id}/editar`);
     };
 
     const handleEliminar = (usuario) => {
@@ -140,11 +126,7 @@ function Usuarios() {
         setLoading(true);
         setError("");
         try {
-            if (isEdit) {
-                await api.put(`/usuarios/${editId}`, form);
-            } else {
-                await api.post('/usuarios', form);
-            }
+            await api.post('/usuarios', form);
             setModalOpen(false);
             fetchUsuarios();
         } catch (e) {
@@ -168,8 +150,6 @@ function Usuarios() {
         }
     };
 
-    const columns = ["#", "Email", "Rol", "Acciones"];
-
     return (
         <PageContainer>
             <div className="dashboard-header">
@@ -190,21 +170,14 @@ function Usuarios() {
 
             <DataCard>
                 <Table
-                    columns={columns}
+                    columns={["#", "Email", "Rol", "Acciones"]}
                     data={usuariosFiltrados}
                     renderRow={(usuario, index) => (
                         <tr key={usuario.id}>
                             <td>{index + 1}</td>
                             <td>{usuario.email}</td>
                             <td>
-                                <span style={{
-                                    padding: "3px 10px",
-                                    borderRadius: 20,
-                                    fontSize: 12,
-                                    fontWeight: 500,
-                                    background: usuario.idrol === 2 ? "#dbeafe" : "#f3f4f6",
-                                    color: usuario.idrol === 2 ? "#1d4ed8" : "#374151",
-                                }}>
+                                <span className={`badge-rol ${usuario.idrol === 2 ? "admin" : "default"}`}>
                                     {usuario.rol}
                                 </span>
                             </td>
@@ -226,7 +199,7 @@ function Usuarios() {
             <Modal
                 isOpen={modalOpen}
                 onClose={() => setModalOpen(false)}
-                title={isEdit ? "Editar usuario" : "Nuevo usuario"}
+                title="Nuevo usuario"
             >
                 <UsuarioForm
                     form={form}
@@ -236,7 +209,6 @@ function Usuarios() {
                     onClose={() => setModalOpen(false)}
                     loading={loading}
                     error={error}
-                    isEdit={isEdit}
                 />
             </Modal>
 

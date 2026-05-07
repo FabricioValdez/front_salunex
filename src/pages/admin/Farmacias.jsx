@@ -8,70 +8,47 @@ import Modal from "../../components/ui/Modal";
 import SearchBar from "../../components/ui/SearchBar";
 import { useCatalogos } from "../../context/CatalogosContext";
 import api from "../../services/api";
+import "../../styles/admin/Catalogos.css";
 
-// ── Formulario ──
 function FarmaciaForm({ form, setForm, empresas, onSubmit, onClose, loading, error }) {
     return (
         <>
-            {error && (
-                <div className="alert alert-danger py-2 text-center mb-3">
-                    {error}
-                </div>
-            )}
+            {error && <div className="alert alert-danger py-2 text-center mb-3">{error}</div>}
             <div className="mb-3">
                 <label className="form-label">Nombre</label>
-                <input
-                    type="text"
-                    className="form-control"
-                    value={form.nombre}
+                <input type="text" className="form-control" value={form.nombre}
                     onChange={(e) => setForm({ ...form, nombre: e.target.value })}
-                    placeholder="Nombre de la farmacia"
-                />
+                    placeholder="Nombre de la farmacia" />
             </div>
             <div className="mb-3">
                 <label className="form-label">Dirección</label>
-                <input
-                    type="text"
-                    className="form-control"
-                    value={form.direccion}
+                <input type="text" className="form-control" value={form.direccion}
                     onChange={(e) => setForm({ ...form, direccion: e.target.value })}
-                    placeholder="Dirección"
-                />
+                    placeholder="Dirección" />
             </div>
             <div className="mb-3">
                 <label className="form-label">Teléfono</label>
-                <input
-                    type="text"
-                    className="form-control"
-                    value={form.telefono}
+                <input type="text" className="form-control" value={form.telefono}
                     onChange={(e) => setForm({ ...form, telefono: e.target.value })}
-                    placeholder="Teléfono"
-                />
+                    placeholder="Teléfono" />
             </div>
             <div className="mb-3">
                 <label className="form-label">Email</label>
-                <input
-                    type="email"
-                    className="form-control"
-                    value={form.email}
+                <input type="email" className="form-control" value={form.email}
                     onChange={(e) => setForm({ ...form, email: e.target.value })}
-                    placeholder="correo@farmacia.com"
-                />
+                    placeholder="correo@farmacia.com" />
             </div>
             <div className="mb-4">
                 <label className="form-label">Empresa</label>
-                <select
-                    className="form-select"
-                    value={form.id_empresa}
-                    onChange={(e) => setForm({ ...form, id_empresa: e.target.value })}
-                >
+                <select className="form-select" value={form.id_empresa}
+                    onChange={(e) => setForm({ ...form, id_empresa: e.target.value })}>
                     <option value="">Selecciona una empresa</option>
                     {empresas.map((e) => (
                         <option key={e.id} value={e.id}>{e.nombre}</option>
                     ))}
                 </select>
             </div>
-            <div className="d-flex gap-2 justify-content-end">
+            <div className="form-actions">
                 <Button variant="secondary" onClick={onClose}>Cancelar</Button>
                 <Button variant="primary" onClick={onSubmit} disabled={loading}>
                     {loading ? "Guardando..." : "Guardar"}
@@ -81,14 +58,13 @@ function FarmaciaForm({ form, setForm, empresas, onSubmit, onClose, loading, err
     );
 }
 
-// ── Modal eliminar ──
-function DeleteModal({ isOpen, onClose, onConfirm, loading, farmacia }) {
+function DeleteModal({ isOpen, onClose, onConfirm, loading, item }) {
     return (
         <Modal isOpen={isOpen} onClose={onClose} title="Eliminar farmacia">
             <p style={{ color: "#4b5563", marginBottom: 20 }}>
-                ¿Estás seguro de eliminar la farmacia <strong>{farmacia?.nombre}</strong>? Esta acción no se puede deshacer.
+                ¿Estás seguro de eliminar la farmacia <strong>{item?.nombre}</strong>? Esta acción no se puede deshacer.
             </p>
-            <div className="d-flex gap-2 justify-content-end">
+            <div className="form-actions">
                 <Button variant="secondary" onClick={onClose}>Cancelar</Button>
                 <Button variant="danger" onClick={onConfirm} disabled={loading}>
                     {loading ? "Eliminando..." : "Eliminar"}
@@ -98,26 +74,21 @@ function DeleteModal({ isOpen, onClose, onConfirm, loading, farmacia }) {
     );
 }
 
-// ── Página principal ──
 function Farmacias() {
-    const { farmacias, empresas, refreshCatalogo } = useCatalogos(); // 👈 Del context
+    const { farmacias, empresas, refreshCatalogo } = useCatalogos();
     const [search, setSearch]             = useState("");
     const [loading, setLoading]           = useState(false);
     const [error, setError]               = useState("");
-
     const [modalOpen, setModalOpen]       = useState(false);
     const [isEdit, setIsEdit]             = useState(false);
     const [editId, setEditId]             = useState(null);
-    const [form, setForm]                 = useState({
-        nombre: "", direccion: "", telefono: "", email: "", id_empresa: ""
-    });
-
+    const [form, setForm]                 = useState({ nombre: "", direccion: "", telefono: "", email: "", id_empresa: "" });
     const [deleteOpen, setDeleteOpen]     = useState(false);
     const [deleteTarget, setDeleteTarget] = useState(null);
 
-    const farmaciasFiltradas = farmacias.filter((f) =>
+    const filtrados = farmacias.filter((f) =>
         f.nombre.toLowerCase().includes(search.toLowerCase()) ||
-        f.empresa.toLowerCase().includes(search.toLowerCase())
+        f.empresa?.toLowerCase().includes(search.toLowerCase())
     );
 
     const handleNuevo = () => {
@@ -128,22 +99,16 @@ function Farmacias() {
         setModalOpen(true);
     };
 
-    const handleEditar = (farmacia) => {
-        setForm({
-            nombre:     farmacia.nombre,
-            direccion:  farmacia.direccion,
-            telefono:   farmacia.telefono,
-            email:      farmacia.email,
-            id_empresa: farmacia.id_empresa,
-        });
+    const handleEditar = (item) => {
+        setForm({ nombre: item.nombre, direccion: item.direccion, telefono: item.telefono, email: item.email, id_empresa: item.id_empresa });
         setIsEdit(true);
-        setEditId(farmacia.id);
+        setEditId(item.id);
         setError("");
         setModalOpen(true);
     };
 
-    const handleEliminar = (farmacia) => {
-        setDeleteTarget(farmacia);
+    const handleEliminar = (item) => {
+        setDeleteTarget(item);
         setDeleteOpen(true);
     };
 
@@ -153,11 +118,14 @@ function Farmacias() {
         try {
             if (isEdit) {
                 await api.put(`/farmacias/${editId}`, form);
+                refreshCatalogo('farmacias', farmacias.map((f) =>
+                    f.id === editId ? { ...f, ...form } : f
+                ));
             } else {
-                await api.post('/farmacias', form);
+                const res = await api.post('/farmacias', form);
+                refreshCatalogo('farmacias', [...farmacias, res.data.farmacia]);
             }
             setModalOpen(false);
-            refreshCatalogo('farmacias'); // 👈 Refresca el context
         } catch (e) {
             setError(e.response?.data?.message || e.message);
         } finally {
@@ -169,9 +137,9 @@ function Farmacias() {
         setLoading(true);
         try {
             await api.delete(`/farmacias/${deleteTarget.id}`);
+            refreshCatalogo('farmacias', farmacias.filter((f) => f.id !== deleteTarget.id));
             setDeleteOpen(false);
             setDeleteTarget(null);
-            refreshCatalogo('farmacias'); // 👈 Refresca el context
         } catch (e) {
             console.error(e);
         } finally {
@@ -179,16 +147,11 @@ function Farmacias() {
         }
     };
 
-    const columns = ["#", "Nombre", "Empresa", "Teléfono", "Email", "Acciones"];
-
     return (
         <PageContainer>
             <div className="dashboard-header">
-                <SearchBar
-                    placeholder="Buscar por nombre o empresa..."
-                    value={search}
-                    onChange={(e) => setSearch(e.target.value)}
-                />
+                <SearchBar placeholder="Buscar farmacia o empresa..." value={search}
+                    onChange={(e) => setSearch(e.target.value)} />
                 <Button variant="primary" icon={Plus} onClick={handleNuevo}>
                     Nueva farmacia
                 </Button>
@@ -201,21 +164,21 @@ function Farmacias() {
 
             <DataCard>
                 <Table
-                    columns={columns}
-                    data={farmaciasFiltradas}
-                    renderRow={(farmacia, index) => (
-                        <tr key={farmacia.id}>
+                    columns={["#", "Nombre", "Empresa", "Teléfono", "Email", "Acciones"]}
+                    data={filtrados}
+                    renderRow={(item, index) => (
+                        <tr key={item.id}>
                             <td>{index + 1}</td>
-                            <td><strong>{farmacia.nombre}</strong></td>
-                            <td>{farmacia.empresa}</td>
-                            <td>{farmacia.telefono}</td>
-                            <td>{farmacia.email}</td>
+                            <td><strong>{item.nombre}</strong></td>
+                            <td>{item.empresa}</td>
+                            <td>{item.telefono}</td>
+                            <td>{item.email}</td>
                             <td>
                                 <div className="table-actions">
-                                    <button className="action-btn" onClick={() => handleEditar(farmacia)}>
+                                    <button className="action-btn" onClick={() => handleEditar(item)}>
                                         <Pencil size={16} color="#3b82f6" />
                                     </button>
-                                    <button className="action-btn" onClick={() => handleEliminar(farmacia)}>
+                                    <button className="action-btn" onClick={() => handleEliminar(item)}>
                                         <Trash2 size={16} color="#ef4444" />
                                     </button>
                                 </div>
@@ -225,29 +188,15 @@ function Farmacias() {
                 />
             </DataCard>
 
-            <Modal
-                isOpen={modalOpen}
-                onClose={() => setModalOpen(false)}
-                title={isEdit ? "Editar farmacia" : "Nueva farmacia"}
-            >
-                <FarmaciaForm
-                    form={form}
-                    setForm={setForm}
-                    empresas={empresas}
-                    onSubmit={handleSubmit}
-                    onClose={() => setModalOpen(false)}
-                    loading={loading}
-                    error={error}
-                />
+            <Modal isOpen={modalOpen} onClose={() => setModalOpen(false)}
+                title={isEdit ? "Editar farmacia" : "Nueva farmacia"}>
+                <FarmaciaForm form={form} setForm={setForm} empresas={empresas}
+                    onSubmit={handleSubmit} onClose={() => setModalOpen(false)}
+                    loading={loading} error={error} />
             </Modal>
 
-            <DeleteModal
-                isOpen={deleteOpen}
-                onClose={() => setDeleteOpen(false)}
-                onConfirm={handleConfirmDelete}
-                loading={loading}
-                farmacia={deleteTarget}
-            />
+            <DeleteModal isOpen={deleteOpen} onClose={() => setDeleteOpen(false)}
+                onConfirm={handleConfirmDelete} loading={loading} item={deleteTarget} />
         </PageContainer>
     );
 }

@@ -65,6 +65,9 @@ nav {
   min-height: 40px;
 }
 
+.sidebar-nav-item:hover {
+    background-color: #e9ecef;
+}
 
 .sidebar.collapsed .sidebar-nav-item {
   justify-content: center;

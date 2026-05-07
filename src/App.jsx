@@ -24,6 +24,7 @@ import OrdenesDeCompra from "./pages/farmacia/OrdenesDeCompra";
 import InventarioFarmacia from "./pages/farmacia/InventarioFarmacia";
 import ControlCalidadFarmacia from "./pages/farmacia/ControlCalidadFarmacia";
 import RecepcionAlmacen from "./pages/farmacia/RecepcionAlmacen";
+import EditarUsuario from "./pages/admin/EditarUsuario";
 
 // 🔒 Protege por autenticación
 function PrivateRoute({ children }) {
@@ -82,6 +83,7 @@ function App() {
           <Route path="presentaciones-producto" element={<PresentacionProducto />} />
           <Route path="vias-administracion" element={<ViaAdministracion />} />
           <Route path="tipos-movimiento" element={<TipoMovimiento />} />
+          <Route path="usuarios/:id/editar" element={<EditarUsuario />} />
         </Route>
 
         {/* EMPRESA (rol 3) */}
