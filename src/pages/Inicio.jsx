@@ -1,4 +1,4 @@
-import "../styles/almacen/inicio.css";
+import "../styles/almacen/Inicio.css";
 import { Plus, Bell } from "lucide-react";
 import InventoryChart from "../components/InventoryChart";
 import { useNavigate } from "react-router-dom";
