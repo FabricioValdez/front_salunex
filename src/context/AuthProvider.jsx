@@ -7,7 +7,17 @@ function AuthProvider({ children }) {
         const idrol = localStorage.getItem("idrol");
         const rol   = localStorage.getItem("rol");
         const email = localStorage.getItem("email");
-        return token ? { token, idrol: Number(idrol), rol, email } : null;
+        const permisos = localStorage.getItem("permisos");
+        
+        return token 
+            ? { 
+                token, 
+                idrol: Number(idrol), 
+                rol, 
+                email, 
+                permisos: permisos ? JSON.parse(permisos) : [] // 🌟 Parseamos los permisos guardados
+              } 
+            : null;
     });
 
     const loginUser = (token, userData) => {
@@ -16,6 +26,7 @@ function AuthProvider({ children }) {
             idrol: userData.idrol,
             rol:   userData.rol,
             email: userData.email,
+            permisos: userData.permisos || [], // 🌟 Guardamos los permisos en el estado global
         });
     };
 

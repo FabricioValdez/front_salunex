@@ -1,19 +1,19 @@
-import "../styles/almacen/Ordenes.css";
+import "../../styles/general/Ordenes.css";
 import { Search, Plus, Clock, AlertTriangle, DollarSign } from "lucide-react";
 import { useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
 
 
-import PageContainer from "../components/ui/PageContainer";
-import Modal from "../components/ui/Modal";
-import FilterButton from "../components/ui/FilterButton";
-import FilterModal from "../components/features/ordenes/FilterModal";
-import SummaryCard from "../components/ui/SummaryCard";
-import SearchBar from "../components/ui/SearchBar";
+import PageContainer from "../../components/ui/PageContainer";
+import Modal from "../../components/ui/Modal";
+import FilterButton from "../../components/ui/FilterButton";
+import FilterModal from "../../components/features/ordenes/FilterModal";
+import SummaryCard from "../../components/ui/SummaryCard";
+import SearchBar from "../../components/ui/SearchBar";
 
-import OrdenList from "../components/features/ordenes/OrdenList";
-import OrdenDetail from "../components/features/ordenes/OrdenDetail";
-import OrdenForm from "../components/features/ordenes/OrdenForm";
+import OrdenList from "../../components/features/ordenes/OrdenList";
+import OrdenDetail from "../../components/features/ordenes/OrdenDetail";
+import OrdenForm from "../../components/features/ordenes/OrdenForm";
 
 const Ordenes = () => {
 

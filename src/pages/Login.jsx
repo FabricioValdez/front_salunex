@@ -9,19 +9,19 @@ function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(""); // 👈 Agregado
+  const [error, setError] = useState("");
 
   const { loginUser, user } = useContext(AuthContext);
   const navigate = useNavigate();
 
-  // 🔥 Si ya está logueado, no puede volver al login
+  // 🔥 Si ya está logueado, lo redirige de forma segura
   useEffect(() => {
     if (user) {
-      switch (user.idrol) {
-        case 2: navigate("/admin", { replace: true }); break;
-        case 3: navigate("/empresa", { replace: true }); break;
-        case 4: navigate("/farmacia", { replace: true }); break;
-        default: navigate("/", { replace: true });
+      // 🌟 Si el usuario tiene permisos de farmacia, va directo; si no, a la raíz pública
+      if (user.permisos?.includes("GFAR")) {
+        navigate("/farmacia", { replace: true });
+      } else {
+        navigate("/", { replace: true });
       }
     }
   }, [user, navigate]);
@@ -33,15 +33,16 @@ function Login() {
 
     try {
       const data = await login(email, password);
-      console.log("Respuesta del backend:", data); // 👈 Agregar esto
+      console.log("Respuesta del backend:", data);
+      
+      // El loginUser guarda token, datos base y el array de permisos en el contexto global
       loginUser(data.token, data.user);
 
-      // Redirige según el rol
-      switch (data.user.idrol) {
-        case 2: navigate("/admin", { replace: true }); break;
-        case 3: navigate("/empresa", { replace: true }); break;
-        case 4: navigate("/farmacia", { replace: true }); break;
-        default: navigate("/", { replace: true }); // rol 1 = almacén
+      // 🌟 Redirección dinámica según los permisos que devolvió Laravel
+      if (data.user.permisos?.includes("GFAR")) {
+        navigate("/farmacia", { replace: true });
+      } else {
+        navigate("/", { replace: true });
       }
     } catch (error) {
       setError(error.message);
@@ -100,7 +101,6 @@ function Login() {
                     />
                   </Form.Group>
 
-                  {/* 👈 Mensaje de error */}
                   {error && (
                     <div className="alert alert-danger py-2 text-center mb-3">
                       {error}

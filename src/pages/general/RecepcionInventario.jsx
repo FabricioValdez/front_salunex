@@ -4,7 +4,7 @@ import PageContainer from "../../components/ui/PageContainer";
 import Table from "../../components/ui/Table/Table";
 import { useCatalogos } from "../../context/CatalogosContext";
 import api from "../../services/api";
-import "../../styles/farmacia/RecepcionAlmacen.css";
+import "../../styles/general/RecepcionInventario.css";
 
 function EstatusBadge({ estatus }) {
     const clase = {

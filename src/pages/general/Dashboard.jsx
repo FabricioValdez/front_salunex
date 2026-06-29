@@ -1,4 +1,4 @@
-import DashboardChart from "../components/features/Dashboard/DashboardChart";
+import DashboardChart from "../../components/features/Dashboard/DashboardChart";
 
 function Dashboard() {
 

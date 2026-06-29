@@ -5,14 +5,14 @@ import AuthContext from "./AuthContext";
 const CatalogosContext = createContext();
 
 export function CatalogosProvider({ children }) {
-    const [roles, setRoles]                                     = useState([]);
-    const [empresas, setEmpresas]                               = useState([]);
-    const [farmacias, setFarmacias]                             = useState([]);
-    const [almacenes, setAlmacenes]                             = useState([]);
-    const [productos, setProductos]                             = useState([]);
-    const [movimientos, setMovimientos]                         = useState([]);
-    const [inventario, setInventario]                           = useState([]);
-    const [categoriasProducto, setCategoriasProducto]           = useState([]);
+    const [roles, setRoles]                             = useState([]);
+    const [empresas, setEmpresas]                       = useState([]);
+    const [farmacias, setFarmacias]                     = useState([]);
+    const [almacenes, setAlmacenes]                     = useState([]);
+    const [productos, setProductos]                     = useState([]);
+    const [movimientos, setMovimientos]                 = useState([]);
+    const [inventario, setInventario]                   = useState([]);
+    const [categoriasProducto, setCategoriasProducto]   = useState([]);
     const [clasificacionesProducto, setClasificacionesProducto] = useState([]);
     const [presentacionesProducto, setPresentacionesProducto]   = useState([]);
     const [viasAdministracion, setViasAdministracion]           = useState([]);
@@ -26,49 +26,48 @@ export function CatalogosProvider({ children }) {
     }, [user]);
 
     const fetchCatalogos = async () => {
+        if (!user || !user.permisos) return;
+        
         setLoading(true);
+        
+        // Mapeo de qué clave de módulo desbloquea qué endpoint de catálogo
+        const configuracionCatalogos = [
+            { clave: 'GROL', endpoint: '/roles', setter: setRoles },
+            { clave: 'GPER', endpoint: '/empresas', setter: setEmpresas },
+            { clave: 'GFAR', endpoint: '/farmacias', setter: setFarmacias },
+            { clave: 'GALM', endpoint: '/almacenes', setter: setAlmacenes },
+            { clave: 'GPRO', endpoint: '/productos', setter: setProductos },
+            { clave: 'GMOV', endpoint: '/movimientos', setter: setMovimientos },
+            { clave: 'GALM', endpoint: '/inventario', setter: setInventario },
+            { clave: 'GPRO', endpoint: '/categorias-producto', setter: setCategoriasProducto },
+            { clave: 'GPRO', endpoint: '/clasificaciones-producto', setter: setClasificacionesProducto },
+            { clave: 'GPRO', endpoint: '/presentaciones-producto', setter: setPresentacionesProducto },
+            { clave: 'GPRO', endpoint: '/vias-administracion', setter: setViasAdministracion },
+            { clave: 'GPER', endpoint: '/tipos-movimiento', setter: setTiposMovimiento },
+        ];
+
+        // 🌟 Filtramos únicamente los endpoints para los cuales el usuario tiene permiso
+        const catalogosPermitidos = configuracionCatalogos.filter(item => 
+            user.permisos.includes(item.clave)
+        );
+
         try {
-            const [
-                rolesRes,
-                empresasRes,
-                farmaciasRes,
-                almacenesRes,
-                productosRes,
-                movimientosRes,
-                inventarioRes,
-                categoriasRes,
-                clasificacionesRes,
-                presentacionesRes,
-                viasRes,
-                tiposRes,
-            ] = await Promise.all([
-                api.get('/roles'),
-                api.get('/empresas'),
-                api.get('/farmacias'),
-                api.get('/almacenes'),
-                api.get('/productos'),
-                api.get('/movimientos'),
-                api.get('/inventario'),
-                api.get('/categorias-producto'),
-                api.get('/clasificaciones-producto'),
-                api.get('/presentaciones-producto'),
-                api.get('/vias-administracion'),
-                api.get('/tipos-movimiento'),
-            ]);
-            setRoles(rolesRes.data);
-            setEmpresas(empresasRes.data);
-            setFarmacias(farmaciasRes.data);
-            setAlmacenes(almacenesRes.data);
-            setProductos(productosRes.data);
-            setMovimientos(movimientosRes.data);
-            setInventario(inventarioRes.data);
-            setCategoriasProducto(categoriasRes.data);
-            setClasificacionesProducto(clasificacionesRes.data);
-            setPresentacionesProducto(presentacionesRes.data);
-            setViasAdministracion(viasRes.data);
-            setTiposMovimiento(tiposRes.data);
+            // Ejecutamos en paralelo solo los permitidos
+            const promesas = catalogosPermitidos.map(item => api.get(item.endpoint));
+            const resultados = await Promise.allSettled(promesas);
+
+            resultados.forEach((res, index) => {
+                const configItem = catalogosPermitidos[index];
+                if (res.status === "fulfilled") {
+                    configItem.setter(res.value.data);
+                } else {
+                    console.error(`Error en catálogo [${configItem.endpoint}]:`, res.reason);
+                    configItem.setter([]);
+                }
+            });
+
         } catch (e) {
-            console.error('Error cargando catálogos:', e);
+            console.error('Error crítico inesperado cargando catálogos:', e);
         } finally {
             setLoading(false);
         }

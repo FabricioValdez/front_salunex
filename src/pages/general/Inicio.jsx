@@ -1,13 +1,13 @@
-import "../styles/almacen/Inicio.css";
+import "../../styles/general/Inicio.css";
 import { Plus, Bell } from "lucide-react";
-import InventoryChart from "../components/InventoryChart";
+import InventoryChart from "../../components/InventoryChart";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
-import PageContainer from "../components/ui/PageContainer";
-import SearchBar from "../components/ui/SearchBar";
-import Button from "../components/ui/Button";
-import Modal from "../components/ui/Modal";
-import DataCard from "../components/ui/DataCard";
+import PageContainer from "../../components/ui/PageContainer";
+import SearchBar from "../../components/ui/SearchBar";
+import Button from "../../components/ui/Button";
+import Modal from "../../components/ui/Modal";
+import DataCard from "../../components/ui/DataCard";
 
 const Inicio = () => {
   const navigate = useNavigate();

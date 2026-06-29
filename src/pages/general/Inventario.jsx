@@ -1,13 +1,13 @@
 import { useState } from "react";
 import { Pencil, Trash2, Plus, Search } from "lucide-react";
-import PageContainer from "../components/ui/PageContainer";
-import DataCard from "../components/ui/DataCard";
-import Table from "../components/ui/Table/Table";
-import Button from "../components/ui/Button";
-import Modal from "../components/ui/Modal";
-import { useCatalogos } from "../context/CatalogosContext";
-import api from "../services/api";
-import "../styles/almacen/Inventario.css";
+import PageContainer from "../../components/ui/PageContainer";
+import DataCard from "../../components/ui/DataCard";
+import Table from "../../components/ui/Table/Table";
+import Button from "../../components/ui/Button";
+import Modal from "../../components/ui/Modal";
+import { useCatalogos } from "../../context/CatalogosContext";
+import api from "../../services/api";
+import "../../styles/general/Inventario.css";
 
 const FILTROS = ["Todos", "Vigente", "Por revisar", "Por expirar", "Expirado"];
 

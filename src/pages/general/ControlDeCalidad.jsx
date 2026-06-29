@@ -1,12 +1,12 @@
 import { useState } from "react";
 import { CheckCircle, RotateCcw } from "lucide-react";
-import PageContainer from "../components/ui/PageContainer";
-import Table from "../components/ui/Table/Table";
-import SummaryCard from "../components/ui/SummaryCard";
-import { useCatalogos } from "../context/CatalogosContext";
+import PageContainer from "../../components/ui/PageContainer";
+import Table from "../../components/ui/Table/Table";
+import SummaryCard from "../../components/ui/SummaryCard";
+import { useCatalogos } from "../../context/CatalogosContext";
 import { AlertCircle, Clock, DollarSign } from "lucide-react";
-import api from "../services/api";
-import "../styles/almacen/ControlCalidad.css";
+import api from "../../services/api";
+import "../../styles/general/ControlCalidad.css";
 
 function EstadoBadge({ estado }) {
   const clase = {

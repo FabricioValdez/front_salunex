@@ -16,15 +16,13 @@ export async function login(email, password) {
     }
 
     console.log("🔥 Respuesta del backend:", data);
-    console.log("🔥 user antes de guardar:", data.user);
-    console.log("🔥 idrol:", data.user.idrol);
 
     localStorage.setItem('token', data.token);
     localStorage.setItem('idrol', data.user.idrol);
     localStorage.setItem('rol', data.user.rol);
     localStorage.setItem('email', data.user.email);
-
-    console.log("🔥 localStorage idrol guardado:", localStorage.getItem('idrol'));
+    // 🌟 Guardamos el array de permisos convirtiéndolo en un string JSON
+    localStorage.setItem('permisos', JSON.stringify(data.user.permisos || []));
 
     return data;
 }
