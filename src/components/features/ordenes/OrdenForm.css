@@ -1,0 +1,278 @@
+.orden-form {
+  width: 100%;
+}
+
+/* ── Grid de dos columnas ── */
+.orden-form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+  min-height: 480px;
+}
+
+/* ── Columna izquierda ── */
+.orden-col-left {
+  padding-right: 24px;
+  border-right: 1px solid #e5e7eb;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+/* ── Columna derecha ── */
+.orden-col-right {
+  padding-left: 24px;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── Grupos de formulario ── */
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 14px;
+}
+
+.form-group label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #374151;
+}
+
+.form-group input,
+.form-group select {
+  padding: 9px 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 13.5px;
+  font-family: inherit;
+  color: #111827;
+  background: #f9fafb;
+  transition: border-color 0.15s;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+  outline: none;
+  border-color: #2563eb;
+  background: #fff;
+}
+
+/* ── Lista de búsqueda ── */
+.med-list {
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  overflow: hidden;
+  flex: 1;
+}
+
+.med-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  border-bottom: 1px solid #f3f4f6;
+  transition: background 0.1s;
+}
+
+.med-item:last-child {
+  border-bottom: none;
+}
+
+.med-item:hover {
+  background: #f9fafb;
+}
+
+.med-item-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.med-nombre {
+  font-size: 13.5px;
+  font-weight: 500;
+  color: #111827;
+}
+
+.med-precio {
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.med-empty {
+  padding: 14px;
+  font-size: 13px;
+  color: #9ca3af;
+  text-align: center;
+}
+
+.add-btn {
+  padding: 5px 12px;
+  background: #2563eb;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-size: 12px;
+  font-family: inherit;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s;
+}
+
+.add-btn:hover {
+  background: #1d4ed8;
+}
+
+/* ── Columna derecha: productos ── */
+.productos-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.productos-header h4 {
+  font-size: 14px;
+  font-weight: 600;
+  color: #111827;
+  margin: 0;
+}
+
+.productos-count {
+  font-size: 12px;
+  color: #6b7280;
+  background: #f3f4f6;
+  padding: 2px 8px;
+  border-radius: 20px;
+}
+
+.productos-lista {
+  flex: 1;
+  overflow-y: auto;
+  min-height: 300px;
+  max-height: 300px;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  margin-bottom: 16px;
+}
+
+.productos-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  gap: 4px;
+  padding: 40px 0;
+}
+
+.productos-empty p {
+  font-size: 13.5px;
+  font-weight: 500;
+  color: #6b7280;
+  margin: 0;
+}
+
+.productos-empty span {
+  font-size: 12px;
+  color: #9ca3af;
+}
+
+/* ── Filas de producto ── */
+.producto-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.producto-row:last-child {
+  border-bottom: none;
+}
+
+.producto-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+}
+
+.producto-nombre {
+  font-size: 13px;
+  font-weight: 500;
+  color: #111827;
+}
+
+.producto-info small {
+  font-size: 11px;
+  color: #9ca3af;
+}
+
+.producto-controles {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.cantidad-input {
+  width: 52px;
+  padding: 5px 8px;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  font-size: 13px;
+  text-align: center;
+  font-family: inherit;
+}
+
+.producto-subtotal {
+  font-size: 13px;
+  font-weight: 600;
+  color: #111827;
+  min-width: 64px;
+  text-align: right;
+}
+
+.delete-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #9ca3af;
+  display: flex;
+  align-items: center;
+  padding: 4px;
+  border-radius: 4px;
+  transition: color 0.15s, background 0.15s;
+}
+
+.delete-btn:hover {
+  color: #dc2626;
+  background: #fee2e2;
+}
+
+/* ── Total ── */
+.orden-total-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  border-top: 1px solid #e5e7eb;
+  margin-bottom: 16px;
+  font-size: 14px;
+  color: #374151;
+}
+
+.orden-total-row strong {
+  font-size: 18px;
+  font-weight: 700;
+  color: #111827;
+}
+
+/* ── Acciones ── */
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}

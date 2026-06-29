@@ -1,0 +1,106 @@
+/* ── Layout dos paneles ── */
+.recepcion-layout {
+    display: flex;
+    gap: 16px;
+}
+
+/* ── Panel detalle ── */
+.recepcion-detalle {
+    flex: 1;
+    background: white;
+    border-radius: 12px;
+    border: 1px solid #e5e7eb;
+    padding: 24px;
+}
+
+.recepcion-detalle-header {
+    margin-bottom: 20px;
+}
+
+.recepcion-detalle-titulo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 4px;
+}
+
+.recepcion-detalle-titulo h3 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 700;
+}
+
+.recepcion-detalle-sub {
+    margin: 0;
+    color: #6b7280;
+    font-size: 13px;
+}
+
+/* ── Botones confirmar/cancelar ── */
+.recepcion-acciones {
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+    margin-top: 20px;
+}
+
+.recepcion-btn-cancelar {
+    padding: 10px 20px;
+    background: #fef2f2;
+    color: #ef4444;
+    border: 1px solid #fecaca;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: inherit;
+}
+
+.recepcion-btn-cancelar:hover {
+    background: #fee2e2;
+}
+
+.recepcion-btn-confirmar {
+    padding: 10px 20px;
+    background: #22c55e;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: inherit;
+}
+
+.recepcion-btn-confirmar:hover {
+    background: #16a34a;
+}
+
+.recepcion-btn-confirmar:disabled,
+.recepcion-btn-cancelar:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* ── Input recibidos/notas ── */
+.recepcion-input {
+    width: 70px;
+    padding: 4px 8px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 13px;
+    font-family: inherit;
+}
+
+.recepcion-input-notas {
+    width: 100%;
+    padding: 4px 8px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 12px;
+    font-family: inherit;
+}

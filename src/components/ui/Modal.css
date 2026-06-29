@@ -1,0 +1,63 @@
+.salunex-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.salunex-modal {
+  background: white;
+  width: 500px;
+  max-width: 90%;
+  border-radius: 14px;
+  padding: 20px;
+  animation: fadeIn 0.2s ease;
+}
+
+.salunex-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.salunex-modal-close {
+  background: none;
+  border: none;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+.salunex-modal-body {
+  margin-top: 10px;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.modal-description {
+  margin-bottom: 20px;
+  color: #4b5563;
+  font-size: 14px;
+}
+
+.modal-options {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.salunex-modal.modal-lg {
+  width: 800px;
+}

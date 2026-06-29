@@ -1,0 +1,74 @@
+.filter-modal{
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 10px 5px;
+}
+
+.filter-title{
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 5px;
+  color: #333;
+}
+
+.form-group{
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.form-group label{
+  font-size: 14px;
+  font-weight: 500;
+  color: #555;
+}
+
+.form-group select,
+.form-group input{
+  padding: 8px 10px;
+  border-radius: 6px;
+  border: 1px solid #dcdcdc;
+  font-size: 14px;
+  transition: all 0.2s ease;
+}
+
+.form-group select:focus,
+.form-group input:focus{
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 2px rgba(59,130,246,0.2);
+}
+
+.modal-actions{
+  display: flex;
+  justify-content: space-between;
+  margin-top: 10px;
+}
+
+.primary-btn{
+  background: #3b82f6;
+  color: white;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.primary-btn:hover{
+  background: #2563eb;
+}
+
+.secondary-btn{
+  background: #f3f4f6;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.secondary-btn:hover{
+  background: #e5e7eb;
+}

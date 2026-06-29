@@ -1,0 +1,230 @@
+/* GENERAL */
+.dashboard-title h1 {
+  font-size: 28px;
+  font-weight: 600;
+  margin-bottom: 5px;
+}
+
+.dashboard-title p {
+  color: #6c757d;
+  margin-bottom: 25px;
+}
+
+/* CARDS */
+.summary-card{
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+
+  padding: 18px;
+  border-radius: 10px;
+  background: white;
+  border: 1px solid #eee;
+}
+
+.card-icon{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 42px;
+  height: 42px;
+
+  border-radius: 10px;
+  background: #f4f6f8;
+}
+
+.card-info p{
+  margin: 0;
+  font-size: 14px;
+  color: #777;
+}
+
+.card-info h2{
+  margin: 4px 0 0 0;
+  font-size: 26px;
+  font-weight: 600;
+}
+
+.pending .card-icon{
+  background: #e8f1ff;
+  color: #3b82f6;
+}
+
+.expired .card-icon{
+  background: #ffeaea;
+  color: #ef4444;
+}
+
+.total .card-icon{
+  background: #e8f9f0;
+  color: #22c55e;
+}
+
+/* ACTIONS */
+.actions-bar {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 25px;
+  align-items: center;
+}
+
+.search-box {
+  flex: 1;
+  position: relative;
+}
+
+.search-box input {
+  width: 100%;
+  padding: 10px 35px 10px 12px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+}
+
+.search-box svg {
+  position: absolute;
+  right: 10px;
+  top: 10px;
+  color: #6b7280;
+}
+
+.filter-btn {
+  padding: 10px 15px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  background: white;
+  cursor: pointer;
+}
+
+.primary-btn {
+  background: #3b82f6;
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.secondary-btn {
+  background: #e5e7eb;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+/* CONTENT SPLIT */
+.ordenes-content {
+  display: flex;
+  gap: 20px;
+}
+
+/* LIST */
+.orders-list {
+  flex: 1;
+  background: white;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  padding: 15px;
+}
+
+.active-row {
+  background: #eef2ff;
+}
+
+/* DETAIL */
+.order-detail {
+  flex: 1;
+  background: white;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  padding: 20px;
+}
+
+.detail-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.provider-info {
+  color: #6b7280;
+  margin-bottom: 20px;
+}
+
+.timeline {
+  margin-bottom: 20px;
+  padding-left: 18px;
+  color: #374151;
+}
+
+.product-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  margin-bottom: 10px;
+}
+
+.detail-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+/* BADGES */
+.badge {
+  padding: 5px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+}
+
+.completed {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.sent {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+.cancelled {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+/* ESTATUS */
+.status {
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: capitalize;
+  width: fit-content;
+}
+
+/* Verde */
+.status-completado {
+  background-color: #d1f7e0;
+  color: #0f9d58;
+}
+
+/* Azul */
+.status-pendiente {
+  background-color: #dbeafe;
+  color: #2563eb;
+}
+
+/* Rojo */
+.status-cancelado {
+  background-color: #fee2e2;
+  color: #dc2626;
+}
+
+.orden-modal-wide {
+  width: 860px;
+}
