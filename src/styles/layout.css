@@ -11,10 +11,11 @@
   flex-direction: column;
   padding: 10px;
   border-right: 1px solid #ddd;
+  overflow: hidden;
 }
 
 .sidebar.collapsed {
-  width: 80px;
+  width: 63px;
 }
 
 .top-section {
@@ -22,24 +23,35 @@
   align-items: center;
   gap: 10px;
   margin-bottom: 20px;
+  height: 40px;
+  padding: 0 2px;
 }
 
 .toggle-btn {
   background: none;
   border: none;
   cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
 }
 
 .logo {
   font-size: 18px;
   font-weight: bold;
+  margin: 0;
+  line-height: 1;
+  white-space: nowrap;
 }
 
 nav {
   flex: 1;
 }
 
-.nav-item {
+.sidebar-nav-item {
   display: flex;
   align-items: center;
   gap: 15px;
@@ -49,15 +61,50 @@ nav {
   border-radius: 8px;
   margin-bottom: 5px;
   transition: background 0.2s;
+  white-space: nowrap;
+  min-height: 40px;
 }
 
-.nav-item:hover {
+.sidebar-nav-item:hover {
+    background-color: #e9ecef;
+}
+
+.sidebar.collapsed .sidebar-nav-item {
+  justify-content: center;
+  padding: 10px 0;
+  gap: 0;
+}
+
+.sidebar-nav-item svg {
+  flex-shrink: 0;
+}
+
+.sidebar-bottom .sidebar-nav-item:hover {
   background-color: #e9ecef;
 }
 
-.nav-item.active {
+.sidebar-nav-item.active {
   background-color: #dbeafe;
   font-weight: bold;
+}
+
+.sidebar-bottom {
+  border-top: 1px solid #ddd;
+  padding-top: 8px;
+  margin-bottom: 4px;
+}
+
+.sidebar-bottom .sidebar-nav-item {
+  width: 100%;
+  border: none;
+  background: none;
+  cursor: pointer;
+  text-align: left;
+}
+
+.sidebar.collapsed .sidebar-bottom .sidebar-nav-item {
+  justify-content: center;
+  padding: 10px 0;
 }
 
 .profile {
@@ -70,10 +117,12 @@ nav {
 
 .profile img {
   border-radius: 50%;
+  flex-shrink: 0;
 }
 
 .content {
   flex: 1;
   padding: 20px;
   background-color: #f1f3f5;
+  overflow-y: auto;
 }
