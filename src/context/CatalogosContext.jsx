@@ -5,19 +5,21 @@ import AuthContext from "./AuthContext";
 const CatalogosContext = createContext();
 
 export function CatalogosProvider({ children }) {
-    const [roles, setRoles]                             = useState([]);
-    const [empresas, setEmpresas]                       = useState([]);
-    const [farmacias, setFarmacias]                     = useState([]);
-    const [almacenes, setAlmacenes]                     = useState([]);
-    const [productos, setProductos]                     = useState([]);
-    const [movimientos, setMovimientos]                 = useState([]);
-    const [inventario, setInventario]                   = useState([]);
-    const [categoriasProducto, setCategoriasProducto]   = useState([]);
+    const [roles, setRoles] = useState([]);
+    const [empresas, setEmpresas] = useState([]);
+    const [farmacias, setFarmacias] = useState([]);
+    const [almacenes, setAlmacenes] = useState([]);
+    const [productos, setProductos] = useState([]);
+    const [movimientos, setMovimientos] = useState([]);
+    const [inventario, setInventario] = useState([]);
+    const [controlCalidad, setControlCalidad] = useState([]);
+    const [recepcionAlmacen, setRecepcionAlmacen] = useState([]);
+    const [categoriasProducto, setCategoriasProducto] = useState([]);
     const [clasificacionesProducto, setClasificacionesProducto] = useState([]);
-    const [presentacionesProducto, setPresentacionesProducto]   = useState([]);
-    const [viasAdministracion, setViasAdministracion]           = useState([]);
-    const [tiposMovimiento, setTiposMovimiento]                 = useState([]);
-    const [loading, setLoading]                                 = useState(false);
+    const [presentacionesProducto, setPresentacionesProducto] = useState([]);
+    const [viasAdministracion, setViasAdministracion] = useState([]);
+    const [tiposMovimiento, setTiposMovimiento] = useState([]);
+    const [loading, setLoading] = useState(false);
 
     const { user } = useContext(AuthContext);
 
@@ -26,28 +28,40 @@ export function CatalogosProvider({ children }) {
     }, [user]);
 
     const fetchCatalogos = async () => {
+        console.log("Permisos detectados en el contexto global:", user?.permisos);
         if (!user || !user.permisos) return;
-        
+
         setLoading(true);
-        
+
         // Mapeo de qué clave de módulo desbloquea qué endpoint de catálogo
+        // 📍 Ubicación: Reemplaza este bloque dentro de fetchCatalogos en CatalogosContext.jsx
+
         const configuracionCatalogos = [
+            // --- Gestión de Personal, Cuentas y Roles ---
             { clave: 'GROL', endpoint: '/roles', setter: setRoles },
+
+            // --- Entidades del Negocio y Almacenamiento ---
             { clave: 'GPER', endpoint: '/empresas', setter: setEmpresas },
             { clave: 'GFAR', endpoint: '/farmacias', setter: setFarmacias },
             { clave: 'GALM', endpoint: '/almacenes', setter: setAlmacenes },
+
+            // --- Flujos Operativos y Movimientos (Páginas Generales) ---
+            { clave: 'GMOV', endpoint: '/inventario', setter: setInventario },
+            { clave: 'GCDC', endpoint: '/control-calidad', setter: setControlCalidad },
+            { clave: 'GORD', endpoint: '/ordenes', setter: setMovimientos },
+            { clave: 'RECP', endpoint: '/recepcion-inventario', setter: setRecepcionAlmacen },
+
+            // --- Catálogos Finos de Productos (Desglosados uno a uno) ---
             { clave: 'GPRO', endpoint: '/productos', setter: setProductos },
-            { clave: 'GMOV', endpoint: '/movimientos', setter: setMovimientos },
-            { clave: 'GALM', endpoint: '/inventario', setter: setInventario },
-            { clave: 'GPRO', endpoint: '/categorias-producto', setter: setCategoriasProducto },
-            { clave: 'GPRO', endpoint: '/clasificaciones-producto', setter: setClasificacionesProducto },
-            { clave: 'GPRO', endpoint: '/presentaciones-producto', setter: setPresentacionesProducto },
-            { clave: 'GPRO', endpoint: '/vias-administracion', setter: setViasAdministracion },
-            { clave: 'GPER', endpoint: '/tipos-movimiento', setter: setTiposMovimiento },
+            { clave: 'GCAT', endpoint: '/categorias-producto', setter: setCategoriasProducto },
+            { clave: 'GCLA', endpoint: '/clasificaciones-producto', setter: setClasificacionesProducto },
+            { clave: 'GPRE', endpoint: '/presentaciones-producto', setter: setPresentacionesProducto },
+            { clave: 'GVIA', endpoint: '/vias-administracion', setter: setViasAdministracion },
+            { clave: 'GTIP', endpoint: '/tipos-movimiento', setter: setTiposMovimiento },
         ];
 
         // 🌟 Filtramos únicamente los endpoints para los cuales el usuario tiene permiso
-        const catalogosPermitidos = configuracionCatalogos.filter(item => 
+        const catalogosPermitidos = configuracionCatalogos.filter(item =>
             user.permisos.includes(item.clave)
         );
 
@@ -75,18 +89,20 @@ export function CatalogosProvider({ children }) {
 
     const refreshCatalogo = async (catalogo, nuevosDatos = null) => {
         const setters = {
-            roles:                   setRoles,
-            empresas:                setEmpresas,
-            farmacias:               setFarmacias,
-            almacenes:               setAlmacenes,
-            productos:               setProductos,
-            movimientos:             setMovimientos,
-            inventario:              setInventario,
-            categoriasProducto:      setCategoriasProducto,
+            roles: setRoles,
+            empresas: setEmpresas,
+            farmacias: setFarmacias,
+            almacenes: setAlmacenes,
+            productos: setProductos,
+            movimientos: setMovimientos,
+            inventario: setInventario,
+            controlCalidad: setControlCalidad,
+            recepcionAlmacen: setRecepcionAlmacen,
+            categoriasProducto: setCategoriasProducto,
             clasificacionesProducto: setClasificacionesProducto,
-            presentacionesProducto:  setPresentacionesProducto,
-            viasAdministracion:      setViasAdministracion,
-            tiposMovimiento:         setTiposMovimiento,
+            presentacionesProducto: setPresentacionesProducto,
+            viasAdministracion: setViasAdministracion,
+            tiposMovimiento: setTiposMovimiento,
         };
 
         if (nuevosDatos) {
@@ -95,18 +111,20 @@ export function CatalogosProvider({ children }) {
         }
 
         const endpoints = {
-            roles:                   '/roles',
-            empresas:                '/empresas',
-            farmacias:               '/farmacias',
-            almacenes:               '/almacenes',
-            productos:               '/productos',
-            movimientos:             '/movimientos',
-            inventario:              '/inventario',
-            categoriasProducto:      '/categorias-producto',
+            roles: '/roles',
+            empresas: '/empresas',
+            farmacias: '/farmacias',
+            almacenes: '/almacenes',
+            productos: '/productos',
+            movimientos: '/movimientos',
+            inventario: '/inventario',
+            controlCalidad: '/control-calidad',
+            recepcionAlmacen: '/recepcion-inventario',
+            categoriasProducto: '/categorias-producto',
             clasificacionesProducto: '/clasificaciones-producto',
-            presentacionesProducto:  '/presentaciones-producto',
-            viasAdministracion:      '/vias-administracion',
-            tiposMovimiento:         '/tipos-movimiento',
+            presentacionesProducto: '/presentaciones-producto',
+            viasAdministracion: '/vias-administracion',
+            tiposMovimiento: '/tipos-movimiento',
         };
 
         try {
@@ -126,6 +144,8 @@ export function CatalogosProvider({ children }) {
             productos,
             movimientos,
             inventario,
+            controlCalidad,
+            recepcionAlmacen,
             categoriasProducto,
             clasificacionesProducto,
             presentacionesProducto,
