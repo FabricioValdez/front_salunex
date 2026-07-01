@@ -52,26 +52,22 @@ function Login() {
   };
 
   return (
-    <Container
-      fluid
-      className="vh-100 d-flex align-items-center justify-content-center"
-      style={{ backgroundColor: "#e1e3e6" }}
-    >
-      <Row className="w-100 justify-content-center">
-        <Col xs={11} sm={7} md={4} lg={3}>
-          <div className="text-center mb-4">
-            <div
-              className="mx-auto mb-3 d-flex align-items-center justify-content-center"
-              style={{
-                width: "80px",
-                height: "80px",
-                backgroundColor: "#5c7cfa",
-                borderRadius: "20px",
-                color: "white",
-                fontSize: "35px",
-              }}
-            >
-              👤
+    <div className="login-page">
+      <div className="login-overlay"></div>
+
+      <Container fluid className="vh-100 d-flex align-items-center">
+        <Row className="w-100 align-items-center">
+
+          {/* LADO IZQUIERDO */}
+          <Col md={6} className="text-center text-md-start text-white ps-md-5">
+            <div className="brand-container">
+              <div className="brand-icon">👤</div>
+              <div>
+                <h1 className="brand-title">SALUNEX</h1>
+                <p className="brand-subtitle">
+                  Sistema de gestión de almacén
+                </p>
+              </div>
             </div>
             <h3 className="fw-bold">SALUNEX</h3>
             <p className="text-muted">Sistema de gestión de almacén</p>
