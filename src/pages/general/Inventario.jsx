@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Pencil, Trash2, Plus, Search } from "lucide-react";
+import { Pencil, Trash2, Search, Calendar, X } from "lucide-react";
 import PageContainer from "../../components/ui/PageContainer";
 import DataCard from "../../components/ui/DataCard";
 import Table from "../../components/ui/Table/Table";
@@ -32,35 +32,33 @@ function VencimientoBadge({ fecha }) {
     return <span className={`badge-estatus ${clases[estado] || ""}`}>{estado}</span>;
 }
 
-function InventarioForm({ form, setForm, productos, almacenes, farmacias, onSubmit, onClose, loading, error }) {
+function InventarioForm({ form, setForm, onSubmit, onClose, loading, error }) {
     return (
         <>
             {error && <div className="alert alert-danger py-2 text-center mb-3">{error}</div>}
+
             <div className="mb-3">
                 <label className="form-label">Producto</label>
-                <select className="form-select" value={form.id_producto}
-                    onChange={(e) => setForm({ ...form, id_producto: e.target.value })}>
-                    <option value="">Selecciona un producto</option>
-                    {productos.map((p) => <option key={p.id} value={p.id}>{p.nombre}</option>)}
-                </select>
+                <input type="text" className="form-control" value={form.producto_nombre} disabled style={{ backgroundColor: "#f3f4f6", color: "#4b5563" }} />
             </div>
+
             <div className="mb-3">
                 <label className="form-label">Lote</label>
-                <input type="text" className="form-control" value={form.lote}
-                    onChange={(e) => setForm({ ...form, lote: e.target.value })}
-                    placeholder="Ej. LOTE001" />
+                <input type="text" className="form-control" value={form.lote} disabled style={{ backgroundColor: "#f3f4f6", color: "#4b5563" }} />
             </div>
-            <div className="mb-3">
-                <label className="form-label">Cantidad</label>
-                <input type="number" className="form-control" value={form.cantidad}
-                    onChange={(e) => setForm({ ...form, cantidad: e.target.value })}
-                    placeholder="0" />
-            </div>
+
             <div className="mb-4">
-                <label className="form-label">Fecha de expiración</label>
-                <input type="date" className="form-control" value={form.fecha_expiracion}
-                    onChange={(e) => setForm({ ...form, fecha_expiracion: e.target.value })} />
+                <label className="form-label">Cantidad</label>
+                <input
+                    type="number"
+                    className="form-control"
+                    value={form.cantidad}
+                    onChange={(e) => setForm({ ...form, cantidad: e.target.value })}
+                    placeholder="0"
+                    autoFocus
+                />
             </div>
+
             <div className="form-actions">
                 <Button variant="secondary" onClick={onClose}>Cancelar</Button>
                 <Button variant="primary" onClick={onSubmit} disabled={loading}>
@@ -89,18 +87,21 @@ function DeleteModal({ isOpen, onClose, onConfirm, loading, item }) {
 
 const formVacio = {
     id_producto: "", id_almacen: "", id_farmacia: "",
-    lote: "", cantidad: "", fecha_expiracion: ""
+    lote: "", cantidad: "", fecha_expiracion: "", producto_nombre: ""
 };
 
 function Inventario() {
-    const { inventario, productos, almacenes, farmacias, refreshCatalogo } = useCatalogos();
+    const { inventario, refreshCatalogo } = useCatalogos();
 
     const [search, setSearch] = useState("");
     const [filtro, setFiltro] = useState("Todos");
+
+    const [fechaInicio, setFechaInicio] = useState("");
+    const [fechaFin, setFechaFin] = useState("");
+
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
     const [modalOpen, setModalOpen] = useState(false);
-    const [isEdit, setIsEdit] = useState(false);
     const [editId, setEditId] = useState(null);
     const [form, setForm] = useState(formVacio);
     const [deleteOpen, setDeleteOpen] = useState(false);
@@ -112,15 +113,21 @@ function Inventario() {
             item.lote?.toLowerCase().includes(search.toLowerCase()) ||
             item.almacen?.toLowerCase().includes(search.toLowerCase()) ||
             item.farmacia?.toLowerCase().includes(search.toLowerCase());
-        const estado = getEstado(item.fecha_expiracion);
-        const coincideFiltro = filtro === "Todos" || estado === filtro;
-        return coincideBusqueda && coincideFiltro;
-    });
 
-    const handleNuevo = () => {
-        setForm(formVacio); setIsEdit(false);
-        setEditId(null); setError(""); setModalOpen(true);
-    };
+        const estado = getEstado(item.fecha_expiracion);
+        const coincideFiltroEstado = filtro === "Todos" || estado === filtro;
+
+        let coincideFecha = true;
+        if (item.fecha_expiracion) {
+            const fechaItem = item.fecha_expiracion.split('T')[0];
+            if (fechaInicio && fechaItem < fechaInicio) coincideFecha = false;
+            if (fechaFin && fechaItem > fechaFin) coincideFecha = false;
+        } else if (fechaInicio || fechaFin) {
+            coincideFecha = false;
+        }
+
+        return coincideBusqueda && coincideFiltroEstado && coincideFecha;
+    });
 
     const handleEditar = (item) => {
         setForm({
@@ -130,25 +137,38 @@ function Inventario() {
             lote: item.lote,
             cantidad: item.cantidad,
             fecha_expiracion: item.fecha_expiracion ?? "",
+            producto_nombre: item.producto
         });
-        setIsEdit(true); setEditId(item.id); setError(""); setModalOpen(true);
+        setEditId(item.id); setError(""); setModalOpen(true);
     };
 
     const handleSubmit = async () => {
         setLoading(true); setError("");
         try {
-            if (isEdit) {
-                await api.put(`/inventario/${editId}`, form);
-                refreshCatalogo('inventario', inventario.map((i) =>
-                    i.id === editId ? { ...i, ...form } : i));
-            } else {
-                const res = await api.post('/inventario', form);
-                refreshCatalogo('inventario', [...inventario, res.data.inventario]);
-            }
+            const payload = {
+                id_producto: form.id_producto,
+                id_almacen: form.id_almacen,
+                id_farmacia: form.id_farmacia,
+                lote: form.lote,
+                cantidad: Number(form.cantidad),
+                fecha_expiracion: form.fecha_expiracion || null
+            };
+
+            await api.put(`/inventario/${editId}`, payload);
+
+            refreshCatalogo('inventario', inventario.map((i) =>
+                i.id === editId ? { ...i, cantidad: payload.cantidad } : i
+            ));
+
             setModalOpen(false);
         } catch (e) {
             setError(e.response?.data?.message || e.message);
         } finally { setLoading(false); }
+    };
+
+    const handleDeleteClick = (item) => {
+        setDeleteTarget(item);
+        setDeleteOpen(true);
     };
 
     const handleConfirmDelete = async () => {
@@ -161,18 +181,102 @@ function Inventario() {
         finally { setLoading(false); }
     };
 
+    const limpiarFechas = () => {
+        setFechaInicio("");
+        setFechaFin("");
+    };
+
     return (
         <PageContainer>
             <div className="dashboard-title">
                 <h1>Mercancía e inventario diario</h1>
-                <p>Gestione las entradas diarias de existencias, haga seguimiento de fechas de vencimiento y monitoree niveles en tiempo real.</p>
+                <p>Gestione las entradas de existencias y controle las cantidades disponibles en tiempo real.</p>
             </div>
 
-            <div className="inventario-actions">
-                <div className="inventario-search">
+            {/* Contenedor principal de acciones estilizado */}
+            <div style={{
+                display: "flex",
+                flexWrap: "wrap",
+                gap: "16px",
+                alignItems: "center",
+                marginBottom: "20px",
+                width: "100%"
+            }}>
+                {/* Buscador */}
+                <div className="inventario-search" style={{ flex: "1 1 320px", position: "relative" }}>
                     <input type="text" placeholder="Buscar medicamento, lote, almacén o farmacia..."
                         value={search} onChange={(e) => setSearch(e.target.value)} />
                     <Search size={16} className="inventario-search-icon" />
+                </div>
+
+                {/* Contenedor de Fechas Estilizado tipo Card o Pill */}
+                <div style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "12px",
+                    background: "#f9fafb",
+                    border: "1px solid #e5e7eb",
+                    borderRadius: "10px",
+                    padding: "6px 14px",
+                    boxShadow: "0 1px 2px rgba(0,0,0,0.05)"
+                }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
+                        <Calendar size={15} color="#9ca3af" />
+                        <span style={{ fontSize: "13px", fontWeight: "500", color: "#4b5563" }}>Rango Exp:</span>
+                    </div>
+
+                    <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                        <input
+                            type="date"
+                            style={{
+                                border: "none",
+                                background: "transparent",
+                                fontSize: "13px",
+                                color: "#1f2937",
+                                outline: "none",
+                                cursor: "pointer"
+                            }}
+                            value={fechaInicio}
+                            onChange={(e) => setFechaInicio(e.target.value)}
+                        />
+                        <span style={{ color: "#d1d5db", fontSize: "13px" }}>—</span>
+                        <input
+                            type="date"
+                            style={{
+                                border: "none",
+                                background: "transparent",
+                                fontSize: "13px",
+                                color: "#1f2937",
+                                outline: "none",
+                                cursor: "pointer"
+                            }}
+                            value={fechaFin}
+                            onChange={(e) => setFechaFin(e.target.value)}
+                        />
+                    </div>
+
+                    {/* Botón de limpiar minimalista */}
+                    {(fechaInicio || fechaFin) && (
+                        <button
+                            onClick={limpiarFechas}
+                            style={{
+                                display: "flex",
+                                alignItems: "center",
+                                background: "#fee2e2",
+                                border: "none",
+                                borderRadius: "50%",
+                                width: "20px",
+                                height: "20px",
+                                justifyContent: "center",
+                                color: "#ef4444",
+                                cursor: "pointer",
+                                transition: "background 0.2s"
+                            }}
+                            title="Limpiar fechas"
+                        >
+                            <X size={12} strokeWidth={3} />
+                        </button>
+                    )}
                 </div>
             </div>
 
@@ -199,7 +303,7 @@ function Inventario() {
                             <td style={{ color: "#6b7280" }}>
                                 {item.fecha_expiracion
                                     ? new Date(item.fecha_expiracion).toLocaleDateString('es-MX', {
-                                        day: '2-digit', month: 'short', year: 'numeric'
+                                        day: '2-digit', month: 'short', year: 'numeric', timeZone: 'UTC'
                                     })
                                     : "—"}
                             </td>
@@ -209,16 +313,12 @@ function Inventario() {
                                     <span>Unidades</span>
                                 </div>
                             </td>
-                            <td style={{ color: "#6b7280" }}>{item.almacen}</td>
-                            <td style={{ color: "#6b7280" }}>{item.farmacia}</td>
+
                             <td><VencimientoBadge fecha={item.fecha_expiracion} /></td>
                             <td>
-                                <div className="table-actions">
+                                <div className="table-actions" style={{ display: 'flex', gap: '0.5rem' }}>
                                     <button className="action-btn" onClick={() => handleEditar(item)}>
                                         <Pencil size={16} color="#3b82f6" />
-                                    </button>
-                                    <button className="action-btn" onClick={() => { setDeleteTarget(item); setDeleteOpen(true); }}>
-                                        <Trash2 size={16} color="#ef4444" />
                                     </button>
                                 </div>
                             </td>
@@ -226,6 +326,17 @@ function Inventario() {
                     )}
                 />
             </DataCard>
+
+            <Modal isOpen={modalOpen} onClose={() => setModalOpen(false)} title="Modificar Cantidad en Inventario">
+                <InventarioForm
+                    form={form}
+                    setForm={setForm}
+                    onSubmit={handleSubmit}
+                    onClose={() => setModalOpen(false)}
+                    loading={loading}
+                    error={error}
+                />
+            </Modal>
 
             <DeleteModal isOpen={deleteOpen} onClose={() => setDeleteOpen(false)}
                 onConfirm={handleConfirmDelete} loading={loading} item={deleteTarget} />
