@@ -45,22 +45,6 @@ function InventarioForm({ form, setForm, productos, almacenes, farmacias, onSubm
                 </select>
             </div>
             <div className="mb-3">
-                <label className="form-label">Almacén</label>
-                <select className="form-select" value={form.id_almacen}
-                    onChange={(e) => setForm({ ...form, id_almacen: e.target.value })}>
-                    <option value="">Selecciona un almacén</option>
-                    {almacenes.map((a) => <option key={a.id} value={a.id}>{a.nombre}</option>)}
-                </select>
-            </div>
-            <div className="mb-3">
-                <label className="form-label">Farmacia</label>
-                <select className="form-select" value={form.id_farmacia}
-                    onChange={(e) => setForm({ ...form, id_farmacia: e.target.value })}>
-                    <option value="">Selecciona una farmacia</option>
-                    {farmacias.map((f) => <option key={f.id} value={f.id}>{f.nombre}</option>)}
-                </select>
-            </div>
-            <div className="mb-3">
                 <label className="form-label">Lote</label>
                 <input type="text" className="form-control" value={form.lote}
                     onChange={(e) => setForm({ ...form, lote: e.target.value })}
@@ -190,10 +174,6 @@ function Inventario() {
                         value={search} onChange={(e) => setSearch(e.target.value)} />
                     <Search size={16} className="inventario-search-icon" />
                 </div>
-                <Button variant="secondary">Exportar</Button>
-                <Button variant="primary" icon={Plus} onClick={handleNuevo}>
-                    Agregar medicamento
-                </Button>
             </div>
 
             <div className="filtros-bar">
@@ -205,7 +185,7 @@ function Inventario() {
 
             <DataCard>
                 <Table
-                    columns={["Nombre Medicamento", "Lote", "Fecha Exp.", "Cantidad", "Almacén", "Farmacia", "Estado", "Acciones"]}
+                    columns={["Nombre Medicamento", "Lote", "Fecha Exp.", "Cantidad", "Estado", "Acciones"]}
                     data={filtrados}
                     renderRow={(item) => (
                         <tr key={item.id}>
@@ -246,14 +226,6 @@ function Inventario() {
                     )}
                 />
             </DataCard>
-
-            <Modal isOpen={modalOpen} onClose={() => setModalOpen(false)}
-                title={isEdit ? "Editar registro" : "Agregar medicamento"}>
-                <InventarioForm form={form} setForm={setForm}
-                    productos={productos} almacenes={almacenes} farmacias={farmacias}
-                    onSubmit={handleSubmit} onClose={() => setModalOpen(false)}
-                    loading={loading} error={error} />
-            </Modal>
 
             <DeleteModal isOpen={deleteOpen} onClose={() => setDeleteOpen(false)}
                 onConfirm={handleConfirmDelete} loading={loading} item={deleteTarget} />
