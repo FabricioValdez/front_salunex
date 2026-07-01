@@ -61,13 +61,7 @@ function Login() {
           {/* LADO IZQUIERDO */}
           <Col md={6} className="text-center text-md-start text-white ps-md-5">
             <div className="brand-container">
-              <div className="brand-icon">👤</div>
-              <div>
-                <h1 className="brand-title">SALUNEX</h1>
-                <p className="brand-subtitle">
-                  Sistema de gestión de almacén
-                </p>
-              </div>
+              <div className="brand-icon"><img src="/public/logo_2.png" alt="" /></div>
             </div>
           </Col>
 
