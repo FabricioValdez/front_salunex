@@ -1,5 +1,6 @@
-import { useState, useContext } from "react";
-import InventoryContext from "../context/InventoryContext";
+const Inventario = () => {
+  return <h1>Vista Inventario</h1>;
+};
 
 import "../styles/Inventario.css";
 

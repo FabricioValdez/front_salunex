@@ -1,4 +1,4 @@
-.table-container{
+/* .table-container{
   width:100%;
 }
 
@@ -70,4 +70,206 @@
 
 .action-btn:hover {
   opacity: 0.7;
+}
+
+.pagination-input-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.pagination-input {
+  width: 50px;
+  padding: 4px 6px;
+  text-align: center;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 14px;
+} */
+
+/* Oculta las flechas por defecto del input number si te molestan */
+/* .pagination-input::-webkit-outer-spin-button,
+.pagination-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+} */
+
+/* ==========================================================================
+   1. ESTILOS DE LA TABLA (DISEÑO ORIGINAL 1)
+   ========================================================================== */
+.table-wrapper {
+  width: 100%;
+  font-family: sans-serif;
+}
+
+.salunex-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.salunex-table th {
+  text-align: left;
+  padding: 12px;
+  font-size: 14px;
+  color: #6b7280;
+  border-bottom: 1px solid #eee;
+}
+
+.salunex-table td {
+  padding: 12px;
+  border-bottom: 1px solid #f3f4f6;
+  font-size: 14px;
+}
+
+.salunex-table tbody tr:hover {
+  background: #f9fafb;
+}
+
+.no-data {
+  text-align: center;
+  color: #9ca3af;
+  padding: 20px !important;
+}
+
+/* Acciones dentro de la tabla */
+.table-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.action-btn {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  padding: 4px;
+}
+
+.action-btn:hover {
+  opacity: 0.7;
+}
+
+/* ==========================================================================
+   2. ESTILOS DE LA NUEVA PAGINACIÓN (FUSIONADO)
+   ========================================================================== */
+.table-pagination-container {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  padding: 15px 12px;
+  color: #333;
+  font-size: 14px;
+}
+
+/* Fila Superior: Datos y selectores */
+.pagination-top-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.pagination-info {
+  display: flex;
+  gap: 20px;
+  color: #6b7280;
+  /* Gris a juego con los headers */
+}
+
+.pagination-controls {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+/* Customización del select e input con estética del Diseño 1 */
+.pagination-controls select,
+.goto-wrapper input {
+  padding: 5px 8px;
+  border: 1px solid #ddd;
+  /* Borde sutil */
+  border-radius: 6px;
+  /* Bordes más suaves */
+  background: #fff;
+  outline: none;
+  color: #4b5563;
+}
+
+.goto-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: #6b7280;
+}
+
+.goto-wrapper input {
+  width: 45px;
+  text-align: center;
+}
+
+/* Fila Inferior: Botonera con estética limpia */
+.pagination-bottom-row {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.pagination-nav-numbers {
+  display: flex;
+  gap: 5px;
+}
+
+/* Botones de navegación con el look & feel minimalista */
+.pagination-bottom-row button {
+  min-width: 32px;
+  height: 32px;
+  padding: 0 6px;
+  border: 1px solid #ddd;
+  background-color: #fff;
+  color: #4b5563;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  border-radius: 6px;
+  transition: all 0.2s;
+}
+
+.pagination-bottom-row button:hover:not(:disabled) {
+  background-color: #f9fafb;
+  /* Mismo hover de las filas */
+  border-color: #ccc;
+}
+
+.pagination-bottom-row button:disabled {
+  color: #d1d5db;
+  cursor: not-allowed;
+  background-color: #fafafa;
+  border-color: #eee;
+}
+
+/* Elipsis (...) estática */
+.pagination-ellipsis {
+  padding: 0 4px;
+  color: #9ca3af;
+  display: flex;
+  align-items: flex-end;
+  height: 32px;
+  padding-bottom: 6px;
+}
+
+/* Página Activa destacada */
+.pagination-bottom-row button.active-page {
+  border: 1px solid #2196f3;
+  /* Azul destacado */
+  color: #2196f3;
+  font-weight: bold;
+  background-color: #f0f9ff;
+  /* Sutil fondo azulado */
+}
+
+/* Ocultar flechitas nativas del input de número */
+.goto-wrapper input::-webkit-outer-spin-button,
+.goto-wrapper input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
 }

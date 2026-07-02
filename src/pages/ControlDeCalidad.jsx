@@ -273,4 +273,4 @@ const ControlCalidad = () => {
   );
 };
 
-export default ControlCalidad;
+export default ControlDeCalidad;

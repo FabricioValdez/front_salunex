@@ -1,4 +1,4 @@
-const API_URL = 'http://localhost:8000/api';
+const API_URL = 'http://localhost/api';
 
 console.log("🔥 authService cargado - API_URL:", API_URL);
 
