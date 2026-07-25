@@ -29,12 +29,23 @@ export async function login(email, password) {
 
 export async function logout() {
     const token = localStorage.getItem('token');
-    await fetch(`${API_URL}/logout`, {
-        method: 'POST',
-        headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json',
-        },
-    });
-    localStorage.clear();
+    
+    try {
+        // Intentamos avisarle al backend que destruya el token
+        await fetch(`${API_URL}/logout`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json',
+            },
+        });
+    } catch (error) {
+        // Si el backend intenta redirigir y el navegador lo bloquea, 
+        // atrapamos el error aquí de forma silenciosa para que no rompa la app.
+        console.warn("Aviso: El backend redirigió el logout, procediendo con la limpieza local.");
+    } finally {
+        // 🌟 Esto se ejecuta SÍ O SÍ, garantizando que se limpie la sesión en React
+        localStorage.clear();
+        window.location.href = '/login'; 
+    }
 }

@@ -1,8 +1,8 @@
 import "../../styles/general/Ordenes.css";
-import { Search, Plus, Clock, AlertTriangle, DollarSign } from "lucide-react";
+import { Search, Plus, Clock, AlertTriangle, ArrowUpRight } from "lucide-react";
 import { useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
-
+import api from "../../services/api";
 
 import PageContainer from "../../components/ui/PageContainer";
 import Modal from "../../components/ui/Modal";
@@ -15,17 +15,14 @@ import OrdenList from "../../components/features/ordenes/OrdenList";
 import OrdenDetail from "../../components/features/ordenes/OrdenDetail";
 import OrdenForm from "../../components/features/ordenes/OrdenForm";
 
-const Ordenes = () => {
+// Helper para conectar a tu Backend (Modifica la URL según tu config de Axios/Fetch)
+const API_URL = "http://localhost:8000/api/movimientos";
 
+const Ordenes = () => {
   const location = useLocation();
   const [search, setSearch] = useState("");
-
-  const [openModal, setOpenModal] = useState(
-    location.state?.openModal || false
-  );
-
+  const [openModal, setOpenModal] = useState(location.state?.openModal || false);
   const [openFilter, setOpenFilter] = useState(false);
-
   const [ordenSeleccionada, setOrdenSeleccionada] = useState(null);
 
   const [filtros, setFiltros] = useState({
@@ -34,206 +31,136 @@ const Ordenes = () => {
     hasta: ""
   });
 
-  const [ordenes, setOrdenes] = useState([
-    {
-      id: "ORD-001",
-      proveedor: "Pfizer",
-      fecha: "2026-03-01",
-      estatus: "completado",
-      productos: [
-        {
-          id: 1,
-          nombre: "Paracetamol",
-          precio: 45,
-          cantidad: 10
-        },
-        {
-          id: 2,
-          nombre: "Ibuprofeno",
-          precio: 60,
-          cantidad: 5
-        }
-      ],
-      total: 750
-    },
-    {
-      id: "ORD-002",
-      proveedor: "Bayer",
-      fecha: "2026-03-04",
-      estatus: "enviado",
-      productos: [
-        {
-          id: 3,
-          nombre: "Amoxicilina",
-          precio: 120,
-          cantidad: 3
-        }
-      ],
-      total: 360
-    },
-    {
-      id: "ORD-003",
-      proveedor: "Genfar",
-      fecha: "2026-03-05",
-      estatus: "cancelado",
-      productos: [],
-      total: 0
+  // Estados dinámicos provenientes del Backend
+  const [ordenesPorSurtir, setOrdenesPorSurtir] = useState([]);
+  const [ordenesPorRecibir, setOrdenesPorRecibir] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  // Carga de Datos desde la API Laravel
+  const fetchOrdenes = async () => {
+    try {
+      setLoading(true);
+
+      // 🌟 CAMBIADO: Usamos 'api.get' en lugar del fetch nativo
+      const res = await api.get("/movimientos");
+      const data = res.data; // Axios almacena el body en 'data'
+
+      setOrdenesPorSurtir(data.por_surtir ? data.por_surtir.map(o => ({ ...o, tipoFlujo: 'surtir' })) : []);
+      setOrdenesPorRecibir(data.por_recibir ? data.por_recibir.map(o => ({ ...o, tipoFlujo: 'recibir' })) : []);
+    } catch (error) {
+      console.error("Error cargando los movimientos:", error);
+    } finally {
+      setLoading(false);
     }
-  ]);
-
-  const ordenesFiltradas = ordenes.filter((orden) => {
-
-    const matchSearch =
-      orden.id.toLowerCase().includes(search.toLowerCase()) ||
-      orden.proveedor.toLowerCase().includes(search.toLowerCase());
-
-    const matchEstatus =
-      filtros.estatus === "todos" || orden.estatus === filtros.estatus;
-
-    const fechaOrden = new Date(orden.fecha);
-
-    const matchDesde =
-      !filtros.desde || fechaOrden >= new Date(filtros.desde);
-
-    const matchHasta =
-      !filtros.hasta || fechaOrden <= new Date(filtros.hasta);
-
-    return matchSearch && matchEstatus && matchDesde && matchHasta;
-
-  });
-
-
-  const generarIdOrden = () => {
-
-    const year = new Date().getFullYear();
-    const numeroOrden = ordenes.length + 1;
-    const numeroFormateado = String(numeroOrden).padStart(3, "0");
-
-    return `OC-${year}-${numeroFormateado}`;
   };
-
-  const agregarOrden = (nuevaOrden) => {
-
-    const nueva = {
-      ...nuevaOrden,
-      id: generarIdOrden(),
-      fecha: new Date().toISOString().split("T")[0],
-    };
-
-    setOrdenes((prev) => [...prev, nueva]);
-  };
-
-  const pendientes = ordenes.filter(o => o.estatus === "enviado").length;
-
-  const vencidas = ordenes.filter(o => o.estatus === "cancelado").length;
-
-  const valorTotal = ordenes
-    .filter(o => o.estatus === "completado")
-    .reduce((acc, o) => acc + o.total, 0);
 
   useEffect(() => {
+    fetchOrdenes();
     if (location.state?.openModal) {
       window.history.replaceState({}, document.title);
     }
   }, []);
 
+  // Combinación unificada para pasar al filtrado y listas tradicionales
+  const todasLasOrdenes = [...ordenesPorSurtir, ...ordenesPorRecibir];
+
+  const ordenesFiltradas = todasLasOrdenes.filter((orden) => {
+    const matchSearch =
+      String(orden.id).includes(search) ||
+      orden.origen.toLowerCase().includes(search.toLowerCase()) ||
+      orden.destino.toLowerCase().includes(search.toLowerCase());
+
+    const matchEstatus =
+      filtros.estatus === "todos" || orden.estatus.toLowerCase() === filtros.estatus.toLowerCase();
+
+    const fechaOrden = new Date(orden.fecha);
+    const matchDesde = !filtros.desde || fechaOrden >= new Date(filtros.desde);
+    const matchHasta = !filtros.hasta || fechaOrden <= new Date(filtros.hasta);
+
+    return matchSearch && matchEstatus && matchDesde && matchHasta;
+  });
+
+  // Cálculos dinámicos basados en la base de datos real
+  const pendientesSurtir = ordenesPorSurtir.filter(o => o.estatus === "Pendiente").length;
+  const enCamino = todasLasOrdenes.filter(o => o.estatus === "En Camino").length;
+  const totalOrdenesActivas = todasLasOrdenes.length;
+
+  const agregarOrden = async (nuevaOrden) => {
+    // Aquí ejecutas el POST hacia `agregar_orden_compra` en el backend
+    // Al finalizar con éxito, cierras modal y recargas:
+    setOpenModal(false);
+    fetchOrdenes();
+  };
+
   return (
     <>
-      <Modal
-        isOpen={openModal}
-        onClose={() => setOpenModal(false)}
-        title="Orden de Compra"
-        className="orden-modal-wide"
-      >
-        <OrdenForm
-          onSubmit={agregarOrden}
-          onClose={() => setOpenModal(false)}
-        />
+      <Modal isOpen={openModal} onClose={() => setOpenModal(false)} title="Orden de Compra" className="orden-modal-wide">
+        <OrdenForm onSubmit={agregarOrden} onClose={() => setOpenModal(false)} />
       </Modal>
 
-      <Modal
-        isOpen={openFilter}
-        onClose={() => setOpenFilter(false)}
-        title="Filtrar órdenes"
-      >
-        <FilterModal
-          filtros={filtros}
-          setFiltros={setFiltros}
-          onClose={() => setOpenFilter(false)}
-        />
+      <Modal isOpen={openFilter} onClose={() => setOpenFilter(false)} title="Filtrar órdenes">
+        <FilterModal filtros={filtros} setFiltros={setFiltros} onClose={() => setOpenFilter(false)} />
       </Modal>
 
       <PageContainer>
-
         <div className="dashboard-title">
-          <h1>Órdenes</h1>
-          <p>
-            Gestionar los flujos de trabajo de reposición y adquisición de proveedores.
-          </p>
+          <h1>Órdenes y Traspasos entre Sucursales</h1>
+          <p>Gestionar flujos de solicitudes de medicamentos, despacho y recepciones en tiempo real.</p>
         </div>
 
+        {/* Mantenemos tus SummaryCards cambiando la lógica a tus nuevos estatus */}
         <div className="summary-cards">
-
           <SummaryCard
-            title="Órdenes pendientes"
-            value={pendientes}
+            title="Por Surtir (Pendientes)"
+            value={pendientesSurtir}
             icon={<Clock size={26} />}
             variant="blue"
           />
-
           <SummaryCard
-            title="Entregas vencidas"
-            value={vencidas}
+            title="En Camino"
+            value={enCamino}
             icon={<AlertTriangle size={26} />}
             variant="red"
           />
-
           <SummaryCard
-            title="Valor total"
-            value={`$${valorTotal.toLocaleString()}`}
-            icon={<DollarSign size={26} />}
+            title="Total en Gestión"
+            value={totalOrdenesActivas}
+            icon={<ArrowUpRight size={26} />}
             variant="green"
           />
-
         </div>
 
         <div className="actions-bar">
-
           <SearchBar
-            placeholder="Buscar Order ID, Proveedor..."
+            placeholder="Buscar ID, Origen, Destino..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
-
-
           <FilterButton onClick={() => setOpenFilter(true)} />
-
-          <button
-            className="primary-btn"
-            onClick={() => setOpenModal(true)}
-          >
-            <Plus size={16} /> Nueva Orden
+          <button className="primary-btn" onClick={() => setOpenModal(true)}>
+            <Plus size={16} /> Nueva Solicitud
           </button>
-
         </div>
 
-        <div className={`ordenes-content ${ordenSeleccionada ? "two-columns" : "one-column"}`}>
-
-          <OrdenList
-            ordenes={ordenesFiltradas}
-            ordenSeleccionada={ordenSeleccionada}
-            onSelect={setOrdenSeleccionada}
-          />
-
-          {ordenSeleccionada && (
-            <OrdenDetail
-              orden={ordenSeleccionada}
-              onClose={() => setOrdenSeleccionada(null)}
+        {loading ? (
+          <div className="text-center">Cargando flujos de inventario...</div>
+        ) : (
+          <div className={`ordenes-content ${ordenSeleccionada ? "two-columns" : "one-column"}`}>
+            <OrdenList
+              ordenes={ordenesFiltradas}
+              ordenSeleccionada={ordenSeleccionada}
+              onSelect={setOrdenSeleccionada}
             />
-          )}
 
-        </div>
-
+            {ordenSeleccionada && (
+              <OrdenDetail
+                orden={ordenSeleccionada}
+                onClose={() => setOrdenSeleccionada(null)}
+                onActionSuccess={fetchOrdenes} // Callback para recargar tras surtir/recibir
+              />
+            )}
+          </div>
+        )}
       </PageContainer>
     </>
   );

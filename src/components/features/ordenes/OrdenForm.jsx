@@ -1,103 +1,163 @@
-import { useState, useContext } from "react";
-import InventoryContext from "../../../context/InventoryContext";
+import { useState, useEffect } from "react";
 import SearchBar from "../../ui/SearchBar";
 import { Trash2 } from "lucide-react";
+import api from "../../../services/api"; // 🌟 1. IMPORTAMOS TU INSTANCIA DE AXIOS
 import "./OrdenForm.css";
 
 const OrdenForm = ({ onSubmit, onClose }) => {
+  // Datos cargados desde Laravel
+  const [productosDisponibles, setProductosDisponibles] = useState([]);
+  const [puntoOrigen, setPuntoOrigen] = useState(null);
+  const [puntosInventarioDestino, setPuntosInventarioDestino] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const { inventario } = useContext(InventoryContext);
-
-  const [proveedor, setProveedor] = useState("");
-  const [estatus, setEstatus] = useState("enviado");
+  // Campos de formulario local
+  const [idOrigen, setIdOrigen] = useState(""); 
   const [busqueda, setBusqueda] = useState("");
-  const [productos, setProductos] = useState([]);
+  const [productosSeleccionados, setProductosSeleccionados] = useState([]);
 
-  const medicamentosFiltrados = inventario.filter((med) =>
-    med.nombre.toLowerCase().includes(busqueda.toLowerCase())
+  // Cargar datos al abrir el modal
+  useEffect(() => {
+    const cargarDatosFormulario = async () => {
+      try {
+        // 🌟 2. CAMBIAMOS FETCH POR API.GET
+        const res = await api.get("/movimientos/datos-formulario");
+        const data = res.data; // Axios guarda la respuesta en .data
+        
+        setProductosDisponibles(data.productos || []);
+        setPuntoOrigen(data.punto_origen || null);
+        setPuntosInventarioDestino(data.puntos_inventario || []);
+      } catch (error) {
+        console.error("Error al obtener la estructura para el formulario:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    cargarDatosFormulario();
+  }, []);
+
+  const medicamentosFiltrados = productosDisponibles.filter((prod) =>
+    prod.nombre.toLowerCase().includes(busqueda.toLowerCase())
   );
 
-  const agregarProducto = (med) => {
-    const existe = productos.find(p => p.id === med.id);
+  const agregarProducto = (prod) => {
+    const existe = productosSeleccionados.find((p) => p.id === prod.id);
     if (existe) {
-      setProductos(
-        productos.map(p =>
-          p.id === med.id
-            ? { ...p, cantidad: p.cantidad + 1 }
-            : p
+      setProductosSeleccionados(
+        productosSeleccionados.map((p) =>
+          p.id === prod.id ? { ...p, cantidad: p.cantidad + 1 } : p
         )
       );
     } else {
-      setProductos([
-        ...productos,
-        { id: med.id, nombre: med.nombre, precio: med.precio, cantidad: 1 }
+      setProductosSeleccionados([
+        ...productosSeleccionados,
+        { id: prod.id, nombre: prod.nombre, precio: prod.precio || 0, cantidad: 1 }
       ]);
     }
   };
 
   const cambiarCantidad = (id, cantidad) => {
-    setProductos(
-      productos.map(p =>
-        p.id === id ? { ...p, cantidad: Number(cantidad) } : p
+    const valor = Number(cantidad);
+    setProductosSeleccionados(
+      productosSeleccionados.map((p) =>
+        p.id === id ? { ...p, cantidad: valor > 0 ? valor : 1 } : p
       )
     );
   };
 
   const eliminarProducto = (id) => {
-    setProductos(productos.filter(p => p.id !== id));
+    setProductosSeleccionados(productosSeleccionados.filter((p) => p.id !== id));
   };
 
-  const total = productos.reduce(
-    (acc, p) => acc + p.precio * p.cantidad, 0
+  const total = productosSeleccionados.reduce(
+    (acc, p) => acc + (p.precio * p.cantidad), 0
   );
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    onSubmit({ proveedor, fecha: new Date().toISOString().split("T")[0], estatus, productos, total });
-    onClose();
+
+    if (!idOrigen) {
+      alert("Por favor seleccione un punto proveedor (Origen).");
+      return;
+    }
+    if (!puntoOrigen) {
+      alert("No se detectó tu ubicación destino (Recibidor).");
+      return;
+    }
+    if (productosSeleccionados.length === 0) {
+      alert("Debe agregar al menos un producto.");
+      return;
+    }
+
+    const payload = {
+      id_origen: parseInt(idOrigen),
+      id_destino: puntoOrigen.id,
+      id_tipo_movimiento: 1, // Traspaso
+      productos: productosSeleccionados.map(p => p.id),
+      cantidades: productosSeleccionados.map(p => p.cantidad)
+    };
+
+    try {
+      // 🌟 3. CAMBIAMOS FETCH POR API.POST
+      const res = await api.post("/movimientos", payload);
+
+      if (res.status === 200 || res.status === 201) {
+        onSubmit(); 
+        onClose();
+      }
+    } catch (error) {
+      console.error("Error al enviar la orden:", error);
+      // Extraemos el error que devuelve Laravel vía Axios
+      const errorMsg = error.response?.data?.error || "No se pudo procesar la orden";
+      alert("Error: " + errorMsg);
+    }
   };
+
+  if (loading) return <div className="text-center p-4">Cargando catálogo...</div>;
 
   return (
     <form onSubmit={handleSubmit} className="orden-form">
-
       <div className="orden-form-grid">
-
-        {/* ── Columna izquierda: datos generales ── */}
+        
+        {/* Columna izquierda: Configuración Origen/Destino */}
         <div className="orden-col orden-col-left">
-
+          
           <div className="form-group">
-            <label>Farmacia</label>
-            <input
-              type="text"
-              value={proveedor}
-              onChange={(e) => setProveedor(e.target.value)}
-              placeholder="Nombre del proveedor"
-              required
-            />
-          </div>
-
-          <div className="form-group">
-            <label>Estatus</label>
+            <label>Punto que va a Proveer / Surtir (Origen)</label>
             <select
-              value={estatus}
-              onChange={(e) => setEstatus(e.target.value)}
+              value={idOrigen}
+              onChange={(e) => setIdOrigen(e.target.value)}
+              required
             >
-              <option value="enviado">Enviado</option>
-              <option value="completado">Completado</option>
-              <option value="cancelado">Cancelado</option>
+              <option value="">-- Seleccione el punto proveedor --</option>
+              {puntosInventarioDestino.map((punto) => (
+                <option key={punto.id} value={punto.id}>
+                  {punto.nombre} [{punto.tipo}]
+                </option>
+              ))}
             </select>
           </div>
 
           <div className="form-group">
-            <label>Buscar medicamento</label>
+            <label>Farmacia / Almacén Recibidor (Destino - Tú)</label>
+            <input
+              type="text"
+              value={puntoOrigen ? `${puntoOrigen.nombre} [${puntoOrigen.tipo}]` : "Sin ubicación asignada"}
+              disabled
+              readOnly
+            />
+          </div>
+
+          <div className="form-group">
+            <label>Buscar medicamentos de la empresa</label>
             <SearchBar
-              placeholder="Buscar medicamento..."
+              placeholder="Escribe el nombre..."
               value={busqueda}
               onChange={(e) => setBusqueda(e.target.value)}
             />
           </div>
 
-          {/* Lista de resultados de búsqueda */}
+          {/* Resultados en tiempo real */}
           {busqueda && (
             <div className="med-list">
               {medicamentosFiltrados.length === 0 ? (
@@ -121,29 +181,28 @@ const OrdenForm = ({ onSubmit, onClose }) => {
               )}
             </div>
           )}
-
         </div>
 
-        {/* ── Columna derecha: productos seleccionados ── */}
+        {/* Columna derecha: Canasta de productos seleccionados */}
         <div className="orden-col orden-col-right">
-
           <div className="productos-header">
             <h4>Productos seleccionados</h4>
-            {productos.length > 0 && (
-              <span className="productos-count">{productos.length} ítem{productos.length > 1 ? "s" : ""}</span>
+            {productosSeleccionados.length > 0 && (
+              <span className="productos-count">
+                {productosSeleccionados.length} ítem{productosSeleccionados.length > 1 ? "s" : ""}
+              </span>
             )}
           </div>
 
           <div className="productos-lista">
-            {productos.length === 0 ? (
+            {productosSeleccionados.length === 0 ? (
               <div className="productos-empty">
                 <p>Busca y agrega medicamentos</p>
-                <span>Los productos aparecerán aquí</span>
+                <span>Aparecerán listados aquí</span>
               </div>
             ) : (
-              productos.map((p) => (
+              productosSeleccionados.map((p) => (
                 <div key={p.id} className="producto-row">
-
                   <div className="producto-info">
                     <span className="producto-nombre">{p.nombre}</span>
                     <small>${p.precio} MXN c/u</small>
@@ -152,7 +211,8 @@ const OrdenForm = ({ onSubmit, onClose }) => {
                   <div className="producto-controles">
                     <input
                       type="number"
-                      min="1"
+                      min="0.01"
+                      step="0.01"
                       value={p.cantidad}
                       onChange={(e) => cambiarCantidad(p.id, e.target.value)}
                       className="cantidad-input"
@@ -168,31 +228,27 @@ const OrdenForm = ({ onSubmit, onClose }) => {
                       <Trash2 size={14} />
                     </button>
                   </div>
-
                 </div>
               ))
             )}
           </div>
 
-          {/* Total */}
           <div className="orden-total-row">
-            <span>Total</span>
+            <span>Total Estimado</span>
             <strong>${total.toLocaleString()} MXN</strong>
           </div>
 
-          {/* Acciones */}
           <div className="form-actions">
             <button type="button" onClick={onClose} className="secondary-btn">
               Cancelar
             </button>
             <button type="submit" className="primary-btn">
-              Guardar Orden
+              Generar e Iniciar Solicitud
             </button>
           </div>
-
         </div>
-      </div>
 
+      </div>
     </form>
   );
 };
