@@ -14,41 +14,32 @@ const menuCompleto = [
   // ==========================================
   // --- 📦 PÁGINAS GENERALES
   // ==========================================
-  { to: "/", icon: House, label: "Inicio" }, // Página de aterrizaje común libre
+  { to: "/", icon: House, label: "Inicio" }, 
   { to: "/general/inventario", icon: Package, label: "Inventario", clave: "GMOV" },
-  { to: "/general/control", icon: ClipboardList, label: "Control de Calidad", clave: "GCDC" }, // Clave: Gestión de Control de calidad
-  { to: "/general/ordenes", icon: ShoppingCart, label: "Órdenes de Compra", clave: "GORD" }, // Clave: Gestión de Órdenes
-  { to: "/general/recepcion-inventario", icon: PackageCheck, label: "Recepción Inventario", clave: "RECP" }, // Clave: Recepcion de Inventario
+  { to: "/general/control", icon: ClipboardList, label: "Control de Calidad", clave: "GCDC" }, 
+  { to: "/general/ordenes", icon: ShoppingCart, label: "Órdenes de Compra", clave: "GORD" }, 
+  { to: "/general/recepcion-inventario", icon: PackageCheck, label: "Recepción Inventario", clave: "RECP" }, 
   
   // ==========================================
   // --- 🛠️ PÁGINAS DE ADMINISTRACIÓN (ADMIN) ---
   // ==========================================
-  
-  // --- Gestión de Personal y Cuentas ---
   { to: "/admin/usuarios", icon: Users, label: "Usuarios", clave: "GUSU" },
-  { to: "/admin/empleados", icon: ArrowLeftRight, label: "Empleados", clave: "GEMP" }, // Vinculado a Gestión de Empleados
-
-  // --- Entidades del Sistema ---
-  { to: "/admin/empresas", icon: Building2, label: "Empresas", clave: "GPER" }, // Control de Permisos / Parámetros
+  { to: "/admin/empleados", icon: ArrowLeftRight, label: "Empleados", clave: "GEMP" }, 
+  { to: "/admin/empresas", icon: Building2, label: "Empresas", clave: "GPER" }, 
   { to: "/admin/farmacias", icon: Pill, label: "Catálogo Farmacias", clave: "GFAR" },
   { to: "/admin/almacenes", icon: Package, label: "Catálogo Almacenes", clave: "GALM" },
-
-  // --- Catálogos Finos de Productos (Módulo GPRO original desglosado en sub-claves) ---
   { to: "/admin/productos", icon: Tablets, label: "Productos", clave: "GPRO" },
-  { to: "/admin/categorias-producto", icon: Tag, label: "Categorías", clave: "GCAT" }, // Clave: Gestión de Categoría Producto
-  { to: "/admin/clasificaciones-producto", icon: Layers, label: "Clasificaciones", clave: "GCLA" }, // Clave: Gestión de Clasificación Prod
-  { to: "/admin/presentaciones-producto", icon: FlaskConical, label: "Presentaciones", clave: "GPRE" }, // Clave: Gestión de Presentación Pro
-  { to: "/admin/vias-administracion", icon: Syringe, label: "Vías Admin.", clave: "GVIA" }, // Clave: Gestión de Vía Administración
-  { to: "/admin/tipos-movimiento-sistema", icon: ArrowLeftRight, label: "Tipos de Movimiento", clave: "GTIP" }, // Clave: Gestión de Tipo movimiento
+  { to: "/admin/categorias-producto", icon: Tag, label: "Categorías", clave: "GCAT" }, 
+  { to: "/admin/clasificaciones-producto", icon: Layers, label: "Clasificaciones", clave: "GCLA" }, 
+  { to: "/admin/presentaciones-producto", icon: FlaskConical, label: "Presentaciones", clave: "GPRE" }, 
+  { to: "/admin/vias-administracion", icon: Syringe, label: "Vías Admin.", clave: "GVIA" }, 
+  { to: "/admin/tipos-movimiento-sistema", icon: ArrowLeftRight, label: "Tipos de Movimiento", clave: "GTIP" }, 
 
   // ==========================================
   // --- ⏳ MÓDULOS FUTUROS (FALTAN AGREGAR) ---
   // ==========================================
-  // { to: "/admin/permisos", icon: Settings, label: "Permisos", clave: "GPER" }, // Futuro módulo en BD
-  // { to: "/admin/roles", icon: ArrowLeftRight, label: "Roles", clave: "GROL" },
-  // { to: "/admin/modulos", icon: Layers, label: "Módulos Sistema", clave: "" },
-  { to: "/general/dashboard", icon: LayoutDashboard, label: "Dashboard" }, // Palomeada = Sin clave por ahora
-  { to: "/suscripcion", icon: Tag, label: "Suscripción" } // Palomeada = Sin clave por ahora
+  { to: "/general/dashboard", icon: LayoutDashboard, label: "Dashboard" }, 
+  { to: "/suscripcion", icon: Tag, label: "Suscripción" } 
 ];
 
 const rutasBase = ["/", "/admin", "/empresa", "/farmacia"];
@@ -72,8 +63,20 @@ const Sidebar = ({ onOpenSettings }) => {
     if (user) cargarPermisosDelUsuario();
   }, [user]);
 
+  // 🌟 AQUI ESTÁ LA MAGIA: Control visual de las opciones
   const menuFiltrado = menuCompleto.filter(modulo => {
+    // 1. Mostrar siempre las opciones sin clave (Inicio, Dashboard, Suscripción)
     if (!modulo.clave) return true;
+
+    // 2. Lógica estricta para Almacenista (3) y Farmacéutico (4)
+    const rolId = Number(user?.idrol);
+    if (rolId === 3 || rolId === 4) {
+      // Claves permitidas que coinciden EXACTAMENTE con tu Imagen 1
+      const vistasDeseadas = ["GMOV", "GCDC", "GORD", "RECP"];
+      return vistasDeseadas.includes(modulo.clave);
+    }
+
+    // 3. Para el Administrador (Rol 1 u otros), respetamos la Base de Datos
     return misPermisos.includes(modulo.clave);
   });
 
@@ -92,7 +95,6 @@ const Sidebar = ({ onOpenSettings }) => {
         {!collapsed && <h2 className="logo">SALUNEX</h2>}
       </div>
 
-      {/* 🌟 SCROLL VERTICAL INTELIGENTE: Se adapta a cualquier pantalla y oculta el desborde */}
       <nav style={{
         flex: 1,
         overflowY: "auto",

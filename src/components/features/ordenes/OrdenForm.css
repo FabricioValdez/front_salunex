@@ -63,8 +63,31 @@
 .med-list {
   border: 1px solid #e5e7eb;
   border-radius: 10px;
-  overflow: hidden;
   flex: 1;
+  max-height: 250px;
+  overflow-y: auto;
+}
+
+.med-list::-webkit-scrollbar,
+.productos-lista::-webkit-scrollbar {
+  width: 6px;
+}
+
+.med-list::-webkit-scrollbar-track,
+.productos-lista::-webkit-scrollbar-track {
+  background: #f9fafb;
+  border-radius: 10px;
+}
+
+.med-list::-webkit-scrollbar-thumb,
+.productos-lista::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 10px;
+}
+
+.med-list::-webkit-scrollbar-thumb:hover,
+.productos-lista::-webkit-scrollbar-thumb:hover {
+  background: #9ca3af;
 }
 
 .med-item {

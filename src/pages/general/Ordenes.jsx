@@ -15,7 +15,6 @@ import OrdenList from "../../components/features/ordenes/OrdenList";
 import OrdenDetail from "../../components/features/ordenes/OrdenDetail";
 import OrdenForm from "../../components/features/ordenes/OrdenForm";
 
-// Helper para conectar a tu Backend (Modifica la URL según tu config de Axios/Fetch)
 const API_URL = "http://localhost:8000/api/movimientos";
 
 const Ordenes = () => {
@@ -41,9 +40,8 @@ const Ordenes = () => {
     try {
       setLoading(true);
 
-      // 🌟 CAMBIADO: Usamos 'api.get' en lugar del fetch nativo
       const res = await api.get("/movimientos");
-      const data = res.data; // Axios almacena el body en 'data'
+      const data = res.data; 
 
       setOrdenesPorSurtir(data.por_surtir ? data.por_surtir.map(o => ({ ...o, tipoFlujo: 'surtir' })) : []);
       setOrdenesPorRecibir(data.por_recibir ? data.por_recibir.map(o => ({ ...o, tipoFlujo: 'recibir' })) : []);
@@ -86,8 +84,6 @@ const Ordenes = () => {
   const totalOrdenesActivas = todasLasOrdenes.length;
 
   const agregarOrden = async (nuevaOrden) => {
-    // Aquí ejecutas el POST hacia `agregar_orden_compra` en el backend
-    // Al finalizar con éxito, cierras modal y recargas:
     setOpenModal(false);
     fetchOrdenes();
   };
@@ -103,63 +99,70 @@ const Ordenes = () => {
       </Modal>
 
       <PageContainer>
-        <div className="dashboard-title">
-          <h1>Órdenes y Traspasos entre Sucursales</h1>
-          <p>Gestionar flujos de solicitudes de medicamentos, despacho y recepciones en tiempo real.</p>
-        </div>
-
-        {/* Mantenemos tus SummaryCards cambiando la lógica a tus nuevos estatus */}
-        <div className="summary-cards">
-          <SummaryCard
-            title="Por Surtir (Pendientes)"
-            value={pendientesSurtir}
-            icon={<Clock size={26} />}
-            variant="blue"
-          />
-          <SummaryCard
-            title="En Camino"
-            value={enCamino}
-            icon={<AlertTriangle size={26} />}
-            variant="red"
-          />
-          <SummaryCard
-            title="Total en Gestión"
-            value={totalOrdenesActivas}
-            icon={<ArrowUpRight size={26} />}
-            variant="green"
-          />
-        </div>
-
-        <div className="actions-bar">
-          <SearchBar
-            placeholder="Buscar ID, Origen, Destino..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-          />
-          <FilterButton onClick={() => setOpenFilter(true)} />
-          <button className="primary-btn" onClick={() => setOpenModal(true)}>
-            <Plus size={16} /> Nueva Solicitud
-          </button>
-        </div>
-
-        {loading ? (
-          <div className="text-center">Cargando flujos de inventario...</div>
-        ) : (
-          <div className={`ordenes-content ${ordenSeleccionada ? "two-columns" : "one-column"}`}>
-            <OrdenList
-              ordenes={ordenesFiltradas}
-              ordenSeleccionada={ordenSeleccionada}
-              onSelect={setOrdenSeleccionada}
+        {/* RENDERIZADO CONDICIONAL: Si hay orden, pantalla completa de detalle; si no, listado normal */}
+        {ordenSeleccionada ? (
+          <div className="ordenes-content full-screen-detail">
+            <OrdenDetail
+              orden={ordenSeleccionada}
+              onClose={() => setOrdenSeleccionada(null)}
+              onActionSuccess={() => {
+                fetchOrdenes();
+                setOrdenSeleccionada(null); // Opcional: cierra el detalle tras el éxito
+              }}
             />
-
-            {ordenSeleccionada && (
-              <OrdenDetail
-                orden={ordenSeleccionada}
-                onClose={() => setOrdenSeleccionada(null)}
-                onActionSuccess={fetchOrdenes} // Callback para recargar tras surtir/recibir
-              />
-            )}
           </div>
+        ) : (
+          <>
+            <div className="dashboard-title">
+              <h1>Órdenes y Traspasos entre Sucursales</h1>
+              <p>Gestionar flujos de solicitudes de medicamentos, despacho y recepciones en tiempo real.</p>
+            </div>
+
+            <div className="summary-cards">
+              <SummaryCard
+                title="Por Surtir (Pendientes)"
+                value={pendientesSurtir}
+                icon={<Clock size={26} />}
+                variant="blue"
+              />
+              <SummaryCard
+                title="En Camino"
+                value={enCamino}
+                icon={<AlertTriangle size={26} />}
+                variant="red"
+              />
+              <SummaryCard
+                title="Total en Gestión"
+                value={totalOrdenesActivas}
+                icon={<ArrowUpRight size={26} />}
+                variant="green"
+              />
+            </div>
+
+            <div className="actions-bar">
+              <SearchBar
+                placeholder="Buscar ID, Origen, Destino..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+              />
+              <FilterButton onClick={() => setOpenFilter(true)} />
+              <button className="primary-btn" onClick={() => setOpenModal(true)}>
+                <Plus size={16} /> Nueva Solicitud
+              </button>
+            </div>
+
+            {loading ? (
+              <div className="text-center p-4">Cargando flujos de inventario...</div>
+            ) : (
+              <div className="ordenes-content one-column">
+                <OrdenList
+                  ordenes={ordenesFiltradas}
+                  ordenSeleccionada={ordenSeleccionada}
+                  onSelect={setOrdenSeleccionada}
+                />
+              </div>
+            )}
+          </>
         )}
       </PageContainer>
     </>

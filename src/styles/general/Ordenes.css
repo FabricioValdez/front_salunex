@@ -117,6 +117,35 @@
 .ordenes-content {
   display: flex;
   gap: 20px;
+  width: 100%;
+}
+
+.ordenes-content.full-screen-detail {
+  display: block; 
+}
+
+.ordenes-content.full-screen-detail .order-detail {
+  width: 100%;
+  flex: none; 
+}
+
+
+.btn-volver {
+  background: none;
+  border: none;
+  color: #6b7280;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  cursor: pointer;
+  font-size: 14px;
+  padding: 0;
+  margin-bottom: 20px;
+  font-weight: 500;
+}
+
+.btn-volver:hover {
+  color: #3b82f6;
 }
 
 /* LIST */

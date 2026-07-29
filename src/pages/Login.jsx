@@ -19,7 +19,7 @@ function Login() {
     if (user) {
       // 🌟 Si el usuario tiene permisos de farmacia, va directo; si no, a la raíz pública
       if (user.permisos?.includes("GFAR")) {
-        navigate("/farmacia", { replace: true });
+        navigate("/", { replace: true });
       } else {
         navigate("/", { replace: true });
       }
@@ -40,7 +40,7 @@ function Login() {
 
       // 🌟 Redirección dinámica según los permisos que devolvió Laravel
       if (data.user.permisos?.includes("GFAR")) {
-        navigate("/farmacia", { replace: true });
+        navigate("/", { replace: true });
       } else {
         navigate("/", { replace: true });
       }

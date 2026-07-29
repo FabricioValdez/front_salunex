@@ -1,347 +1,169 @@
 import { useState } from "react";
-import { Pencil, Trash2, Search, Calendar, X } from "lucide-react";
+import { Search, ArrowLeft, List, Plus, Pencil, Trash2, Calendar } from "lucide-react";
 import PageContainer from "../../components/ui/PageContainer";
 import DataCard from "../../components/ui/DataCard";
 import Table from "../../components/ui/Table/Table";
-import Button from "../../components/ui/Button";
 import Modal from "../../components/ui/Modal";
+import Button from "../../components/ui/Button";
 import { useCatalogos } from "../../context/CatalogosContext";
-import api from "../../services/api";
 import "../../styles/general/Inventario.css";
 
-const FILTROS = ["Todos", "Vigente", "Por revisar", "Por expirar", "Expirado"];
-
+// Badge para la fecha de expiración en la vista de detalle
 function getEstado(fecha) {
-    if (!fecha) return "Sin fecha";
-    const diff = Math.ceil((new Date(fecha) - new Date()) / (1000 * 60 * 60 * 24));
-    if (diff < 0) return "Expirado";
-    if (diff <= 30) return "Por expirar";
-    if (diff <= 90) return "Por revisar";
-    return "Vigente";
+  if (!fecha) return "Sin fecha";
+  const diff = Math.ceil((new Date(fecha) - new Date()) / (1000 * 60 * 60 * 24));
+  if (diff < 0) return "Expirado";
+  if (diff <= 30) return "Por expirar";
+  if (diff <= 90) return "Por revisar";
+  return "Vigente";
 }
 
 function VencimientoBadge({ fecha }) {
-    if (!fecha) return <span style={{ color: "#9ca3af" }}>Sin fecha</span>;
-    const estado = getEstado(fecha);
-    const clases = {
-        "Expirado": "expirado",
-        "Por expirar": "por-expirar",
-        "Por revisar": "por-revisar",
-        "Vigente": "vigente",
-    };
-    return <span className={`badge-estatus ${clases[estado] || ""}`}>{estado}</span>;
+  if (!fecha) return <span style={{ color: "#9ca3af" }}>Sin fecha</span>;
+  const estado = getEstado(fecha);
+  const clases = {
+    "Expirado": "expirado",
+    "Por expirar": "por-expirar",
+    "Por revisar": "por-revisar",
+    "Vigente": "vigente",
+  };
+  return <span className={`badge-estatus ${clases[estado] || ""}`}>{estado}</span>;
 }
-
-function InventarioForm({ form, setForm, onSubmit, onClose, loading, error }) {
-    return (
-        <>
-            {error && <div className="alert alert-danger py-2 text-center mb-3">{error}</div>}
-
-            <div className="mb-3">
-                <label className="form-label">Producto</label>
-                <input type="text" className="form-control" value={form.producto_nombre} disabled style={{ backgroundColor: "#f3f4f6", color: "#4b5563" }} />
-            </div>
-
-            <div className="mb-3">
-                <label className="form-label">Lote</label>
-                <input type="text" className="form-control" value={form.lote} disabled style={{ backgroundColor: "#f3f4f6", color: "#4b5563" }} />
-            </div>
-
-            <div className="mb-4">
-                <label className="form-label">Cantidad</label>
-                <input
-                    type="number"
-                    className="form-control"
-                    value={form.cantidad}
-                    onChange={(e) => setForm({ ...form, cantidad: e.target.value })}
-                    placeholder="0"
-                    autoFocus
-                />
-            </div>
-
-            <div className="form-actions">
-                <Button variant="secondary" onClick={onClose}>Cancelar</Button>
-                <Button variant="primary" onClick={onSubmit} disabled={loading}>
-                    {loading ? "Guardando..." : "Guardar"}
-                </Button>
-            </div>
-        </>
-    );
-}
-
-function DeleteModal({ isOpen, onClose, onConfirm, loading, item }) {
-    return (
-        <Modal isOpen={isOpen} onClose={onClose} title="Eliminar registro">
-            <p style={{ color: "#4b5563", marginBottom: 20 }}>
-                ¿Estás seguro de eliminar el registro de <strong>{item?.producto}</strong> con lote <strong>{item?.lote}</strong>?
-            </p>
-            <div className="form-actions">
-                <Button variant="secondary" onClick={onClose}>Cancelar</Button>
-                <Button variant="danger" onClick={onConfirm} disabled={loading}>
-                    {loading ? "Eliminando..." : "Eliminar"}
-                </Button>
-            </div>
-        </Modal>
-    );
-}
-
-const formVacio = {
-    id_producto: "", id_almacen: "", id_farmacia: "",
-    lote: "", cantidad: "", fecha_expiracion: "", producto_nombre: ""
-};
 
 function Inventario() {
-    const { inventario, refreshCatalogo } = useCatalogos();
+  const { inventario } = useCatalogos();
+  const [search, setSearch] = useState("");
+  
+  // Estado para controlar la vista de detalle
+  const [itemSeleccionado, setItemSeleccionado] = useState(null);
 
-    const [search, setSearch] = useState("");
-    const [filtro, setFiltro] = useState("Todos");
-
-    const [fechaInicio, setFechaInicio] = useState("");
-    const [fechaFin, setFechaFin] = useState("");
-
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState("");
-    const [modalOpen, setModalOpen] = useState(false);
-    const [editId, setEditId] = useState(null);
-    const [form, setForm] = useState(formVacio);
-    const [deleteOpen, setDeleteOpen] = useState(false);
-    const [deleteTarget, setDeleteTarget] = useState(null);
-
-    const filtrados = inventario.filter((item) => {
-        const coincideBusqueda =
-            item.producto?.toLowerCase().includes(search.toLowerCase()) ||
-            item.lote?.toLowerCase().includes(search.toLowerCase()) ||
-            item.almacen?.toLowerCase().includes(search.toLowerCase()) ||
-            item.farmacia?.toLowerCase().includes(search.toLowerCase());
-
-        const estado = getEstado(item.fecha_expiracion);
-        const coincideFiltroEstado = filtro === "Todos" || estado === filtro;
-
-        let coincideFecha = true;
-        if (item.fecha_expiracion) {
-            const fechaItem = item.fecha_expiracion.split('T')[0];
-            if (fechaInicio && fechaItem < fechaInicio) coincideFecha = false;
-            if (fechaFin && fechaItem > fechaFin) coincideFecha = false;
-        } else if (fechaInicio || fechaFin) {
-            coincideFecha = false;
-        }
-
-        return coincideBusqueda && coincideFiltroEstado && coincideFecha;
-    });
-
-    const handleEditar = (item) => {
-        setForm({
-            id_producto: item.id_producto,
-            id_almacen: item.id_almacen,
-            id_farmacia: item.id_farmacia,
-            lote: item.lote,
-            cantidad: item.cantidad,
-            fecha_expiracion: item.fecha_expiracion ?? "",
-            producto_nombre: item.producto
-        });
-        setEditId(item.id); setError(""); setModalOpen(true);
-    };
-
-    const handleSubmit = async () => {
-        setLoading(true); setError("");
-        try {
-            const payload = {
-                id_producto: form.id_producto,
-                id_almacen: form.id_almacen,
-                id_farmacia: form.id_farmacia,
-                lote: form.lote,
-                cantidad: Number(form.cantidad),
-                fecha_expiracion: form.fecha_expiracion || null
-            };
-
-            await api.put(`/inventario/${editId}`, payload);
-
-            refreshCatalogo('inventario', inventario.map((i) =>
-                i.id === editId ? { ...i, cantidad: payload.cantidad } : i
-            ));
-
-            setModalOpen(false);
-        } catch (e) {
-            setError(e.response?.data?.message || e.message);
-        } finally { setLoading(false); }
-    };
-
-    const handleDeleteClick = (item) => {
-        setDeleteTarget(item);
-        setDeleteOpen(true);
-    };
-
-    const handleConfirmDelete = async () => {
-        setLoading(true);
-        try {
-            await api.delete(`/inventario/${deleteTarget.id}`);
-            refreshCatalogo('inventario', inventario.filter((i) => i.id !== deleteTarget.id));
-            setDeleteOpen(false); setDeleteTarget(null);
-        } catch (e) { console.error(e); }
-        finally { setLoading(false); }
-    };
-
-    const limpiarFechas = () => {
-        setFechaInicio("");
-        setFechaFin("");
-    };
-
+  // Filtrado de la vista principal (Maestro)
+  const filtrados = inventario.filter((item) => {
+    const termino = search.toLowerCase();
     return (
-        <PageContainer>
-            <div className="dashboard-title">
-                <h1>Mercancía e inventario diario</h1>
-                <p>Gestione las entradas de existencias y controle las cantidades disponibles en tiempo real.</p>
-            </div>
-
-            {/* Contenedor principal de acciones estilizado */}
-            <div style={{
-                display: "flex",
-                flexWrap: "wrap",
-                gap: "16px",
-                alignItems: "center",
-                marginBottom: "20px",
-                width: "100%"
-            }}>
-                {/* Buscador */}
-                <div className="inventario-search" style={{ flex: "1 1 320px", position: "relative" }}>
-                    <input type="text" placeholder="Buscar medicamento, lote, almacén o farmacia..."
-                        value={search} onChange={(e) => setSearch(e.target.value)} />
-                    <Search size={16} className="inventario-search-icon" />
-                </div>
-
-                {/* Contenedor de Fechas Estilizado tipo Card o Pill */}
-                <div style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "12px",
-                    background: "#f9fafb",
-                    border: "1px solid #e5e7eb",
-                    borderRadius: "10px",
-                    padding: "6px 14px",
-                    boxShadow: "0 1px 2px rgba(0,0,0,0.05)"
-                }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
-                        <Calendar size={15} color="#9ca3af" />
-                        <span style={{ fontSize: "13px", fontWeight: "500", color: "#4b5563" }}>Rango Exp:</span>
-                    </div>
-
-                    <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-                        <input
-                            type="date"
-                            style={{
-                                border: "none",
-                                background: "transparent",
-                                fontSize: "13px",
-                                color: "#1f2937",
-                                outline: "none",
-                                cursor: "pointer"
-                            }}
-                            value={fechaInicio}
-                            onChange={(e) => setFechaInicio(e.target.value)}
-                        />
-                        <span style={{ color: "#d1d5db", fontSize: "13px" }}>—</span>
-                        <input
-                            type="date"
-                            style={{
-                                border: "none",
-                                background: "transparent",
-                                fontSize: "13px",
-                                color: "#1f2937",
-                                outline: "none",
-                                cursor: "pointer"
-                            }}
-                            value={fechaFin}
-                            onChange={(e) => setFechaFin(e.target.value)}
-                        />
-                    </div>
-
-                    {/* Botón de limpiar minimalista */}
-                    {(fechaInicio || fechaFin) && (
-                        <button
-                            onClick={limpiarFechas}
-                            style={{
-                                display: "flex",
-                                alignItems: "center",
-                                background: "#fee2e2",
-                                border: "none",
-                                borderRadius: "50%",
-                                width: "20px",
-                                height: "20px",
-                                justifyContent: "center",
-                                color: "#ef4444",
-                                cursor: "pointer",
-                                transition: "background 0.2s"
-                            }}
-                            title="Limpiar fechas"
-                        >
-                            <X size={12} strokeWidth={3} />
-                        </button>
-                    )}
-                </div>
-            </div>
-
-            <div className="filtros-bar">
-                {FILTROS.map((f) => (
-                    <button key={f} className={`filtro-btn ${filtro === f ? "active" : ""}`}
-                        onClick={() => setFiltro(f)}>{f}</button>
-                ))}
-            </div>
-
-            <DataCard>
-                <Table
-                    columns={["Nombre Medicamento", "Lote", "Fecha Exp.", "Cantidad", "Estado", "Acciones"]}
-                    data={filtrados}
-                    renderRow={(item) => (
-                        <tr key={item.id}>
-                            <td>
-                                <div className="inventario-nombre">
-                                    <p>{item.producto}</p>
-                                    <span>{item.categoria}</span>
-                                </div>
-                            </td>
-                            <td style={{ color: "#6b7280" }}>{item.lote}</td>
-                            <td style={{ color: "#6b7280" }}>
-                                {item.fecha_expiracion
-                                    ? new Date(item.fecha_expiracion).toLocaleDateString('es-MX', {
-                                        day: '2-digit', month: 'short', year: 'numeric', timeZone: 'UTC'
-                                    })
-                                    : "—"}
-                            </td>
-                            <td>
-                                <div className="inventario-cantidad">
-                                    <strong>{item.cantidad}</strong>
-                                    <span>Unidades</span>
-                                </div>
-                            </td>
-
-                            <td><VencimientoBadge fecha={item.fecha_expiracion} /></td>
-                            <td>
-                                <div className="table-actions" style={{ display: 'flex', gap: '0.5rem' }}>
-                                    <button className="action-btn" onClick={() => handleEditar(item)}>
-                                        <Pencil size={16} color="#3b82f6" />
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>
-                    )}
-                />
-            </DataCard>
-
-            <Modal isOpen={modalOpen} onClose={() => setModalOpen(false)} title="Modificar Cantidad en Inventario">
-                <InventarioForm
-                    form={form}
-                    setForm={setForm}
-                    onSubmit={handleSubmit}
-                    onClose={() => setModalOpen(false)}
-                    loading={loading}
-                    error={error}
-                />
-            </Modal>
-
-            <DeleteModal isOpen={deleteOpen} onClose={() => setDeleteOpen(false)}
-                onConfirm={handleConfirmDelete} loading={loading} item={deleteTarget} />
-        </PageContainer>
+      item.producto?.toLowerCase().includes(termino) ||
+      item.codigo_interno?.toLowerCase().includes(termino) ||
+      item.ubicacion_nombre?.toLowerCase().includes(termino)
     );
+  });
+
+  // ==========================================
+  // VISTA DE DETALLE DE LOTES (Pantalla Completa)
+  // ==========================================
+  if (itemSeleccionado) {
+    return (
+      <PageContainer>
+        <div style={{ padding: "20px", background: "white", borderRadius: "12px", border: "1px solid #e5e7eb" }}>
+          
+          <button className="btn-volver" onClick={() => setItemSeleccionado(null)} style={{ background: "none", border: "none", color: "#6b7280", display: "flex", alignItems: "center", gap: "5px", cursor: "pointer", marginBottom: "20px", fontWeight: 500 }}>
+            <ArrowLeft size={16} /> Volver al inventario general
+          </button>
+
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px", paddingBottom: "15px", borderBottom: "1px solid #eee" }}>
+            <div>
+              <h2 style={{ margin: "0 0 5px 0", fontSize: "22px" }}>
+                Desglose de Lotes para: <strong>{itemSeleccionado.producto}</strong>
+              </h2>
+              <p style={{ color: "#6b7280", margin: 0 }}>
+                <strong>Ubicación:</strong> {itemSeleccionado.ubicacion_nombre} [{itemSeleccionado.ubicacion_tipo}]
+              </p>
+            </div>
+            <button className="primary-btn" style={{ background: "#3b82f6", color: "white", border: "none", padding: "8px 15px", borderRadius: "8px", cursor: "pointer", display: "flex", alignItems: "center", gap: "5px" }}>
+              <Plus size={16} /> Agregar Lote Manual
+            </button>
+          </div>
+
+          <DataCard>
+            <Table
+              columns={["ID Lote", "Número de Lote", "Cantidad", "Fecha de Expiración", "Estado", "Acciones"]}
+              data={itemSeleccionado.lotes || []}
+              renderRow={(lote) => (
+                <tr key={lote.id_detalle}>
+                  <td style={{ color: "#6b7280" }}>{lote.id_detalle}</td>
+                  <td><code>{lote.lote}</code></td>
+                  <td><strong>{lote.cantidad} pz</strong></td>
+                  <td>
+                    {lote.fecha_expiracion
+                      ? new Date(lote.fecha_expiracion).toLocaleDateString('es-MX', { day: '2-digit', month: 'short', year: 'numeric', timeZone: 'UTC' })
+                      : "—"}
+                  </td>
+                  <td><VencimientoBadge fecha={lote.fecha_expiracion} /></td>
+                  <td>
+                    <div style={{ display: "flex", gap: "10px" }}>
+                      <button style={{ background: "none", border: "none", color: "#f59e0b", cursor: "pointer" }} title="Editar Lote">
+                        <Pencil size={18} />
+                      </button>
+                      <button style={{ background: "none", border: "none", color: "#ef4444", cursor: "pointer" }} title="Eliminar Lote">
+                        <Trash2 size={18} />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              )}
+            />
+            {(!itemSeleccionado.lotes || itemSeleccionado.lotes.length === 0) && (
+              <div style={{ textAlign: "center", padding: "30px", color: "#9ca3af" }}>
+                No hay lotes con stock disponible para este producto.
+              </div>
+            )}
+          </DataCard>
+        </div>
+      </PageContainer>
+    );
+  }
+
+  // ==========================================
+  // VISTA PRINCIPAL (MAESTRO)
+  // ==========================================
+  return (
+    <PageContainer>
+      <div className="dashboard-title">
+        <h1>Inventario general por producto</h1>
+        <p>Gestione las existencias globales agrupadas por sucursal y producto.</p>
+      </div>
+
+      <div style={{ display: "flex", gap: "16px", marginBottom: "20px" }}>
+        <div className="search-box" style={{ flex: "1", position: "relative" }}>
+          <input 
+            type="text" 
+            placeholder="Buscar por producto, código o almacén..."
+            value={search} 
+            onChange={(e) => setSearch(e.target.value)} 
+            style={{ width: "100%", padding: "10px 35px 10px 12px", borderRadius: "8px", border: "1px solid #ddd" }}
+          />
+          <Search size={18} style={{ position: "absolute", right: "12px", top: "12px", color: "#6b7280" }} />
+        </div>
+      </div>
+
+      <DataCard>
+        <Table
+          columns={["Ubicación", "Producto", "Código interno", "Categoría", "Stock Total", "Acciones"]}
+          data={filtrados}
+          renderRow={(item) => (
+            <tr key={item.id}>
+              <td>{item.ubicacion_nombre}</td>
+              <td><strong>{item.producto}</strong></td>
+              <td style={{ color: "#6b7280" }}>{item.codigo_interno}</td>
+              <td><span style={{ background: "#f3f4f6", padding: "4px 8px", borderRadius: "12px", fontSize: "12px", color: "#4b5563" }}>{item.categoria}</span></td>
+              <td>
+                <span style={{ background: "#d1f7e0", color: "#0f9d58", padding: "4px 10px", borderRadius: "12px", fontWeight: "bold", fontSize: "13px" }}>
+                  {item.stock_total} pz
+                </span>
+              </td>
+              <td>
+                <button 
+                  onClick={() => setItemSeleccionado(item)}
+                  style={{ background: "#0ea5e9", color: "white", border: "none", padding: "6px 12px", borderRadius: "6px", cursor: "pointer", display: "flex", alignItems: "center", gap: "6px", fontSize: "13px" }}
+                >
+                  <List size={14} /> Ver Lotes / Desglose
+                </button>
+              </td>
+            </tr>
+          )}
+        />
+      </DataCard>
+    </PageContainer>
+  );
 }
 
 export default Inventario;

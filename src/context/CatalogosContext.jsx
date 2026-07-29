@@ -61,9 +61,18 @@ export function CatalogosProvider({ children }) {
         ];
 
         // 🌟 Filtramos únicamente los endpoints para los cuales el usuario tiene permiso
-        const catalogosPermitidos = configuracionCatalogos.filter(item =>
-            user.permisos.includes(item.clave)
-        );
+        const catalogosPermitidos = configuracionCatalogos.filter(item => {
+            const rolId = Number(user?.idrol);
+
+            // Si es Almacenista (3) o Farmacéutico (4), SOLO descargamos estos 4 catálogos
+            if (rolId === 3 || rolId === 4) {
+                const vistasDeseadas = ["GMOV", "GCDC", "GORD", "RECP"];
+                return vistasDeseadas.includes(item.clave);
+            }
+
+            // Si es Administrador, descarga los catálogos según la base de datos
+            return user.permisos.includes(item.clave);
+        });
 
         try {
             // Ejecutamos en paralelo solo los permitidos
