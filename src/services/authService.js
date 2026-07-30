@@ -1,19 +1,9 @@
-const API_URL = 'http://localhost/api';
-
-console.log("🔥 authService cargado - API_URL:", API_URL);
+import api from './api'; // Asegúrate de ajustar la ruta si api.js está en otra carpeta
 
 export async function login(email, password) {
-    const response = await fetch(`${API_URL}/login`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
-    });
-
-    const data = await response.json();
-
-    if (!response.ok) {
-        throw new Error(data.message || 'Error al iniciar sesión');
-    }
+    // api.post('/login') usará https://back-salunex2.onrender.com/api/login en Vercel
+    const response = await api.post('/login', { email, password });
+    const data = response.data;
 
     console.log("🔥 Respuesta del backend:", data);
 
@@ -28,23 +18,14 @@ export async function login(email, password) {
 }
 
 export async function logout() {
-    const token = localStorage.getItem('token');
-    
     try {
         // Intentamos avisarle al backend que destruya el token
-        await fetch(`${API_URL}/logout`, {
-            method: 'POST',
-            headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json',
-            },
-        });
+        await api.post('/logout');
     } catch (error) {
-        // Si el backend intenta redirigir y el navegador lo bloquea, 
-        // atrapamos el error aquí de forma silenciosa para que no rompa la app.
-        console.warn("Aviso: El backend redirigió el logout, procediendo con la limpieza local.");
+        // Si hay algún problema en el servidor, lo atrapamos para limpiar el cliente de todos modos
+        console.warn("Aviso: Error en el logout del backend, procediendo con la limpieza local.");
     } finally {
-        // 🌟 Esto se ejecuta SÍ O SÍ, garantizando que se limpie la sesión en React
+        // 🌟 Esto se ejecuta SÍ O SÍ
         localStorage.clear();
         window.location.href = '/login'; 
     }

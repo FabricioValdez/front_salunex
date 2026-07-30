@@ -45,7 +45,9 @@ function Login() {
         navigate("/", { replace: true });
       }
     } catch (error) {
-      setError(error.message);
+      // ✅ Ajuste para leer correctamente el mensaje de error que devuelve Laravel a través de Axios
+      const errorMessage = error.response?.data?.message || error.message || "Ocurrió un error al iniciar sesión";
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
