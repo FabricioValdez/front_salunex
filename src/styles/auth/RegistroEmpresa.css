@@ -1,0 +1,395 @@
+.register-page {
+  position: relative;
+  min-height: 100vh;
+  background-image: url("/background-login.png");
+  background-size: cover;
+  background-position: center;
+}
+
+.register-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(1, 134, 171, 0.311);
+}
+
+.register-page .container-fluid {
+  position: relative;
+  z-index: 1;
+}
+
+/* LOGO */
+
+.register-brand-container {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.register-brand-icon {
+  width: 300px;
+  height: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.register-brand-icon img {
+  width: 700px;
+  height: 700px;
+  object-fit: contain;
+}
+
+/* TARJETA */
+
+.register-card {
+  max-width: 680px;
+  width: 100%;
+  border-radius: 12px;
+}
+
+.register-subtitle {
+  font-size: 14px;
+}
+
+/* PASOS */
+
+.register-steps {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  margin-bottom: 32px;
+}
+
+.register-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 85px;
+  color: #9ca3af;
+  transition: 0.3s;
+}
+
+.register-step span {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 2px solid #d1d5db;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  background: #ffffff;
+
+  font-size: 14px;
+  font-weight: 600;
+
+  transition: 0.3s;
+}
+
+.register-step small {
+  margin-top: 7px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.register-step.active {
+  color: #2563eb;
+}
+
+.register-step.active span {
+  background: #2563eb;
+  border-color: #2563eb;
+  color: white;
+}
+
+.register-step-line {
+  width: 70px;
+  height: 2px;
+  background: #d1d5db;
+  margin-top: 18px;
+  transition: 0.3s;
+}
+
+.register-step-line.active {
+  background: #2563eb;
+}
+
+/* FORMULARIO */
+
+.register-step-content {
+  animation: registerFade 0.25s ease;
+}
+
+.register-section-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #2563eb;
+  margin-bottom: 20px;
+}
+
+.register-card .form-label {
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.register-card .form-control,
+.register-card .form-select {
+  min-height: 42px;
+}
+
+.register-card .form-control:focus,
+.register-card .form-select:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 0.2rem rgba(37, 99, 235, 0.15);
+}
+
+/* PRUEBA GRATUITA */
+
+.trial-message {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  padding: 14px 16px;
+  margin: 5px 0 20px;
+
+  border: 1px solid #bbf7d0;
+  border-radius: 8px;
+
+  background: #f0fdf4;
+}
+
+.trial-icon {
+  flex-shrink: 0;
+
+  width: 32px;
+  height: 32px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 50%;
+
+  background: #22c55e;
+  color: white;
+
+  font-weight: bold;
+}
+
+.trial-message strong {
+  color: #166534;
+  font-size: 14px;
+}
+
+.trial-message p {
+  margin: 2px 0 0;
+  color: #15803d;
+  font-size: 13px;
+}
+
+/* BOTONES */
+
+.register-navigation {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.register-next-btn {
+  min-width: 130px;
+
+  background: #2563eb;
+  border: none;
+
+  font-weight: 500;
+}
+
+.register-next-btn:hover,
+.register-next-btn:focus {
+  background: #1e40af;
+}
+
+.register-back-btn {
+  min-width: 110px;
+
+  background: transparent;
+  border: 2px solid #2563eb;
+
+  color: #2563eb;
+
+  font-weight: 500;
+}
+
+.register-back-btn:hover,
+.register-back-btn:focus {
+  background: #2563eb;
+  border-color: #2563eb;
+  color: white;
+}
+
+/* LOGIN */
+
+.register-login-link {
+  text-align: center;
+  margin-top: 22px;
+
+  color: #6b7280;
+  font-size: 14px;
+}
+
+.register-login-link button {
+  padding: 0;
+
+  border: none;
+  background: transparent;
+
+  color: #2563eb;
+
+  font-weight: 600;
+}
+
+.register-login-link button:hover {
+  text-decoration: underline;
+}
+
+/* ANIMACIÓN */
+
+@keyframes registerFade {
+  from {
+    opacity: 0;
+    transform: translateX(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* RESPONSIVE */
+
+@media (max-width: 767px) {
+  .register-page {
+    height: auto;
+    min-height: 100vh;
+  }
+
+  .register-brand-container {
+    margin-bottom: 10px;
+  }
+
+  .register-brand-icon {
+    width: 180px;
+    height: 80px;
+  }
+
+  .register-brand-icon img {
+    width: 300px;
+    height: 300px;
+  }
+
+  .register-card {
+    max-width: 95%;
+    margin-bottom: 30px;
+  }
+
+  .register-step {
+    min-width: 65px;
+  }
+
+  .register-step-line {
+    width: 35px;
+  }
+
+  .register-step small {
+    font-size: 10px;
+  }
+}
+
+@media (max-width: 450px) {
+  .register-card .card-body {
+    padding: 22px !important;
+  }
+
+  .register-step {
+    min-width: 58px;
+  }
+
+  .register-step-line {
+    width: 22px;
+  }
+
+  .register-step span {
+    width: 32px;
+    height: 32px;
+  }
+
+  .register-step-line {
+    margin-top: 16px;
+  }
+
+  .register-navigation {
+    flex-direction: column-reverse;
+  }
+
+  .register-navigation .btn {
+    width: 100%;
+  }
+}
+
+/* ===== AJUSTES FINALES DE ALTURA ===== */
+
+.register-card .card-body {
+  padding-top: 32px !important;
+  padding-bottom: 28px !important;
+}
+
+/* Encabezado */
+.register-card h4 {
+  margin-bottom: 4px !important;
+}
+
+.register-subtitle {
+  margin-bottom: 0;
+}
+
+/* Stepper un poco más compacto */
+.register-steps {
+  margin-top: 22px;
+  margin-bottom: 25px;
+}
+
+.register-step small {
+  margin-top: 5px;
+}
+
+/* Título de cada sección */
+.register-section-title {
+  margin-bottom: 16px;
+}
+
+/* Reducir ligeramente separación de inputs */
+.register-card .mb-3 {
+  margin-bottom: 14px !important;
+}
+
+/* Mensaje de prueba */
+.trial-message {
+  padding: 12px 14px;
+  margin: 3px 0 14px;
+}
+
+/* Botones */
+.register-navigation {
+  margin-top: 4px;
+}
+
+/* Enlace de login */
+.register-login-link {
+  margin-top: 16px;
+}

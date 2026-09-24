@@ -3,6 +3,7 @@ import { useContext } from "react";
 import AuthContext from "./context/AuthContext";
 
 import Login from "./pages/Login";
+import RegistroEmpresa from "./pages/RegistroEmpresa"
 import MainLayout from "./Main/Layout";
 import Inicio from "./pages/general/Inicio";
 import Inventario from "./pages/general/Inventario";
@@ -23,6 +24,7 @@ import PresentacionProducto from "./pages/admin/PresentacionProducto";
 import ViaAdministracion from "./pages/admin/ViaAdministracion";
 import TipoMovimiento from "./pages/admin/TipoMovimiento";
 import EditarUsuario from "./pages/admin/EditarUsuario";
+import RegistroExitoso from "./pages/RegistroExitoso";
 
 // 🔒 Protege por autenticación (Se mantiene activa)
 function PrivateRoute({ children }) {
@@ -50,6 +52,11 @@ function App() {
 
         {/* PÚBLICA */}
         <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<RegistroEmpresa />} />
+        <Route
+          path="/registro-exitoso"
+          element={<RegistroExitoso />}
+        />
         <Route path="/sin-permiso" element={
           <div style={{ padding: 40 }}>
             <h2>🚫 Sin permiso</h2>
