@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Modal from "./Modal";
 import "./SettingsModal.css";
@@ -105,29 +105,135 @@ function SettingsGeneral() {
 }
 
 function SettingsCuenta() {
+    const [usuario, setUsuario] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState("");
+
+    useEffect(() => {
+        const cargarUsuario = async () => {
+            try {
+                const token = localStorage.getItem("token");
+
+                const response = await fetch("http://localhost/api/me", {
+                    method: "GET",
+                    headers: {
+                        Accept: "application/json",
+                        Authorization: `Bearer ${token}`,
+                    },
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(
+                        data.message || "No se pudo cargar la información"
+                    );
+                }
+
+                setUsuario(data);
+            } catch (err) {
+                console.error("Error cargando usuario:", err);
+                setError("No se pudo cargar la información de la cuenta.");
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        cargarUsuario();
+    }, []);
+
+    if (loading) {
+        return (
+            <div>
+                <h3 className="settings-section-title">Mi cuenta</h3>
+                <p>Cargando información...</p>
+            </div>
+        );
+    }
+
+    if (error) {
+        return (
+            <div>
+                <h3 className="settings-section-title">Mi cuenta</h3>
+                <p className="text-danger">{error}</p>
+            </div>
+        );
+    }
+
+    const nombre = usuario?.nombre || "Usuario";
+    const rol = usuario?.rol || "Sin rol";
+    const empresa = usuario?.empresa?.nombre || "Sin empresa";
+
+    const iniciales = nombre
+        .split(" ")
+        .filter(Boolean)
+        .slice(0, 2)
+        .map((palabra) => palabra.charAt(0).toUpperCase())
+        .join("");
+
     return (
         <div>
             <h3 className="settings-section-title">Mi cuenta</h3>
 
             <div className="settings-avatar-row">
-                <div className="settings-avatar">LG</div>
+                <div className="settings-avatar">
+                    {iniciales || "U"}
+                </div>
+
                 <div>
-                    <p className="settings-avatar-name">Dra. Laura González</p>
-                    <span className="settings-avatar-role">Gerente de almacén</span>
+                    <p className="settings-avatar-name">
+                        {nombre}
+                    </p>
+
+                    <span className="settings-avatar-role">
+                        {rol}
+                    </span>
                 </div>
             </div>
 
-            <p className="settings-group-label">Información personal</p>
-            <label className="settings-label">Nombre completo</label>
-            <input className="settings-input" defaultValue="Dra. Laura González" />
+            <p className="settings-group-label">
+                Información personal
+            </p>
 
-            <label className="settings-label">Correo electrónico</label>
-            <input className="settings-input" defaultValue="laura@salunex.mx" />
+            <label className="settings-label">
+                Nombre completo
+            </label>
 
-            <label className="settings-label">Rol</label>
-            <input className="settings-input" defaultValue="Gerente de almacén" disabled />
+            <input
+                className="settings-input"
+                value={nombre}
+                disabled
+            />
 
-            <button className="settings-btn-save">Guardar cambios</button>
+            <label className="settings-label">
+                Correo electrónico
+            </label>
+
+            <input
+                className="settings-input"
+                value={usuario?.email || ""}
+                disabled
+            />
+
+            <label className="settings-label">
+                Rol
+            </label>
+
+            <input
+                className="settings-input"
+                value={rol}
+                disabled
+            />
+
+            <label className="settings-label">
+                Empresa
+            </label>
+
+            <input
+                className="settings-input"
+                value={empresa}
+                disabled
+            />
         </div>
     );
 }

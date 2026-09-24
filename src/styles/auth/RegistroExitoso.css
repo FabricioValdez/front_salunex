@@ -1,0 +1,120 @@
+.registro-exitoso-page {
+  position: relative;
+  min-height: 100vh;
+
+  background-image: url("/background-login.png");
+  background-size: cover;
+  background-position: center;
+}
+
+.registro-exitoso-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(1, 134, 171, 0.311);
+}
+
+.registro-exitoso-page .container {
+  position: relative;
+  z-index: 1;
+}
+
+.registro-exitoso-card {
+  width: 100%;
+  max-width: 520px;
+  border-radius: 14px;
+}
+
+.registro-exitoso-icon {
+  width: 75px;
+  height: 75px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  margin: 0 auto 22px;
+
+  border-radius: 50%;
+
+  background: #22c55e;
+  color: #ffffff;
+
+  font-size: 38px;
+  font-weight: 700;
+}
+
+.registro-exitoso-title {
+  color: #111827;
+  font-size: 26px;
+  font-weight: 700;
+
+  margin-bottom: 15px;
+}
+
+.registro-exitoso-text {
+  max-width: 420px;
+
+  margin: 0 auto 22px;
+
+  color: #6b7280;
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+.registro-exitoso-trial {
+  padding: 15px 18px;
+  margin-bottom: 25px;
+
+  border: 1px solid #bbf7d0;
+  border-radius: 8px;
+
+  background: #f0fdf4;
+}
+
+.registro-exitoso-trial strong {
+  color: #166534;
+  font-size: 15px;
+}
+
+.registro-exitoso-trial p {
+  margin: 5px 0 0;
+
+  color: #15803d;
+  font-size: 14px;
+}
+
+.registro-exitoso-btn {
+  min-width: 180px;
+
+  padding: 10px 24px;
+
+  background: #2563eb;
+  border: none;
+
+  font-weight: 600;
+}
+
+.registro-exitoso-btn:hover,
+.registro-exitoso-btn:focus {
+  background: #1e40af;
+}
+
+@media (max-width: 576px) {
+  .registro-exitoso-card {
+    max-width: 92%;
+  }
+
+  .registro-exitoso-title {
+    font-size: 22px;
+  }
+
+  .registro-exitoso-icon {
+    width: 65px;
+    height: 65px;
+    font-size: 32px;
+  }
+
+  .registro-exitoso-btn {
+    width: 100%;
+  }
+}
