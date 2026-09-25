@@ -7,10 +7,18 @@
   display: flex;
   flex-direction: column;
   gap: 16px;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 
 .plan-card.recomendado {
   border: 2px solid #2563eb;
+}
+
+/* ── Estilo cuando la tarjeta es el Plan Actual ── */
+.plan-card.plan-actual-card {
+  opacity: 0.65;
+  background-color: #f8fafc;
+  border: 1px dashed #94a3b8;
 }
 
 .plan-badge {
@@ -25,6 +33,23 @@
   padding: 4px 14px;
   border-radius: 20px;
   white-space: nowrap;
+}
+
+/* ── Badge gris superior para el Plan Actual ── */
+.plan-badge-actual {
+  position: absolute;
+  top: -12px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #64748b;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 4px 14px;
+  border-radius: 20px;
+  white-space: nowrap;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .plan-nombre {
@@ -70,14 +95,14 @@
   font-weight: 500;
   cursor: pointer;
   border: none;
-  transition: opacity 0.15s;
+  transition: opacity 0.15s, background-color 0.15s;
 }
 
 .plan-btn-actual {
-  background: #f3f4f6;
-  color: #9ca3af;
-  cursor: default;
-  border: 1px solid #e5e7eb;
+  background: #e2e8f0;
+  color: #64748b;
+  cursor: not-allowed;
+  border: 1px solid #cbd5e1;
 }
 
 .plan-btn-recomendado {

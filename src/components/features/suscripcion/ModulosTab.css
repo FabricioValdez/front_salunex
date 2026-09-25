@@ -21,22 +21,22 @@
   display: flex;
   align-items: center;
   gap: 14px;
-  background: #fff;
+  background: #ffffff;
   border: 1px solid #e5e7eb;
   border-radius: 12px;
   padding: 16px 20px;
   cursor: pointer;
-  transition: border-color 0.15s, background 0.15s;
+  transition: border-color 0.15s, background-color 0.15s, box-shadow 0.15s;
 }
 
 .modulo-card:hover {
   border-color: #93c5fd;
-  background: #f8faff;
+  background-color: #f8faff;
 }
 
 .modulo-card.seleccionado {
   border-color: #2563eb;
-  background: #eff6ff;
+  background-color: #eff6ff;
 }
 
 .modulo-check {
@@ -53,9 +53,9 @@
 }
 
 .modulo-card.seleccionado .modulo-check {
-  background: #2563eb;
+  background-color: #2563eb;
   border-color: #2563eb;
-  color: #fff;
+  color: #ffffff;
 }
 
 .modulo-info {
@@ -89,7 +89,7 @@
 
 /* ── Resumen ── */
 .modulos-resumen {
-  background: #fff;
+  background: #ffffff;
   border: 1px solid #e5e7eb;
   border-radius: 14px;
   padding: 20px;
@@ -147,22 +147,23 @@
 .modulos-resumen .primary-btn {
   width: 100%;
   padding: 10px;
-  background: #2563eb;
-  color: #fff;
+  background-color: #2563eb;
+  color: #ffffff;
   border: none;
   border-radius: 8px;
   font-size: 14px;
   font-family: inherit;
   font-weight: 500;
   cursor: pointer;
+  transition: background-color 0.15s;
 }
 
 .modulos-resumen .primary-btn:disabled {
-  background: #e5e7eb;
+  background-color: #e5e7eb;
   color: #9ca3af;
   cursor: default;
 }
 
 .modulos-resumen .primary-btn:hover:not(:disabled) {
-  background: #1d4ed8;
+  background-color: #1d4ed8;
 }

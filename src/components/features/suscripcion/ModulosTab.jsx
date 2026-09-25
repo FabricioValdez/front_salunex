@@ -1,55 +1,98 @@
-import { useState } from "react";
-import { Check } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Check, Loader2 } from "lucide-react";
+import clienteAxios from "../../../services/api";
 import "./ModulosTab.css";
 
-const modulos = [
-  {
-    id: "inventario",
-    nombre: "Inventario",
-    descripcion: "Control de stock, entradas y salidas de medicamentos",
-    precio: 199,
-  },
-  {
-    id: "ordenes",
-    nombre: "Órdenes de compra",
-    descripcion: "Gestión de pedidos a proveedores y seguimiento",
-    precio: 199,
-  },
-  {
-    id: "control",
-    nombre: "Control de calidad",
-    descripcion: "Revisión y validación de productos recibidos",
-    precio: 149,
-  },
-  {
-    id: "dashboard",
-    nombre: "Dashboard / Reportes",
-    descripcion: "Métricas, gráficas y reportes de tu operación",
-    precio: 249,
-  },
-];
-
 const ModulosTab = () => {
+  const [modulos, setModulos] = useState([]);
   const [seleccionados, setSeleccionados] = useState([]);
+  const [cargandoModulos, setCargandoModulos] = useState(true);
+  const [procesandoPago, setProcesandoPago] = useState(false);
+  const [error, setError] = useState(null);
 
-  const toggleModulo = (id) => {
-    setSeleccionados((prev) =>
-      prev.includes(id)
-        ? prev.filter((m) => m !== id)
-        : [...prev, id]
-    );
+  useEffect(() => {
+    const cargarModulos = async () => {
+      try {
+        const { data } = await clienteAxios.get("/suscripciones/modulos");
+        if (data.success) {
+          setModulos(data.data);
+        }
+      } catch (err) {
+        setError("Error al cargar los módulos disponibles.");
+      } finally {
+        setCargandoModulos(false);
+      }
+    };
+
+    cargarModulos();
+  }, []);
+
+  const toggleModulo = (rawId) => {
+    const id = Number(rawId);
+    setSeleccionados((prev) => {
+      const existe = prev.some((item) => Number(item) === id);
+      return existe
+        ? prev.filter((item) => Number(item) !== id)
+        : [...prev, id];
+    });
   };
 
-  const total = modulos
-    .filter((m) => seleccionados.includes(m.id))
-    .reduce((acc, m) => acc + m.precio, 0);
+  // Filtrado directo de módulos activos
+  const modulosActivos = modulos.filter((m) =>
+    seleccionados.some((selId) => Number(selId) === Number(m.id))
+  );
+
+  // Suma evaluada de forma síncrona en cada render
+  const sumaTotal = modulosActivos.reduce(
+    (acc, m) => acc + (parseFloat(m.precio) || 0),
+    0
+  );
+
+  const handleContratarModulos = async () => {
+    if (seleccionados.length < 3) {
+      alert("Debes seleccionar al menos 3 módulos.");
+      return;
+    }
+
+    try {
+      setProcesandoPago(true);
+      const origenActual = window.location.origin;
+
+      const { data } = await clienteAxios.post(
+        "/suscripciones/checkout-personalizado",
+        {
+          modulos: seleccionados,
+          success_url: `${origenActual}/suscripcion`,
+          cancel_url: `${origenActual}/suscripcion`,
+        }
+      );
+
+      if (data.success && data.url) {
+        window.location.href = data.url;
+      }
+    } catch (err) {
+      alert(err.response?.data?.message || "Error al procesar la solicitud.");
+      setProcesandoPago(false);
+    }
+  };
+
+  if (cargandoModulos) {
+    return <p className="text-center py-6">Cargando módulos...</p>;
+  }
+
+  if (error) {
+    return <p className="text-center text-red-500 py-6">{error}</p>;
+  }
 
   return (
-    <div className="modulos-layout">
-
+    <div className="modulos-layout notranslate" translate="no">
+      {/* Lista de selección */}
       <div className="modulos-lista">
         {modulos.map((modulo) => {
-          const activo = seleccionados.includes(modulo.id);
+          const activo = seleccionados.some(
+            (s) => Number(s) === Number(modulo.id)
+          );
+
           return (
             <div
               key={modulo.id}
@@ -61,48 +104,60 @@ const ModulosTab = () => {
               </div>
               <div className="modulo-info">
                 <p className="modulo-nombre">{modulo.nombre}</p>
-                <span className="modulo-descripcion">{modulo.descripcion}</span>
+                <span className="modulo-descripcion">
+                  Código: {modulo.clave}
+                </span>
               </div>
-              <span className="modulo-precio">
-                ${modulo.precio} <small>MXN/mes</small>
+              <span className="modulo-precio notranslate" translate="no">
+                ${parseFloat(modulo.precio).toLocaleString()} <small>MXN/mes</small>
               </span>
             </div>
           );
         })}
       </div>
 
-      {/* ── Resumen ── */}
-      <div className="modulos-resumen">
+      {/* Resumen lateral */}
+      <div className="modulos-resumen notranslate" translate="no">
         <h3>Resumen</h3>
 
-        {seleccionados.length === 0 ? (
+        {modulosActivos.length === 0 ? (
           <p className="resumen-vacio">Selecciona los módulos que necesitas</p>
         ) : (
           <ul className="resumen-lista">
-            {modulos
-              .filter((m) => seleccionados.includes(m.id))
-              .map((m) => (
-                <li key={m.id}>
-                  <span>{m.nombre}</span>
-                  <span>${m.precio} MXN</span>
-                </li>
-              ))}
+            {modulosActivos.map((m) => (
+              <li key={m.id}>
+                <span>{m.nombre}</span>
+                <span>${parseFloat(m.precio).toLocaleString()} MXN</span>
+              </li>
+            ))}
           </ul>
         )}
 
         <div className="resumen-total">
           <span>Total mensual</span>
-          <strong>${total.toLocaleString()} MXN</strong>
+          <strong>${sumaTotal.toLocaleString()} MXN</strong>
         </div>
+
+        {seleccionados.length > 0 && seleccionados.length < 3 && (
+          <p className="text-xs text-amber-600 mb-2">
+            Selecciona al menos {3 - seleccionados.length} módulo(s) más.
+          </p>
+        )}
 
         <button
           className="primary-btn"
-          disabled={seleccionados.length === 0}
+          disabled={seleccionados.length < 3 || procesandoPago}
+          onClick={handleContratarModulos}
         >
-          Contratar módulos
+          {procesandoPago ? (
+            <span className="flex items-center justify-center gap-2">
+              <Loader2 className="animate-spin" size={16} /> Conectando con Stripe...
+            </span>
+          ) : (
+            "Contratar módulos"
+          )}
         </button>
       </div>
-
     </div>
   );
 };

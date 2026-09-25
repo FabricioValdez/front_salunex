@@ -81,3 +81,66 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* ── Modal Oficial de Salunex (Contenido Interno) ── */
+.suscripcion-modal-body {
+  text-align: center;
+  padding: 12px 4px 4px;
+}
+
+.suscripcion-modal-icono {
+  margin: 0 auto 14px;
+}
+
+.suscripcion-modal-icono.success {
+  color: #22c55e;
+}
+
+.suscripcion-modal-icono.error {
+  color: #ef4444;
+}
+
+.suscripcion-modal-icono.loading {
+  color: #2563eb;
+}
+
+.suscripcion-modal-titulo {
+  font-size: 20px;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0 0 8px;
+}
+
+.suscripcion-modal-mensaje {
+  font-size: 14px;
+  color: #64748b;
+  margin: 0 0 20px;
+  line-height: 1.4;
+}
+
+.suscripcion-modal-folio-box {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 14px 18px;
+  text-align: left;
+  font-size: 13.5px;
+  color: #334155;
+  margin-bottom: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.suscripcion-modal-folio-box span {
+  color: #64748b;
+}
+
+.suscripcion-modal-folio-box strong {
+  color: #0f172a;
+}
+
+.suscripcion-modal-btn {
+  width: 100%;
+  justify-content: center;
+}

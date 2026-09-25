@@ -11,6 +11,7 @@ import ControlDeCalidad from "./pages/general/ControlDeCalidad";
 import RecepcionAlmacen from "./pages/general/RecepcionInventario";
 import Dashboard from "./pages/general/Dashboard";
 import Suscripcion from "./pages/Suscripcion";
+import SuscripcionExito from "./components/features/suscripcion/SuscripcionExito";
 import Usuarios from "./pages/admin/Usuarios";
 import Empresas from "./pages/admin/Empresas";
 import Farmacias from "./pages/admin/Farmacias";
@@ -62,6 +63,7 @@ function App() {
         }>
           <Route index element={<Inicio />} />
           <Route path="suscripcion" element={<Suscripcion />} />
+          <Route path="suscripcion/exito" element={<SuscripcionExito />} />
 
           {/* Sub-rutas bajo el prefijo /general/... asignado en tu Sidebar */}
           <Route path="general">
