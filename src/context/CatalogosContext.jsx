@@ -33,25 +33,15 @@ export function CatalogosProvider({ children }) {
 
         setLoading(true);
 
-        // Mapeo de qué clave de módulo desbloquea qué endpoint de catálogo
-        // 📍 Ubicación: Reemplaza este bloque dentro de fetchCatalogos en CatalogosContext.jsx
-
         const configuracionCatalogos = [
-            // --- Gestión de Personal, Cuentas y Roles ---
             { clave: 'GROL', endpoint: '/roles', setter: setRoles },
-
-            // --- Entidades del Negocio y Almacenamiento ---
             { clave: 'GPER', endpoint: '/empresas', setter: setEmpresas },
             { clave: 'GFAR', endpoint: '/farmacias', setter: setFarmacias },
             { clave: 'GALM', endpoint: '/almacenes', setter: setAlmacenes },
-
-            // --- Flujos Operativos y Movimientos (Páginas Generales) ---
             { clave: 'GMOV', endpoint: '/inventario', setter: setInventario },
             { clave: 'GCDC', endpoint: '/control-calidad', setter: setControlCalidad },
             { clave: 'GORD', endpoint: '/ordenes', setter: setMovimientos },
             { clave: 'RECP', endpoint: '/recepcion-inventario', setter: setRecepcionAlmacen },
-
-            // --- Catálogos Finos de Productos (Desglosados uno a uno) ---
             { clave: 'GPRO', endpoint: '/productos', setter: setProductos },
             { clave: 'GCAT', endpoint: '/categorias-producto', setter: setCategoriasProducto },
             { clave: 'GCLA', endpoint: '/clasificaciones-producto', setter: setClasificacionesProducto },
@@ -60,22 +50,12 @@ export function CatalogosProvider({ children }) {
             { clave: 'GTIP', endpoint: '/tipos-movimiento', setter: setTiposMovimiento },
         ];
 
-        // 🌟 Filtramos únicamente los endpoints para los cuales el usuario tiene permiso
+        // 🌟 Filtramos estrictamente leyendo el arreglo de permisos del backend
         const catalogosPermitidos = configuracionCatalogos.filter(item => {
-            const rolId = Number(user?.idrol);
-
-            // Si es Almacenista (3) o Farmacéutico (4), SOLO descargamos estos 4 catálogos
-            if (rolId === 3 || rolId === 4) {
-                const vistasDeseadas = ["GMOV", "GCDC", "GORD", "RECP"];
-                return vistasDeseadas.includes(item.clave);
-            }
-
-            // Si es Administrador, descarga los catálogos según la base de datos
             return user.permisos.includes(item.clave);
         });
 
         try {
-            // Ejecutamos en paralelo solo los permitidos
             const promesas = catalogosPermitidos.map(item => api.get(item.endpoint));
             const resultados = await Promise.allSettled(promesas);
 
