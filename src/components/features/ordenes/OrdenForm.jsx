@@ -1,32 +1,43 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import SearchBar from "../../ui/SearchBar";
 import { Trash2 } from "lucide-react";
-import api from "../../../services/api"; // 🌟 1. IMPORTAMOS TU INSTANCIA DE AXIOS
+import api from "../../../services/api";
+import AuthContext from "../../../context/AuthContext"; // 🌟 Importamos tu contexto global
 import "./OrdenForm.css";
 
 const OrdenForm = ({ onSubmit, onClose }) => {
-  // Datos cargados desde Laravel
+  // 🌟 Extraemos al usuario del contexto global
+  const { user } = useContext(AuthContext);
+
   const [productosDisponibles, setProductosDisponibles] = useState([]);
   const [puntoOrigen, setPuntoOrigen] = useState(null);
   const [puntosInventarioDestino, setPuntosInventarioDestino] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Campos de formulario local
-  const [idOrigen, setIdOrigen] = useState(""); 
+  const [idOrigen, setIdOrigen] = useState("");
   const [busqueda, setBusqueda] = useState("");
   const [productosSeleccionados, setProductosSeleccionados] = useState([]);
 
-  // Cargar datos al abrir el modal
   useEffect(() => {
     const cargarDatosFormulario = async () => {
       try {
-        // 🌟 2. CAMBIAMOS FETCH POR API.GET
         const res = await api.get("/movimientos/datos-formulario");
-        const data = res.data; // Axios guarda la respuesta en .data
-        
+        const data = res.data;
+
         setProductosDisponibles(data.productos || []);
-        setPuntoOrigen(data.punto_origen || null);
-        setPuntosInventarioDestino(data.puntos_inventario || []);
+
+        // 🌟 1. Asignamos la ubicación directamente desde el usuario global (o backend como respaldo)
+        const miUbicacion = user?.ubicacion || data.punto_origen || null;
+        setPuntoOrigen(miUbicacion);
+
+        // 🌟 2. Filtramos la lista de proveedores para excluir la propia farmacia del usuario
+        const proveedores = data.puntos_inventario || [];
+        if (miUbicacion) {
+          setPuntosInventarioDestino(proveedores.filter(p => p.id !== miUbicacion.id));
+        } else {
+          setPuntosInventarioDestino(proveedores);
+        }
+
       } catch (error) {
         console.error("Error al obtener la estructura para el formulario:", error);
       } finally {
@@ -34,7 +45,7 @@ const OrdenForm = ({ onSubmit, onClose }) => {
       }
     };
     cargarDatosFormulario();
-  }, []);
+  }, [user]);
 
   const medicamentosFiltrados = productosDisponibles.filter((prod) =>
     prod.nombre.toLowerCase().includes(busqueda.toLowerCase())
@@ -92,22 +103,20 @@ const OrdenForm = ({ onSubmit, onClose }) => {
     const payload = {
       id_origen: parseInt(idOrigen),
       id_destino: puntoOrigen.id,
-      id_tipo_movimiento: 1, // Traspaso
+      id_tipo_movimiento: 1,
       productos: productosSeleccionados.map(p => p.id),
       cantidades: productosSeleccionados.map(p => p.cantidad)
     };
 
     try {
-      // 🌟 3. CAMBIAMOS FETCH POR API.POST
       const res = await api.post("/movimientos", payload);
 
       if (res.status === 200 || res.status === 201) {
-        onSubmit(); 
+        onSubmit();
         onClose();
       }
     } catch (error) {
       console.error("Error al enviar la orden:", error);
-      // Extraemos el error que devuelve Laravel vía Axios
       const errorMsg = error.response?.data?.error || "No se pudo procesar la orden";
       alert("Error: " + errorMsg);
     }
@@ -118,10 +127,9 @@ const OrdenForm = ({ onSubmit, onClose }) => {
   return (
     <form onSubmit={handleSubmit} className="orden-form">
       <div className="orden-form-grid">
-        
-        {/* Columna izquierda: Configuración Origen/Destino */}
+
         <div className="orden-col orden-col-left">
-          
+
           <div className="form-group">
             <label>Punto que va a Proveer / Surtir (Origen)</label>
             <select
@@ -157,7 +165,6 @@ const OrdenForm = ({ onSubmit, onClose }) => {
             />
           </div>
 
-          {/* Resultados en tiempo real */}
           {busqueda && (
             <div className="med-list">
               {medicamentosFiltrados.length === 0 ? (
@@ -183,7 +190,6 @@ const OrdenForm = ({ onSubmit, onClose }) => {
           )}
         </div>
 
-        {/* Columna derecha: Canasta de productos seleccionados */}
         <div className="orden-col orden-col-right">
           <div className="productos-header">
             <h4>Productos seleccionados</h4>

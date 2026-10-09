@@ -1,4 +1,4 @@
-import { useState, useContext, useEffect } from "react";
+import { useState, useContext } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import {
   House, ClipboardList, ShoppingCart, Package,
@@ -8,21 +8,16 @@ import {
 } from "lucide-react";
 import AuthContext from "../context/AuthContext";
 import { logout } from "../services/authService";
-import api from "../services/api";
 
 const menuCompleto = [
-  // ==========================================
   // --- 📦 PÁGINAS GENERALES
-  // ==========================================
   { to: "/", icon: House, label: "Inicio" }, 
   { to: "/general/inventario", icon: Package, label: "Inventario", clave: "GMOV" },
   { to: "/general/control", icon: ClipboardList, label: "Control de Calidad", clave: "GCDC" }, 
   { to: "/general/ordenes", icon: ShoppingCart, label: "Órdenes de Compra", clave: "GORD" }, 
   { to: "/general/recepcion-inventario", icon: PackageCheck, label: "Recepción Inventario", clave: "RECP" }, 
   
-  // ==========================================
   // --- 🛠️ PÁGINAS DE ADMINISTRACIÓN (ADMIN) ---
-  // ==========================================
   { to: "/admin/usuarios", icon: Users, label: "Usuarios", clave: "GUSU" },
   { to: "/admin/empleados", icon: ArrowLeftRight, label: "Empleados", clave: "GEMP" }, 
   { to: "/admin/empresas", icon: Building2, label: "Empresas", clave: "GPER" }, 
@@ -35,9 +30,7 @@ const menuCompleto = [
   { to: "/admin/vias-administracion", icon: Syringe, label: "Vías Admin.", clave: "GVIA" }, 
   { to: "/admin/tipos-movimiento-sistema", icon: ArrowLeftRight, label: "Tipos de Movimiento", clave: "GTIP" }, 
 
-  // ==========================================
-  // --- ⏳ MÓDULOS FUTUROS (FALTAN AGREGAR) ---
-  // ==========================================
+  // --- ⏳ MÓDULOS FUTUROS ---
   { to: "/general/dashboard", icon: LayoutDashboard, label: "Dashboard" }, 
   { to: "/suscripcion", icon: Tag, label: "Suscripción" } 
 ];
@@ -46,38 +39,13 @@ const rutasBase = ["/", "/admin", "/empresa", "/farmacia"];
 
 const Sidebar = ({ onOpenSettings }) => {
   const [collapsed, setCollapsed] = useState(false);
-  const [misPermisos, setMisPermisos] = useState([]);
   const { user, logoutUser } = useContext(AuthContext);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const cargarPermisosDelUsuario = async () => {
-      try {
-        const res = await api.get('/usuario/permisos');
-        setMisPermisos(res.data.permisos);
-      } catch (error) {
-        console.error("Error cargando los permisos desde el controlador:", error);
-      }
-    };
-
-    if (user) cargarPermisosDelUsuario();
-  }, [user]);
-
-  // 🌟 AQUI ESTÁ LA MAGIA: Control visual de las opciones
+  // 🌟 Única validación: Si no tiene clave, pasa. Si tiene clave, verifica en el array global.
   const menuFiltrado = menuCompleto.filter(modulo => {
-    // 1. Mostrar siempre las opciones sin clave (Inicio, Dashboard, Suscripción)
     if (!modulo.clave) return true;
-
-    // 2. Lógica estricta para Almacenista (3) y Farmacéutico (4)
-    const rolId = Number(user?.idrol);
-    if (rolId === 3 || rolId === 4) {
-      // Claves permitidas que coinciden EXACTAMENTE con tu Imagen 1
-      const vistasDeseadas = ["GMOV", "GCDC", "GORD", "RECP"];
-      return vistasDeseadas.includes(modulo.clave);
-    }
-
-    // 3. Para el Administrador (Rol 1 u otros), respetamos la Base de Datos
-    return misPermisos.includes(modulo.clave);
+    return user?.permisos?.includes(modulo.clave);
   });
 
   const handleLogout = async () => {

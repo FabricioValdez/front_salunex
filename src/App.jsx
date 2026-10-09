@@ -32,15 +32,14 @@ function PrivateRoute({ children }) {
   return user ? children : <Navigate to="/login" replace />;
 }
 
-// 🔓 APAGADO TEMPORAL: Deja pasar a cualquier usuario autenticado sin importar su idrol
+// 🔒 ENCENDIDO: Ahora confía ciegamente en el arreglo que provee el backend
 function RoleRoute({ children, requiredPermission }) {
   const { user } = useContext(AuthContext);
   if (!user) return <Navigate to="/login" replace />;
 
-  // 🔓 COMENTA ESTO TEMPORALMENTE para que no te rebote a ningún lado mientras prueban:
-  // if (!user.permisos || !user.permisos.includes(requiredPermission)) {
-  //   return <Navigate to="/sin-permiso" replace />;
-  // }
+  if (!user.permisos || !user.permisos.includes(requiredPermission)) {
+    return <Navigate to="/sin-permiso" replace />;
+  }
 
   return children;
 }
@@ -75,7 +74,7 @@ function App() {
           {/* Sub-rutas bajo el prefijo /general/... asignado en tu Sidebar */}
           <Route path="general">
             <Route path="dashboard" element={<Dashboard />} /> {/* Público por ahora */}
-            <Route path="inventario" element={<RoleRoute requiredPermission="GALM"><Inventario /></RoleRoute>} />
+            <Route path="inventario" element={<RoleRoute requiredPermission="GMOV"><Inventario /></RoleRoute>} />
             <Route path="control" element={<RoleRoute requiredPermission="GCDC"><ControlDeCalidad /></RoleRoute>} />
             <Route path="ordenes" element={<RoleRoute requiredPermission="GORD"><Ordenes /></RoleRoute>} />
             <Route path="recepcion-inventario" element={<RoleRoute requiredPermission="RECP"><RecepcionAlmacen /></RoleRoute>} />
