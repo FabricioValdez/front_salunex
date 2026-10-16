@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-// Usamos la variable de entorno de Vite o una URL por defecto si no existe
+// Usamos la variable de entorno de Vite o el puerto 8000 por defecto si no existe
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
 
 const api = axios.create({
