@@ -10,6 +10,7 @@ const Dashboard = () => {
 
   // Estado para el token de Metabase
   const [metabaseToken, setMetabaseToken] = useState("");
+  const [metabaseTokenMio, setMetabaseTokenMio] = useState("");
 
   const meses = [
     "Ene", "Feb", "Mar", "Abr", "May", "Jun",
@@ -49,11 +50,17 @@ const Dashboard = () => {
       // 2. Peticiones simultáneas: Datos del dashboard y Token de Metabase
       const [dashResponse, tokenResponse] = await Promise.all([
         api.get("/dashboard"),
-        api.get("/metabase-token"), // Asegúrate de crear este endpoint en Laravel
+        api.get("/metabase-token"),
       ]);
 
       setDashboardData(dashResponse.data);
-      setMetabaseToken(tokenResponse.data.token);
+
+      // --- MODIFICACIÓN AQUÍ ---
+      // Guardamos ambos tokens usando las nuevas llaves que devuelve tu backend
+      setMetabaseToken(tokenResponse.data.token_companero);
+      setMetabaseTokenMio(tokenResponse.data.token_mio);
+      // -------------------------
+
     } catch (err) {
       console.error("Error dashboard:", err);
       setError(
@@ -437,6 +444,28 @@ const Dashboard = () => {
             {metabaseToken && (
               <metabase-dashboard
                 token={metabaseToken}
+                with-title="true"
+                with-downloads="true"
+              ></metabase-dashboard>
+            )}
+          </div>
+        </article>
+
+        {/* =====================================================
+            DASHBOARD DE METABASE (TUYO)
+        ===================================================== */}
+        <article className="large-card" style={{ width: "100%", minHeight: "750px", padding: "20px", marginTop: "20px" }}>
+          <div className="card-header" style={{ marginBottom: "20px" }}>
+            <div>
+              <h3>Métricas de Inventario y Solicitudes</h3>
+              <p className="chart-description">Estado de lotes y productos más solicitados</p>
+            </div>
+          </div>
+
+          <div style={{ width: "100%", height: "700px" }}>
+            {metabaseTokenMio && (
+              <metabase-dashboard
+                token={metabaseTokenMio}
                 with-title="true"
                 with-downloads="true"
               ></metabase-dashboard>
