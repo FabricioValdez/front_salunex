@@ -11,6 +11,7 @@ const Dashboard = () => {
   // Estado para el token de Metabase
   const [metabaseToken, setMetabaseToken] = useState("");
   const [metabaseTokenMio, setMetabaseTokenMio] = useState("");
+  const [metabaseTokenTercero, setMetabaseTokenTercero] = useState("");
 
   const meses = [
     "Ene", "Feb", "Mar", "Abr", "May", "Jun",
@@ -59,6 +60,7 @@ const Dashboard = () => {
       // Guardamos ambos tokens usando las nuevas llaves que devuelve tu backend
       setMetabaseToken(tokenResponse.data.token_companero);
       setMetabaseTokenMio(tokenResponse.data.token_mio);
+      setMetabaseTokenTercero(tokenResponse.data.token_tercero);
       // -------------------------
 
     } catch (err) {
@@ -466,6 +468,25 @@ const Dashboard = () => {
             {metabaseTokenMio && (
               <metabase-dashboard
                 token={metabaseTokenMio}
+                with-title="true"
+                with-downloads="true"
+              ></metabase-dashboard>
+            )}
+          </div>
+        </article>
+
+        {/* METABASE: DASHBOARD 36 */}
+        <article className="large-card" style={{ width: "100%", minHeight: "750px", padding: "20px", marginTop: "20px" }}>
+          <div className="card-header" style={{ marginBottom: "20px" }}>
+            <div>
+              <h3>Ventas e inventario por categoría</h3>
+            </div>
+          </div>
+          <div style={{ width: "100%", height: "700px" }}>
+            {/* Token temporal de ejemplo: reemplazar por uno generado por Laravel. */}
+            {metabaseTokenTercero && (
+              <metabase-dashboard
+                token={metabaseTokenTercero}
                 with-title="true"
                 with-downloads="true"
               ></metabase-dashboard>
