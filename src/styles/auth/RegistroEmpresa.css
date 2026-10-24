@@ -393,3 +393,124 @@
 .register-login-link {
   margin-top: 16px;
 }
+
+/* Teléfono con selector de país integrado */
+.register-page .registro-telefono {
+  display: flex;
+  align-items: stretch;
+  width: 100%;
+  min-height: 52px;
+  overflow: hidden;
+  background-color: #fff;
+  border: 1px solid #d9dee7;
+  border-radius: 8px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.register-page .registro-telefono:focus-within {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+}
+
+.register-page .registro-telefono .registro-telefono-pais {
+  flex: 0 0 116px;
+  width: 116px;
+  min-width: 116px;
+  max-width: 116px;
+  margin: 0;
+  padding: 12px 30px 12px 12px;
+  color: #374151;
+  font-size: 14px;
+  background-color: #f8fafc;
+  background-position: right 10px center;
+  border: 0 !important;
+  border-right: 1px solid #e5e7eb !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  cursor: pointer;
+}
+
+.register-page .registro-telefono .registro-telefono-numero {
+  flex: 1 1 0%;
+  width: 0;
+  min-width: 0;
+  margin: 0;
+  padding: 12px;
+  font-size: 15px;
+  background-color: transparent;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+
+.register-page .registro-telefono-numero::placeholder {
+  color: #9ca3af;
+}
+
+.register-page .registro-telefono-error {
+  border-color: #dc3545;
+}
+
+.register-page .registro-telefono-error:focus-within {
+  border-color: #dc3545;
+  box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.12);
+}
+
+.register-page .registro-telefono-disabled,
+.register-page .registro-telefono-disabled .registro-telefono-pais,
+.register-page .registro-telefono-disabled .registro-telefono-numero {
+  background-color: #e9ecef;
+  cursor: not-allowed;
+}
+
+.register-page .registro-telefono {
+  height: 42px;
+  min-height: 42px;
+}
+
+.register-page .registro-telefono .registro-telefono-pais,
+.register-page .registro-telefono .registro-telefono-numero {
+  height: 100% !important;
+  min-height: 0 !important;
+  box-sizing: border-box;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  font-size: 16px;
+}
+
+/* Reservar espacio para los mensajes de validación */
+.register-page .register-step-content .mb-3:has(
+  > .form-control,
+  > .form-select,
+  > .input-group,
+  > .registro-telefono
+) {
+  position: relative;
+  padding-bottom: 34px;
+}
+
+/* Mostrar los errores dentro del espacio reservado */
+.register-page .register-step-content .mb-3 > .invalid-feedback,
+.register-page .register-step-content .mb-3
+  > .input-group
+  > .invalid-feedback {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  margin-top: 4px;
+  font-size: 12px;
+  line-height: 14px;
+}
+
+/* En campos sin InputGroup, descontar el espacio reservado */
+.register-page .register-step-content .mb-3 > .invalid-feedback {
+  top: auto;
+  bottom: 0;
+  height: 28px;
+}
+
+/* Los errores de contraseña se posicionan respecto al grupo */
+.register-page .register-step-content .input-group {
+  position: relative;
+}
