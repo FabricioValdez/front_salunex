@@ -1,20 +1,60 @@
-.inventario-form{
-  display:flex;
-  flex-direction:column;
-  gap:12px;
+/* ==========================================================================
+   Formularios Modales (Umbrales y Lotes)
+   ========================================================================== */
+.inventario-form-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  /* 3 columnas por defecto */
+  gap: 16px;
+  margin-bottom: 24px;
 }
 
-.inventario-form input,
-.inventario-form select{
-  padding:10px;
-  border-radius:6px;
-  border:1px solid #ccc;
-  font-size:14px;
-  outline:none;
+.inventario-form-grid.grid-2 {
+  grid-template-columns: repeat(2, 1fr);
+  /* Para el formulario de lotes */
 }
 
-.form-actions{
-  display:flex;
-  justify-content:flex-end;
-  margin-top:10px;
+@media (max-width: 768px) {
+
+  .inventario-form-grid,
+  .inventario-form-grid.grid-2 {
+    grid-template-columns: 1fr;
+  }
+}
+
+.inv-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.inv-form-label {
+  font-size: 14px;
+  font-weight: 500;
+  color: #374151;
+}
+
+.inv-form-input {
+  padding: 10px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  outline: none;
+  font-size: 14px;
+  background-color: #fff;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  width: 100%;
+}
+
+.inv-form-input:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+}
+
+.inv-modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 24px;
+  padding-top: 16px;
+  border-top: 1px solid #f3f4f6;
 }

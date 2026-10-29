@@ -1,0 +1,84 @@
+/* ==========================================================================
+   ESTILOS PARA SUBMENÚS (ACORDEÓN)
+   ========================================================================== */
+
+/* Contenedor principal para mantener todo alineado */
+.submenu-wrapper {
+    margin-bottom: 4px;
+}
+
+/* Botón padre (ej. "Productos") */
+.submenu-toggle {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 12px 15px;
+    color: #4b5563;
+    /* Gris texto normal */
+    transition: all 0.2s ease;
+}
+
+.submenu-toggle-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* Estilo cuando el botón padre está "abierto" */
+.submenu-toggle.active-submenu {
+    background-color: #f1f5f9;
+    /* Gris muy clarito arriba */
+    color: #111827;
+    font-weight: 600;
+    border-radius: 8px 8px 0 0;
+    /* Redondeado solo de arriba para pegar con la caja abajo */
+}
+
+/* La caja gris que contiene las opciones */
+.submenu-container {
+    background-color: #f8fafc;
+    /* Fondo gris para dar profundidad */
+    border-radius: 0 0 8px 8px;
+    /* Redondeado de abajo */
+    margin: 0 10px 10px 10px;
+    /* Separación sutil de los bordes del menú */
+    overflow: hidden;
+    border: 1px solid #e2e8f0;
+    border-top: none;
+    /* Se quita el borde de arriba para fusionarse con el botón padre */
+    padding: 4px 0;
+}
+
+/* Cada opción individual (ej. Categorías, Clasificaciones) */
+.sidebar-nav-item.sub-item {
+    padding: 10px 15px 10px 42px !important;
+    /* Sangría a la izquierda para simular jerarquía */
+    font-size: 13.5px;
+    color: #64748b;
+    border-left: 3px solid transparent;
+    transition: all 0.2s ease;
+    text-decoration: none;
+    display: block;
+}
+
+/* Hover al pasar el cursor por un sub-item */
+.sidebar-nav-item.sub-item:hover {
+    background-color: #e2e8f0;
+    /* Gris más oscuro al pasar el mouse */
+    color: #334155;
+}
+
+/* Estado ACTIVO del sub-item (cuando estás en esa pantalla) */
+.sidebar-nav-item.sub-item.active {
+    background-color: #e0f2fe;
+    /* Fondo azul pastel */
+    color: #0369a1;
+    /* Texto azul oscuro */
+    border-left: 3px solid #0ea5e9;
+    /* Borde izquierdo azul para resaltar */
+    font-weight: 500;
+}

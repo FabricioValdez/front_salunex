@@ -5,96 +5,22 @@ import PageContainer from "../../components/ui/PageContainer";
 import DataCard from "../../components/ui/DataCard";
 import Table from "../../components/ui/Table/Table";
 import Button from "../../components/ui/Button";
-import Modal from "../../components/ui/Modal";
 import SearchBar from "../../components/ui/SearchBar";
-import { useCatalogos } from "../../context/CatalogosContext";
+import Modal from "../../components/ui/Modal";
 import api from "../../services/api";
 
-// ── Formulario nuevo usuario ──
-function UsuarioForm({ form, setForm, roles, onSubmit, onClose, loading, error }) {
-    return (
-        <>
-            {error && (
-                <div className="alert alert-danger py-2 text-center mb-3">{error}</div>
-            )}
-            <div className="mb-3">
-                <label className="form-label">Email</label>
-                <input
-                    type="email"
-                    className="form-control"
-                    value={form.email}
-                    onChange={(e) => setForm({ ...form, email: e.target.value })}
-                    placeholder="correo@ejemplo.com"
-                />
-            </div>
-            <div className="mb-3">
-                <label className="form-label">Contraseña</label>
-                <input
-                    type="password"
-                    className="form-control"
-                    value={form.password}
-                    onChange={(e) => setForm({ ...form, password: e.target.value })}
-                    placeholder="••••••••"
-                />
-            </div>
-            <div className="mb-4">
-                <label className="form-label">Rol</label>
-                <select
-                    className="form-select"
-                    value={form.idrol}
-                    onChange={(e) => setForm({ ...form, idrol: e.target.value })}
-                >
-                    <option value="">Selecciona un rol</option>
-                    {roles.map((r) => (
-                        <option key={r.id} value={r.id}>{r.nombre}</option>
-                    ))}
-                </select>
-            </div>
-            <div className="d-flex gap-2 justify-content-end">
-                <Button variant="secondary" onClick={onClose}>Cancelar</Button>
-                <Button variant="primary" onClick={onSubmit} disabled={loading}>
-                    {loading ? "Guardando..." : "Crear usuario"}
-                </Button>
-            </div>
-        </>
-    );
-}
-
-// ── Modal eliminar ──
-function DeleteModal({ isOpen, onClose, onConfirm, loading, usuario }) {
-    return (
-        <Modal isOpen={isOpen} onClose={onClose} title="Eliminar usuario">
-            <p style={{ color: "#4b5563", marginBottom: 20 }}>
-                ¿Estás seguro de eliminar al usuario <strong>{usuario?.email}</strong>? Esta acción no se puede deshacer.
-            </p>
-            <div className="d-flex gap-2 justify-content-end">
-                <Button variant="secondary" onClick={onClose}>Cancelar</Button>
-                <Button variant="danger" onClick={onConfirm} disabled={loading}>
-                    {loading ? "Eliminando..." : "Eliminar"}
-                </Button>
-            </div>
-        </Modal>
-    );
-}
-
-// ── Página principal ──
 function Usuarios() {
-    const { roles } = useCatalogos();
-    const navigate  = useNavigate();
-
-    const [usuarios, setUsuarios]   = useState([]);
-    const [search, setSearch]       = useState("");
-    const [loading, setLoading]     = useState(false);
-    const [error, setError]         = useState("");
-    const [modalOpen, setModalOpen] = useState(false);
-    const [form, setForm]           = useState({ email: "", password: "", idrol: "" });
-    const [deleteOpen, setDeleteOpen]     = useState(false);
+    const navigate = useNavigate();
+    const [usuarios, setUsuarios] = useState([]);
+    const [search, setSearch] = useState("");
+    const [loading, setLoading] = useState(false);
+    const [deleteOpen, setDeleteOpen] = useState(false);
     const [deleteTarget, setDeleteTarget] = useState(null);
 
     const fetchUsuarios = async () => {
         try {
             const res = await api.get('/usuarios');
-            setUsuarios(res.data);
+            setUsuarios(res.data.data || []);
         } catch (e) {
             console.error(e);
         }
@@ -104,37 +30,9 @@ function Usuarios() {
 
     const usuariosFiltrados = usuarios.filter((u) =>
         u.email.toLowerCase().includes(search.toLowerCase()) ||
-        u.rol.toLowerCase().includes(search.toLowerCase())
+        u.rol_nombre.toLowerCase().includes(search.toLowerCase()) ||
+        (u.empleado_nombre && u.empleado_nombre.toLowerCase().includes(search.toLowerCase()))
     );
-
-    const handleNuevo = () => {
-        setForm({ email: "", password: "", idrol: "" });
-        setError("");
-        setModalOpen(true);
-    };
-
-    const handleEditar = (usuario) => {
-        navigate(`/admin/usuarios/${usuario.id}/editar`);
-    };
-
-    const handleEliminar = (usuario) => {
-        setDeleteTarget(usuario);
-        setDeleteOpen(true);
-    };
-
-    const handleSubmit = async () => {
-        setLoading(true);
-        setError("");
-        try {
-            await api.post('/usuarios', form);
-            setModalOpen(false);
-            fetchUsuarios();
-        } catch (e) {
-            setError(e.response?.data?.message || e.message);
-        } finally {
-            setLoading(false);
-        }
-    };
 
     const handleConfirmDelete = async () => {
         setLoading(true);
@@ -152,42 +50,74 @@ function Usuarios() {
 
     return (
         <PageContainer>
-            <div className="dashboard-header">
+            <div style={{ marginBottom: "24px" }}>
+                <h1 style={{ fontSize: "24px", fontWeight: "600", color: "#111827", marginBottom: "8px" }}>Usuarios y Empleados</h1>
+                <p style={{ color: "#6b7280", margin: 0 }}>Gestione los accesos y perfiles del personal de la empresa.</p>
+            </div>
+
+            <div style={{ display: "flex", gap: "16px", marginBottom: "24px" }}>
                 <SearchBar
-                    placeholder="Buscar por email o rol..."
+                    placeholder="Buscar por empleado, email o rol..."
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
+                    style={{ flex: 1 }}
                 />
-                <Button variant="primary" icon={Plus} onClick={handleNuevo}>
+                <Button variant="primary" icon={Plus} onClick={() => navigate("/admin/usuarios/nuevo")}>
                     Nuevo usuario
                 </Button>
             </div>
 
-            <div className="dashboard-title">
-                <h1>Gestión de Usuarios</h1>
-                <p>Administra los usuarios y sus roles en el sistema.</p>
-            </div>
-
             <DataCard>
                 <Table
-                    columns={["#", "Email", "Rol", "Acciones"]}
+                    columns={["No. Empleado", "Empleado", "Puesto", "Teléfono", "Email", "Rol", "Ubicación", "Estatus", "Acciones"]}
                     data={usuariosFiltrados}
                     renderRow={(usuario, index) => (
                         <tr key={usuario.id}>
-                            <td>{index + 1}</td>
-                            <td>{usuario.email}</td>
+                            <td style={{ color: "#6b7280" }}>{usuario.numero_empleado || '-'}</td>
+                            <td style={{ fontWeight: "500", color: "#111827" }}>
+                                {usuario.empleado_nombre ? `${usuario.empleado_nombre} ${usuario.apellido_paterno || ''}` : <span style={{ color: "#9ca3af" }}>Sin perfil</span>}
+                            </td>
+                            <td style={{ color: "#4b5563" }}>{usuario.puesto || '-'}</td>
+                            <td style={{ color: "#4b5563" }}>{usuario.telefono || '-'}</td>
+                            <td style={{ color: "#4b5563" }}>{usuario.email}</td>
                             <td>
-                                <span className={`badge-rol ${usuario.idrol === 2 ? "admin" : "default"}`}>
-                                    {usuario.rol}
+                                <span style={{
+                                    padding: "4px 12px",
+                                    borderRadius: "12px",
+                                    fontSize: "12px",
+                                    fontWeight: "500",
+                                    backgroundColor: usuario.rol_nombre === 'Farmaceutico' ? "#d1fae5" : "#e0e7ff",
+                                    color: usuario.rol_nombre === 'Farmaceutico' ? "#065f46" : "#3730a3"
+                                }}>
+                                    {usuario.rol_nombre}
+                                </span>
+                            </td>
+                            <td style={{ color: "#4b5563" }}>{usuario.ubicacion_nombre || '-'}</td>
+                            <td>
+                                <span style={{
+                                    padding: "4px 12px",
+                                    borderRadius: "12px",
+                                    fontSize: "12px",
+                                    fontWeight: "500",
+                                    backgroundColor: usuario.estatus === 'ACTIVO' ? "#dcfce7" : "#fee2e2",
+                                    color: usuario.estatus === 'ACTIVO' ? "#166534" : "#991b1b"
+                                }}>
+                                    {usuario.estatus || 'ACTIVO'}
                                 </span>
                             </td>
                             <td>
-                                <div className="table-actions">
-                                    <button className="action-btn" onClick={() => handleEditar(usuario)}>
-                                        <Pencil size={16} color="#3b82f6" />
+                                <div style={{ display: "flex", gap: "8px", justifyContent: "center" }}>
+                                    <button
+                                        style={{ border: "none", background: "none", cursor: "pointer", color: "#3b82f6" }}
+                                        onClick={() => navigate(`/admin/usuarios/${usuario.id}/editar`)}
+                                    >
+                                        <Pencil size={18} />
                                     </button>
-                                    <button className="action-btn" onClick={() => handleEliminar(usuario)}>
-                                        <Trash2 size={16} color="#ef4444" />
+                                    <button
+                                        style={{ border: "none", background: "none", cursor: "pointer", color: "#ef4444" }}
+                                        onClick={() => { setDeleteTarget(usuario); setDeleteOpen(true); }}
+                                    >
+                                        <Trash2 size={18} />
                                     </button>
                                 </div>
                             </td>
@@ -196,29 +126,17 @@ function Usuarios() {
                 />
             </DataCard>
 
-            <Modal
-                isOpen={modalOpen}
-                onClose={() => setModalOpen(false)}
-                title="Nuevo usuario"
-            >
-                <UsuarioForm
-                    form={form}
-                    setForm={setForm}
-                    roles={roles}
-                    onSubmit={handleSubmit}
-                    onClose={() => setModalOpen(false)}
-                    loading={loading}
-                    error={error}
-                />
+            <Modal isOpen={deleteOpen} onClose={() => setDeleteOpen(false)} title="Eliminar usuario">
+                <p style={{ color: "#4b5563", marginBottom: "24px" }}>
+                    ¿Estás seguro de eliminar a <strong>{deleteTarget?.email}</strong>? Esta acción borrará también su perfil de empleado.
+                </p>
+                <div style={{ display: "flex", justifyContent: "flex-end", gap: "12px" }}>
+                    <Button variant="secondary" onClick={() => setDeleteOpen(false)}>Cancelar</Button>
+                    <Button variant="danger" onClick={handleConfirmDelete} disabled={loading}>
+                        {loading ? "Eliminando..." : "Eliminar"}
+                    </Button>
+                </div>
             </Modal>
-
-            <DeleteModal
-                isOpen={deleteOpen}
-                onClose={() => setDeleteOpen(false)}
-                onConfirm={handleConfirmDelete}
-                loading={loading}
-                usuario={deleteTarget}
-            />
         </PageContainer>
     );
 }

@@ -11,7 +11,7 @@
 }
 
 /* CARDS */
-.summary-card{
+.summary-card {
   display: grid;
   grid-template-columns: 1fr auto;
   align-items: center;
@@ -22,7 +22,7 @@
   border: 1px solid #eee;
 }
 
-.card-icon{
+.card-icon {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -34,29 +34,29 @@
   background: #f4f6f8;
 }
 
-.card-info p{
+.card-info p {
   margin: 0;
   font-size: 14px;
   color: #777;
 }
 
-.card-info h2{
+.card-info h2 {
   margin: 4px 0 0 0;
   font-size: 26px;
   font-weight: 600;
 }
 
-.pending .card-icon{
+.pending .card-icon {
   background: #e8f1ff;
   color: #3b82f6;
 }
 
-.expired .card-icon{
+.expired .card-icon {
   background: #ffeaea;
   color: #ef4444;
 }
 
-.total .card-icon{
+.total .card-icon {
   background: #e8f9f0;
   color: #22c55e;
 }
@@ -121,12 +121,12 @@
 }
 
 .ordenes-content.full-screen-detail {
-  display: block; 
+  display: block;
 }
 
 .ordenes-content.full-screen-detail .order-detail {
   width: 100%;
-  flex: none; 
+  flex: none;
 }
 
 
@@ -256,4 +256,179 @@
 
 .orden-modal-wide {
   width: 860px;
+}
+
+/* ==========================================================================
+   AGREGADOS PARA FORMULARIO DE NUEVA ORDEN (PANTALLA COMPLETA)
+   ========================================================================== */
+.orden-full-container {
+  background: #ffffff;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  padding: 24px;
+}
+
+.orden-full-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #f3f4f6;
+  padding-bottom: 20px;
+  margin-bottom: 24px;
+}
+
+.orden-full-header h2 {
+  font-size: 22px;
+  font-weight: 600;
+  color: #111827;
+  margin: 0 0 4px 0;
+}
+
+.orden-full-header p {
+  color: #6b7280;
+  font-size: 14px;
+  margin: 0;
+}
+
+.orden-grid-origen {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  margin-bottom: 30px;
+}
+
+.orden-productos-section {
+  border-top: 1px solid #f3f4f6;
+  padding-top: 24px;
+}
+
+.orden-productos-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.orden-productos-header h3 {
+  font-size: 18px;
+  font-weight: 600;
+  color: #374151;
+  margin: 0;
+}
+
+/* Botón Mágico (Auto-llenado) */
+.btn-magia {
+  background-color: #f59e0b;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.btn-magia:hover:not(:disabled) {
+  background-color: #d97706;
+}
+
+.btn-magia:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Filas dinámicas de medicamentos */
+.orden-fila-producto {
+  display: grid;
+  grid-template-columns: 2fr 1fr 100px 40px;
+  gap: 16px;
+  align-items: end;
+  margin-bottom: 16px;
+  background: #f9fafb;
+  padding: 16px;
+  border-radius: 8px;
+  border: 1px solid #f3f4f6;
+}
+
+.orden-fila-label {
+  font-size: 13px;
+  color: #4b5563;
+  font-weight: 500;
+  display: block;
+  margin-bottom: 6px;
+}
+
+.orden-input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 14px;
+  outline: none;
+  background-color: #fff;
+}
+
+.orden-input:focus {
+  border-color: #3b82f6;
+}
+
+.orden-input:disabled {
+  background-color: #f3f4f6;
+  color: #6b7280;
+}
+
+/* Fila de Totales y Botones Finales */
+.orden-totales {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 16px;
+  padding: 24px 0;
+  border-top: 1px solid #f3f4f6;
+  margin-top: 24px;
+}
+
+.orden-total-texto {
+  font-size: 16px;
+  color: #4b5563;
+}
+
+.orden-total-monto {
+  font-size: 24px;
+  font-weight: 700;
+  color: #111827;
+}
+
+/* Badges de alerta de stock (Auto-llenado) */
+.badge-alerta-stock {
+  display: inline-block;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: bold;
+  margin-left: 8px;
+}
+
+.badge-alerta-stock.BAJO {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.badge-alerta-stock.MEDIO {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.badge-alerta-stock.NORMAL {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.status-pendiente {
+  background-color: #fef3c7;
+  color: #d97706;
 }

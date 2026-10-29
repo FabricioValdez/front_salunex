@@ -1,0 +1,111 @@
+/* ==========================================================================
+   Contenedores de Cuadrícula (Grid)
+   ========================================================================== */
+
+/* Fila de 2 columnas */
+.ubicacion-grid-2 {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+    margin-bottom: 20px;
+}
+
+/* Fila de 3 columnas */
+.ubicacion-grid-3 {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-bottom: 20px;
+}
+
+/* Fila de 1 columna (para el campo dinámico) */
+.ubicacion-grid-1 {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 16px;
+    margin-bottom: 20px;
+}
+
+/* Responsividad para móviles: colapsar a 1 columna en pantallas pequeñas */
+@media (max-width: 768px) {
+    .ubicacion-grid-2,
+    .ubicacion-grid-3 {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ==========================================================================
+   Elementos del Formulario
+   ========================================================================== */
+
+.ubicacion-form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.ubicacion-label {
+    font-size: 14px;
+    font-weight: 500;
+    color: #374151;
+}
+
+.ubicacion-input {
+    padding: 10px 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    outline: none;
+    font-size: 14px;
+    background-color: #fff;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.ubicacion-input:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+}
+
+.ubicacion-input:disabled {
+    background-color: #f3f4f6;
+    color: #9ca3af;
+    cursor: not-allowed;
+}
+
+/* ==========================================================================
+   Tipografía y Contenedores Generales
+   ========================================================================== */
+
+.ubicacion-header {
+    margin-bottom: 24px;
+}
+
+.ubicacion-title {
+    font-size: 24px;
+    font-weight: 600;
+    color: #111827;
+    margin-bottom: 8px;
+}
+
+.ubicacion-card-title {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 24px;
+    color: #111827;
+}
+
+.ubicacion-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 32px;
+    padding-bottom: 32px;
+}
+
+.ubicacion-alert-error {
+    padding: 12px;
+    background-color: #fee2e2;
+    color: #991b1b;
+    border-radius: 8px;
+    margin-bottom: 24px;
+    font-size: 14px;
+}
