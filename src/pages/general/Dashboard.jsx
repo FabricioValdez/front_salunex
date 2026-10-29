@@ -10,8 +10,6 @@ const Dashboard = () => {
 
   // Estado para el token de Metabase
   const [metabaseToken, setMetabaseToken] = useState("");
-  const [metabaseTokenMio, setMetabaseTokenMio] = useState("");
-  const [metabaseTokenTercero, setMetabaseTokenTercero] = useState("");
 
   const meses = [
     "Ene", "Feb", "Mar", "Abr", "May", "Jun",
@@ -51,18 +49,11 @@ const Dashboard = () => {
       // 2. Peticiones simultáneas: Datos del dashboard y Token de Metabase
       const [dashResponse, tokenResponse] = await Promise.all([
         api.get("/dashboard"),
-        api.get("/metabase-token"),
+        api.get("/metabase-token"), // Asegúrate de crear este endpoint en Laravel
       ]);
 
       setDashboardData(dashResponse.data);
-
-      // --- MODIFICACIÓN AQUÍ ---
-      // Guardamos ambos tokens usando las nuevas llaves que devuelve tu backend
-      setMetabaseToken(tokenResponse.data.token_companero);
-      setMetabaseTokenMio(tokenResponse.data.token_mio);
-      setMetabaseTokenTercero(tokenResponse.data.token_tercero);
-      // -------------------------
-
+      setMetabaseToken(tokenResponse.data.token);
     } catch (err) {
       console.error("Error dashboard:", err);
       setError(
@@ -122,13 +113,11 @@ const Dashboard = () => {
     return new Intl.NumberFormat("es-MX").format(Number(value || 0));
   };
 
+  // ✅ Corregido: Se eliminó la duplicación del return
   const formatCurrency = (value) => {
-    return new Intl.NumberFormat("es-MX", {
     return new Intl.NumberFormat("es-MX", {
       style: "currency",
       currency: "MXN",
-      minimumFractionDigits: 2,
-    }).format(Number(value || 0));
       minimumFractionDigits: 2,
     }).format(Number(value || 0));
   };
@@ -144,12 +133,7 @@ const Dashboard = () => {
     }).format(date);
   };
 
-  const getBadgeClass = (estado = "") => {
-    return estado
-      .toLowerCase()
-      .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, "")
-      .replace(/\s+/g, "-");
+  // ✅ Corregido: Se eliminó la duplicación de la función
   const getBadgeClass = (estado = "") => {
     return estado
       .toLowerCase()
@@ -158,11 +142,9 @@ const Dashboard = () => {
       .replace(/\s+/g, "-");
   };
 
+  // ✅ Corregido: Se eliminó la duplicación del loader
   if (loading) {
     return (
-      <div className="dashboard-loader-container">
-        <span className="loader2"></span>
-      </div>
       <div className="dashboard-loader-container">
         <span className="loader2"></span>
       </div>
@@ -444,7 +426,7 @@ const Dashboard = () => {
         </article>
 
         {/* =====================================================
-            DASHBOARD DE METABASE (AGREGADO ABAJO DEL TODO)
+          DASHBOARD DE METABASE (AGREGADO ABAJO DEL TODO)
         ===================================================== */}
         <article className="large-card" style={{ width: "100%", minHeight: "750px", padding: "20px", marginTop: "20px" }}>
           <div className="card-header" style={{ marginBottom: "20px" }}>
@@ -458,47 +440,6 @@ const Dashboard = () => {
             {metabaseToken && (
               <metabase-dashboard
                 token={metabaseToken}
-                with-title="true"
-                with-downloads="true"
-              ></metabase-dashboard>
-            )}
-          </div>
-        </article>
-
-        {/* =====================================================
-            DASHBOARD DE METABASE (TUYO)
-        ===================================================== */}
-        <article className="large-card" style={{ width: "100%", minHeight: "750px", padding: "20px", marginTop: "20px" }}>
-          <div className="card-header" style={{ marginBottom: "20px" }}>
-            <div>
-              <h3>Métricas de Inventario y Solicitudes</h3>
-              <p className="chart-description">Estado de lotes y productos más solicitados</p>
-            </div>
-          </div>
-
-          <div style={{ width: "100%", height: "700px" }}>
-            {metabaseTokenMio && (
-              <metabase-dashboard
-                token={metabaseTokenMio}
-                with-title="true"
-                with-downloads="true"
-              ></metabase-dashboard>
-            )}
-          </div>
-        </article>
-
-        {/* METABASE: DASHBOARD 36 */}
-        <article className="large-card" style={{ width: "100%", minHeight: "750px", padding: "20px", marginTop: "20px" }}>
-          <div className="card-header" style={{ marginBottom: "20px" }}>
-            <div>
-              <h3>Ventas e inventario por categoría</h3>
-            </div>
-          </div>
-          <div style={{ width: "100%", height: "700px" }}>
-            {/* Token temporal de ejemplo: reemplazar por uno generado por Laravel. */}
-            {metabaseTokenTercero && (
-              <metabase-dashboard
-                token={metabaseTokenTercero}
                 with-title="true"
                 with-downloads="true"
               ></metabase-dashboard>
