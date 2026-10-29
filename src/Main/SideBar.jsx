@@ -1,52 +1,93 @@
-import { useState, useContext } from "react";
-import { NavLink, useNavigate } from "react-router-dom";
+import { useState, useContext, useEffect } from "react";
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import {
-  House, ClipboardList, ShoppingCart, Package,
-  PackageCheck, ClipboardCheck,
-  LayoutDashboard, Menu, Settings, Tablets,
-  Users, Building2, Pill, Tag, Layers, FlaskConical, Syringe, ArrowLeftRight,
+  House, ClipboardList, Package, LayoutDashboard, Menu, Settings, Tablets,
+  Users, Building2, Tag, Layers, FlaskConical, Syringe, ArrowLeftRight,
+  MapPin, ChevronDown, ChevronRight
 } from "lucide-react";
 import AuthContext from "../context/AuthContext";
 import { logout } from "../services/authService";
+import "./SideBar.css";
 
 const menuCompleto = [
   // --- 📦 PÁGINAS GENERALES
-  { to: "/", icon: House, label: "Inicio" }, 
+  { to: "/", icon: House, label: "Inicio" },
   { to: "/general/inventario", icon: Package, label: "Inventario", clave: "GMOV" },
-  { to: "/general/control", icon: ClipboardList, label: "Control de Calidad", clave: "GCDC" }, 
-  { to: "/general/ordenes", icon: ShoppingCart, label: "Órdenes de Compra", clave: "GORD" }, 
-  { to: "/general/recepcion-inventario", icon: PackageCheck, label: "Recepción Inventario", clave: "RECP" }, 
-  
+  { to: "/general/ordenes", icon: ArrowLeftRight, label: "Movimientos", claves_or: ["GMOV", "RECP", "GORD", "GCDC"] },
+
   // --- 🛠️ PÁGINAS DE ADMINISTRACIÓN (ADMIN) ---
-  { to: "/admin/usuarios", icon: Users, label: "Usuarios", clave: "GUSU" },
-  { to: "/admin/empleados", icon: ArrowLeftRight, label: "Empleados", clave: "GEMP" }, 
-  { to: "/admin/empresas", icon: Building2, label: "Empresas", clave: "GPER" }, 
-  { to: "/admin/farmacias", icon: Pill, label: "Catálogo Farmacias", clave: "GFAR" },
-  { to: "/admin/almacenes", icon: Package, label: "Catálogo Almacenes", clave: "GALM" },
-  { to: "/admin/productos", icon: Tablets, label: "Productos", clave: "GPRO" },
-  { to: "/admin/categorias-producto", icon: Tag, label: "Categorías", clave: "GCAT" }, 
-  { to: "/admin/clasificaciones-producto", icon: Layers, label: "Clasificaciones", clave: "GCLA" }, 
-  { to: "/admin/presentaciones-producto", icon: FlaskConical, label: "Presentaciones", clave: "GPRE" }, 
-  { to: "/admin/vias-administracion", icon: Syringe, label: "Vías Admin.", clave: "GVIA" }, 
-  { to: "/admin/tipos-movimiento-sistema", icon: ArrowLeftRight, label: "Tipos de Movimiento", clave: "GTIP" }, 
+  { to: "/admin/usuarios", icon: Users, label: "Usuarios y Empleados", clave: "GUSU" },
+  { to: "/admin/empresas", icon: Building2, label: "Empresas", clave: "GPER" },
+  { to: "/admin/ubicaciones", icon: MapPin, label: "Catálogo Ubicaciones", clave: "GUBI" },
+
+  // 🌟 CAMBIO: Convertimos "Productos" en una categoría con submenús
+  {
+    icon: Tablets,
+    label: "Productos",
+    claves_or: ["GPRO", "GCAT", "GCLA", "GPRE", "GVIA"], // Si tiene al menos uno, ve la carpeta
+    subrutas: [
+      { to: "/admin/productos", icon: Tablets, label: "Catálogo de Productos", clave: "GPRO" },
+      { to: "/admin/categorias-producto", icon: Tag, label: "Categorías", clave: "GCAT" },
+      { to: "/admin/clasificaciones-producto", icon: Layers, label: "Clasificaciones", clave: "GCLA" },
+      { to: "/admin/presentaciones-producto", icon: FlaskConical, label: "Presentaciones", clave: "GPRE" },
+      { to: "/admin/vias-administracion", icon: Syringe, label: "Vías Admin.", clave: "GVIA" },
+    ]
+  },
 
   // --- ⏳ MÓDULOS FUTUROS ---
-  { to: "/general/dashboard", icon: LayoutDashboard, label: "Dashboard" }, 
-  { to: "/suscripcion", icon: Tag, label: "Suscripción" } 
+  { to: "/general/dashboard", icon: LayoutDashboard, label: "Dashboard" },
+  { to: "/suscripcion", icon: Tag, label: "Suscripción" }
 ];
 
 const rutasBase = ["/", "/admin", "/empresa", "/farmacia"];
 
 const Sidebar = ({ onOpenSettings }) => {
   const [collapsed, setCollapsed] = useState(false);
+  const [openMenus, setOpenMenus] = useState({}); // Controla qué acordeones están abiertos
   const { user, logoutUser } = useContext(AuthContext);
   const navigate = useNavigate();
+  const location = useLocation();
 
-  // 🌟 Única validación: Si no tiene clave, pasa. Si tiene clave, verifica en el array global.
-  const menuFiltrado = menuCompleto.filter(modulo => {
-    if (!modulo.clave) return true;
-    return user?.permisos?.includes(modulo.clave);
-  });
+  // Mantenemos abierto el menú si estamos dentro de alguna de sus subrutas
+  useEffect(() => {
+    menuCompleto.forEach(modulo => {
+      if (modulo.subrutas && modulo.subrutas.some(sub => location.pathname.includes(sub.to))) {
+        setOpenMenus(prev => ({ ...prev, [modulo.label]: true }));
+      }
+    });
+  }, [location.pathname]);
+
+  const toggleSubmenu = (label) => {
+    // Si el menú lateral está colapsado, no dejamos abrir submenús (se rompería el diseño)
+    if (collapsed) {
+      setCollapsed(false);
+      setOpenMenus({ [label]: true });
+    } else {
+      setOpenMenus(prev => ({ ...prev, [label]: !prev[label] }));
+    }
+  };
+
+  // Filtrado que soporta tanto rutas normales como carpetas de subrutas
+  const menuFiltrado = menuCompleto.map(modulo => {
+    // Si es una carpeta con subrutas
+    if (modulo.subrutas) {
+      const subrutasFiltradas = modulo.subrutas.filter(sub =>
+        !sub.clave || user?.permisos?.includes(sub.clave)
+      );
+      // Solo devolvemos la carpeta si tiene al menos un submenú permitido
+      if (subrutasFiltradas.length > 0) {
+        return { ...modulo, subrutas: subrutasFiltradas };
+      }
+      return null;
+    }
+
+    // Lógica para rutas directas
+    if (!modulo.clave && !modulo.claves_or) return modulo;
+    if (modulo.claves_or && modulo.claves_or.some(c => user?.permisos?.includes(c))) return modulo;
+    if (user?.permisos?.includes(modulo.clave)) return modulo;
+
+    return null;
+  }).filter(Boolean); // Eliminamos los nulos
 
   const handleLogout = async () => {
     await logout();
@@ -63,23 +104,59 @@ const Sidebar = ({ onOpenSettings }) => {
         {!collapsed && <h2 className="logo">SALUNEX</h2>}
       </div>
 
-      <nav style={{
-        flex: 1,
-        overflowY: "auto",
-        overflowX: "hidden",
-        maxHeight: "calc(100vh - 240px)"
-      }}>
-        {menuFiltrado.map(({ to, icon: IconComponent, label }) => (
-          <NavLink
-            key={to}
-            to={to}
-            end={rutasBase.includes(to)}
-            className="sidebar-nav-item"
-          >
-            <IconComponent size={20} />
-            {!collapsed && <span>{label}</span>}
-          </NavLink>
-        ))}
+      <nav style={{ flex: 1, overflowY: "auto", overflowX: "hidden", maxHeight: "calc(100vh - 240px)" }}>
+        {menuFiltrado.map((modulo) => {
+          const IconComponent = modulo.icon;
+
+          // RENDERIZADO DE CARPETA (Acordeón)
+          if (modulo.subrutas) {
+            const isOpen = openMenus[modulo.label];
+            return (
+              <div key={modulo.label} className="submenu-wrapper">
+                <button
+                  className={`sidebar-nav-item submenu-toggle ${isOpen ? "active-submenu" : ""}`}
+                  onClick={() => toggleSubmenu(modulo.label)}
+                >
+                  <div className="submenu-toggle-left">
+                    <IconComponent size={20} />
+                    {!collapsed && <span>{modulo.label}</span>}
+                  </div>
+                  {!collapsed && (
+                    isOpen ? <ChevronDown size={16} /> : <ChevronRight size={16} />
+                  )}
+                </button>
+
+                {/* Opciones hijas */}
+                {isOpen && !collapsed && (
+                  <div className="submenu-container">
+                    {modulo.subrutas.map(sub => (
+                      <NavLink
+                        key={sub.to}
+                        to={sub.to}
+                        className={({ isActive }) => `sidebar-nav-item sub-item ${isActive ? "active" : ""}`}
+                      >
+                        {!collapsed && <span>{sub.label}</span>}
+                      </NavLink>
+                    ))}
+                  </div>
+                )}
+              </div>
+            );
+          }
+
+          // RENDERIZADO DE RUTA NORMAL
+          return (
+            <NavLink
+              key={modulo.to}
+              to={modulo.to}
+              end={rutasBase.includes(modulo.to)}
+              className="sidebar-nav-item"
+            >
+              <IconComponent size={20} />
+              {!collapsed && <span>{modulo.label}</span>}
+            </NavLink>
+          );
+        })}
       </nav>
 
       <div className="sidebar-bottom">
@@ -87,11 +164,7 @@ const Sidebar = ({ onOpenSettings }) => {
           <Settings size={20} />
           {!collapsed && <span>Configuración</span>}
         </button>
-        <button
-          className="sidebar-nav-item"
-          onClick={handleLogout}
-          style={{ color: "var(--danger, #e74c3c)" }}
-        >
+        <button className="sidebar-nav-item" onClick={handleLogout} style={{ color: "var(--danger, #e74c3c)" }}>
           <span>⏻</span>
           {!collapsed && <span>Cerrar sesión</span>}
         </button>

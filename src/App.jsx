@@ -3,7 +3,7 @@ import { useContext } from "react";
 import AuthContext from "./context/AuthContext";
 
 import Login from "./pages/Login";
-import RegistroEmpresa from "./pages/RegistroEmpresa"
+import RegistroEmpresa from "./pages/RegistroEmpresa";
 import MainLayout from "./Main/Layout";
 import Inicio from "./pages/general/Inicio";
 import Inventario from "./pages/general/Inventario";
@@ -13,17 +13,20 @@ import RecepcionAlmacen from "./pages/general/RecepcionInventario";
 import Dashboard from "./pages/general/Dashboard";
 import Suscripcion from "./pages/Suscripcion";
 import SuscripcionExito from "./components/features/suscripcion/SuscripcionExito";
+
+// Componentes de Administrador actualizados
 import Usuarios from "./pages/admin/Usuarios";
+import UsuarioForm from "./pages/admin/UsuarioForm";
 import Empresas from "./pages/admin/Empresas";
-import Farmacias from "./pages/admin/Farmacias";
-import Almacenes from "./pages/admin/Almacenes";
+import Ubicaciones from "./pages/admin/Ubicaciones";
+import UbicacionForm from "./pages/admin/UbicacionForm";
+
 import Productos from "./pages/admin/Productos";
 import CategoriaProducto from "./pages/admin/CategoriaProducto";
 import ClasificacionProducto from "./pages/admin/ClasificacionProducto";
 import PresentacionProducto from "./pages/admin/PresentacionProducto";
 import ViaAdministracion from "./pages/admin/ViaAdministracion";
 import TipoMovimiento from "./pages/admin/TipoMovimiento";
-import EditarUsuario from "./pages/admin/EditarUsuario";
 import RegistroExitoso from "./pages/RegistroExitoso";
 
 // 🔒 Protege por autenticación (Se mantiene activa)
@@ -32,7 +35,7 @@ function PrivateRoute({ children }) {
   return user ? children : <Navigate to="/login" replace />;
 }
 
-// 🔒 ENCENDIDO: Ahora confía ciegamente en el arreglo que provee el backend
+// 🔒 Valida permisos del backend
 function RoleRoute({ children, requiredPermission }) {
   const { user } = useContext(AuthContext);
   if (!user) return <Navigate to="/login" replace />;
@@ -52,10 +55,7 @@ function App() {
         {/* PÚBLICA */}
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<RegistroEmpresa />} />
-        <Route
-          path="/registro-exitoso"
-          element={<RegistroExitoso />}
-        />
+        <Route path="/registro-exitoso" element={<RegistroExitoso />} />
         <Route path="/sin-permiso" element={
           <div style={{ padding: 40 }}>
             <h2>🚫 Sin permiso</h2>
@@ -64,39 +64,41 @@ function App() {
         } />
 
         {/* GENERAL */}
-        <Route path="/" element={
-          <PrivateRoute><MainLayout /></PrivateRoute>
-        }>
+        <Route path="/" element={<PrivateRoute><MainLayout /></PrivateRoute>}>
           <Route index element={<Inicio />} />
           <Route path="suscripcion" element={<Suscripcion />} />
           <Route path="suscripcion/exito" element={<SuscripcionExito />} />
 
-          {/* Sub-rutas bajo el prefijo /general/... asignado en tu Sidebar */}
+          {/* Sub-rutas bajo el prefijo /general/... */}
           <Route path="general">
-            <Route path="dashboard" element={<Dashboard />} /> {/* Público por ahora */}
+            <Route path="dashboard" element={<Dashboard />} />
             <Route path="inventario" element={<RoleRoute requiredPermission="GMOV"><Inventario /></RoleRoute>} />
             <Route path="control" element={<RoleRoute requiredPermission="GCDC"><ControlDeCalidad /></RoleRoute>} />
-            <Route path="ordenes" element={<RoleRoute requiredPermission="GORD"><Ordenes /></RoleRoute>} />
-            <Route path="recepcion-inventario" element={<RoleRoute requiredPermission="RECP"><RecepcionAlmacen /></RoleRoute>} />
+
+            {/* 🌟 CAMBIO REALIZADO AQUÍ: Reemplazamos GORD por GMOV */}
+            <Route path="ordenes" element={<RoleRoute requiredPermission="GMOV"><Ordenes /></RoleRoute>} />
+
+            {/* 🌟 También le ponemos GMOV a esta, aunque al estar unificadas ya casi no se usará */}
+            <Route path="recepcion-inventario" element={<RoleRoute requiredPermission="GMOV"><RecepcionAlmacen /></RoleRoute>} />
           </Route>
         </Route>
 
         {/* ADMINISTRADOR */}
-        <Route path="/admin" element={
-          <PrivateRoute><MainLayout /></PrivateRoute>
-        }>
-          {/* Cada sub-ruta valida quirúrgicamente su propio permiso asignado */}
+        <Route path="/admin" element={<PrivateRoute><MainLayout /></PrivateRoute>}>
           <Route index element={<Navigate to="usuarios" replace />} />
 
-          {/* Cuentas y Personal */}
+          {/* Módulo de Usuarios (Unificado Crear/Editar) */}
           <Route path="usuarios" element={<RoleRoute requiredPermission="GUSU"><Usuarios /></RoleRoute>} />
-          <Route path="usuarios/:id/editar" element={<RoleRoute requiredPermission="GUSU"><EditarUsuario /></RoleRoute>} />
-          <Route path="tipos-movimiento" element={<RoleRoute requiredPermission="GEMP"><TipoMovimiento /></RoleRoute>} /> {/* Vistas Empleados */}
+          <Route path="usuarios/nuevo" element={<RoleRoute requiredPermission="GUSU"><UsuarioForm /></RoleRoute>} />
+          <Route path="usuarios/:id/editar" element={<RoleRoute requiredPermission="GUSU"><UsuarioForm /></RoleRoute>} />
 
-          {/* Entidades corporativas */}
+          <Route path="tipos-movimiento" element={<RoleRoute requiredPermission="GEMP"><TipoMovimiento /></RoleRoute>} />
+
+          {/* Módulo de Entidades y Ubicaciones */}
           <Route path="empresas" element={<RoleRoute requiredPermission="GPER"><Empresas /></RoleRoute>} />
-          <Route path="farmacias" element={<RoleRoute requiredPermission="GFAR"><Farmacias /></RoleRoute>} />
-          <Route path="almacenes" element={<RoleRoute requiredPermission="GALM"><Almacenes /></RoleRoute>} />
+          <Route path="ubicaciones" element={<RoleRoute requiredPermission="GUBI"><Ubicaciones /></RoleRoute>} />
+          <Route path="ubicaciones/nuevo" element={<RoleRoute requiredPermission="GUBI"><UbicacionForm /></RoleRoute>} />
+          <Route path="ubicaciones/:id/editar" element={<RoleRoute requiredPermission="GUBI"><UbicacionForm /></RoleRoute>} />
 
           {/* Catálogos de Productos desglosados */}
           <Route path="productos" element={<RoleRoute requiredPermission="GPRO"><Productos /></RoleRoute>} />

@@ -1,0 +1,127 @@
+/* ==========================================================================
+   Encabezado y Controles
+   ========================================================================== */
+.ubicaciones-page-header {
+    margin-bottom: 24px;
+}
+
+.ubicaciones-page-header h1 {
+    font-size: 24px;
+    font-weight: 600;
+    color: #111827;
+    margin-bottom: 8px;
+}
+
+.ubicaciones-page-header p {
+    color: #6b7280;
+    margin: 0;
+    font-size: 15px;
+}
+
+.ubicaciones-controls {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 24px;
+    align-items: center;
+}
+
+.ubicaciones-search-wrapper {
+    flex: 1;
+    /* Hace que el buscador tome todo el espacio disponible */
+}
+
+/* ==========================================================================
+   Estilos de la Tabla
+   ========================================================================== */
+.ub-col-id {
+    color: #6b7280;
+    /* Gris suave, sin color llamativo */
+    font-weight: 500;
+}
+
+.ub-col-nombre {
+    font-weight: 500;
+    color: #111827;
+}
+
+.ub-col-texto {
+    color: #6b7280;
+}
+
+/* Etiquetas (Badges) estilo pastel */
+.ub-badge {
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 500;
+    display: inline-block;
+}
+
+.ub-badge-farmacia {
+    background-color: #d1fae5;
+    /* Verde muy claro */
+    color: #065f46;
+    /* Verde oscuro */
+}
+
+.ub-badge-almacen {
+    background-color: #e0e7ff;
+    /* Azul/Índigo muy claro */
+    color: #3730a3;
+    /* Azul/Índigo oscuro */
+}
+
+.ub-badge-oficina {
+    background-color: #f3f4f6;
+    /* Gris claro */
+    color: #374151;
+    /* Gris oscuro */
+}
+
+/* ==========================================================================
+   Botones de Acción Minimalistas (Solo Íconos)
+   ========================================================================== */
+.ub-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+}
+
+.ub-btn-icon {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.2s ease;
+}
+
+.ub-btn-icon:hover {
+    opacity: 0.7;
+}
+
+.ub-btn-edit {
+    color: #3b82f6;
+    /* Azul para editar */
+}
+
+.ub-btn-delete {
+    color: #ef4444;
+    /* Rojo para eliminar */
+}
+
+/* ==========================================================================
+   Modal
+   ========================================================================== */
+.ub-modal-text {
+    color: #4b5563;
+    margin-bottom: 24px;
+}
+
+.ub-modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+}

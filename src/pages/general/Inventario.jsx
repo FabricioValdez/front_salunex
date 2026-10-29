@@ -1,14 +1,16 @@
 import { useState } from "react";
-import { Search, ArrowLeft, List, Plus, Pencil, Trash2, Calendar } from "lucide-react";
+import { Search, ArrowLeft, List, Plus, Pencil, Trash2, Settings2 } from "lucide-react";
 import PageContainer from "../../components/ui/PageContainer";
 import DataCard from "../../components/ui/DataCard";
 import Table from "../../components/ui/Table/Table";
 import Modal from "../../components/ui/Modal";
 import Button from "../../components/ui/Button";
+import InventarioForm from "../../components/features/inventario/InventarioForm";
+import UmbralesForm from "../../components/features/inventario/UmbralesForm";
 import { useCatalogos } from "../../context/CatalogosContext";
+import api from "../../services/api";
 import "../../styles/general/Inventario.css";
 
-// Badge para la fecha de expiración en la vista de detalle
 function getEstado(fecha) {
   if (!fecha) return "Sin fecha";
   const diff = Math.ceil((new Date(fecha) - new Date()) / (1000 * 60 * 60 * 24));
@@ -19,26 +21,30 @@ function getEstado(fecha) {
 }
 
 function VencimientoBadge({ fecha }) {
-  if (!fecha) return <span style={{ color: "#9ca3af" }}>Sin fecha</span>;
+  if (!fecha) return <span className="inv-col-texto">Sin fecha</span>;
   const estado = getEstado(fecha);
   const clases = {
-    "Expirado": "expirado",
-    "Por expirar": "por-expirar",
-    "Por revisar": "por-revisar",
-    "Vigente": "vigente",
+    "Expirado": "expirado", "Por expirar": "por-expirar",
+    "Por revisar": "por-revisar", "Vigente": "vigente",
   };
-  return <span className={`badge-estatus ${clases[estado] || ""}`}>{estado}</span>;
+  return <span className={`badge-estatus ${clases[estado]}`}>{estado}</span>;
 }
 
 function Inventario() {
-  const { inventario } = useCatalogos();
+  const { inventario, refreshCatalogo } = useCatalogos();
   const [search, setSearch] = useState("");
-  
-  // Estado para controlar la vista de detalle
-  const [itemSeleccionado, setItemSeleccionado] = useState(null);
 
-  // Filtrado de la vista principal (Maestro)
-  const filtrados = inventario.filter((item) => {
+  // Estados de navegación y modales
+  const [itemSeleccionado, setItemSeleccionado] = useState(null);
+  const [modalUmbralesOpen, setModalUmbralesOpen] = useState(false);
+  const [modalLoteOpen, setModalLoteOpen] = useState(false);
+  const [loteEdicion, setLoteEdicion] = useState(null); // null = Crear, objeto = Editar
+
+  // 1. Extraemos de forma segura el arreglo, ya sea que venga con el nuevo formato de la API o vacío
+  const listaInventario = Array.isArray(inventario) ? inventario : (inventario?.registros || []);
+
+  // 2. Filtramos sobre esa lista extraída
+  const filtrados = listaInventario.filter((item) => {
     const termino = search.toLowerCase();
     return (
       item.producto?.toLowerCase().includes(termino) ||
@@ -47,41 +53,85 @@ function Inventario() {
     );
   });
 
+  const handleGuardarUmbrales = async (data) => {
+    try {
+      await api.post('/inventario/umbrales', data);
+      refreshCatalogo('inventario');
+      setModalUmbralesOpen(false);
+      // Actualizamos la vista de detalle si está abierta
+      if (itemSeleccionado) {
+        setItemSeleccionado({ ...itemSeleccionado, ...data });
+      }
+    } catch (e) {
+      console.error("Error guardando umbrales", e);
+    }
+  };
+
+  const handleGuardarLote = async (data) => {
+    try {
+      const payload = {
+        ...data,
+        id_producto: itemSeleccionado.id_producto,
+        operacion: loteEdicion ? 'Modificar' : 'Agregar'
+      };
+      if (loteEdicion) payload.id_detalle = loteEdicion.id_detalle;
+
+      await api.post('/inventario/lote', payload);
+      refreshCatalogo('inventario');
+      setModalLoteOpen(false);
+      // Idealmente aquí deberías hacer un requery del item, pero refreshCatalogo lo hará globalmente
+      setItemSeleccionado(null); // Obligamos a recargar la vista para ver los cambios
+    } catch (e) {
+      console.error("Error guardando lote", e);
+    }
+  };
+
+  const handleEliminarLote = async (id_detalle) => {
+    if (!window.confirm("¿Seguro que deseas eliminar este lote?")) return;
+    try {
+      await api.post('/inventario/lote', { operacion: 'Eliminar', id_detalle });
+      refreshCatalogo('inventario');
+      setItemSeleccionado(null);
+    } catch (e) {
+      console.error("Error eliminando lote", e);
+    }
+  };
+
   // ==========================================
-  // VISTA DE DETALLE DE LOTES (Pantalla Completa)
+  // VISTA DE DETALLE DE LOTES
   // ==========================================
   if (itemSeleccionado) {
     return (
       <PageContainer>
-        <div style={{ padding: "20px", background: "white", borderRadius: "12px", border: "1px solid #e5e7eb" }}>
-          
-          <button className="btn-volver" onClick={() => setItemSeleccionado(null)} style={{ background: "none", border: "none", color: "#6b7280", display: "flex", alignItems: "center", gap: "5px", cursor: "pointer", marginBottom: "20px", fontWeight: 500 }}>
+        <div className="inventario-detalle-container">
+
+          <button className="inv-btn-volver" onClick={() => setItemSeleccionado(null)}>
             <ArrowLeft size={16} /> Volver al inventario general
           </button>
 
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px", paddingBottom: "15px", borderBottom: "1px solid #eee" }}>
-            <div>
-              <h2 style={{ margin: "0 0 5px 0", fontSize: "22px" }}>
-                Desglose de Lotes para: <strong>{itemSeleccionado.producto}</strong>
-              </h2>
-              <p style={{ color: "#6b7280", margin: 0 }}>
-                <strong>Ubicación:</strong> {itemSeleccionado.ubicacion_nombre} [{itemSeleccionado.ubicacion_tipo}]
-              </p>
+          <div className="inventario-detalle-header">
+            <div className="inventario-detalle-title">
+              <h2>Desglose de Lotes: <strong>{itemSeleccionado.producto}</strong></h2>
+              <p><strong>Ubicación:</strong> {itemSeleccionado.ubicacion_nombre} | <strong>Código:</strong> {itemSeleccionado.codigo_interno}</p>
             </div>
-            <button className="primary-btn" style={{ background: "#3b82f6", color: "white", border: "none", padding: "8px 15px", borderRadius: "8px", cursor: "pointer", display: "flex", alignItems: "center", gap: "5px" }}>
-              <Plus size={16} /> Agregar Lote Manual
-            </button>
+            <div style={{ display: "flex", gap: "12px" }}>
+              <Button variant="secondary" icon={Settings2} onClick={() => setModalUmbralesOpen(true)}>
+                Configurar Umbrales
+              </Button>
+              {/* <Button variant="primary" icon={Plus} onClick={() => { setLoteEdicion(null); setModalLoteOpen(true); }}>
+                Agregar Lote Manual
+              </Button> */}
+            </div>
           </div>
 
           <DataCard>
             <Table
-              columns={["ID Lote", "Número de Lote", "Cantidad", "Fecha de Expiración", "Estado", "Acciones"]}
+              columns={["Lote", "Cantidad", "Fecha de Expiración", "Estado", "Acciones"]}
               data={itemSeleccionado.lotes || []}
               renderRow={(lote) => (
                 <tr key={lote.id_detalle}>
-                  <td style={{ color: "#6b7280" }}>{lote.id_detalle}</td>
-                  <td><code>{lote.lote}</code></td>
-                  <td><strong>{lote.cantidad} pz</strong></td>
+                  <td><code style={{ color: "#4f46e5", background: "#e0e7ff", padding: "2px 6px", borderRadius: "4px" }}>{lote.lote}</code></td>
+                  <td className="inv-col-bold">{lote.cantidad} pz</td>
                   <td>
                     {lote.fecha_expiracion
                       ? new Date(lote.fecha_expiracion).toLocaleDateString('es-MX', { day: '2-digit', month: 'short', year: 'numeric', timeZone: 'UTC' })
@@ -89,11 +139,11 @@ function Inventario() {
                   </td>
                   <td><VencimientoBadge fecha={lote.fecha_expiracion} /></td>
                   <td>
-                    <div style={{ display: "flex", gap: "10px" }}>
-                      <button style={{ background: "none", border: "none", color: "#f59e0b", cursor: "pointer" }} title="Editar Lote">
+                    <div className="inv-action-icons">
+                      {/* <button className="inv-icon-btn inv-icon-edit" title="Editar Lote" onClick={() => { setLoteEdicion(lote); setModalLoteOpen(true); }}>
                         <Pencil size={18} />
-                      </button>
-                      <button style={{ background: "none", border: "none", color: "#ef4444", cursor: "pointer" }} title="Eliminar Lote">
+                      </button> */}
+                      <button className="inv-icon-btn inv-icon-delete" title="Eliminar Lote" onClick={() => handleEliminarLote(lote.id_detalle)}>
                         <Trash2 size={18} />
                       </button>
                     </div>
@@ -102,12 +152,20 @@ function Inventario() {
               )}
             />
             {(!itemSeleccionado.lotes || itemSeleccionado.lotes.length === 0) && (
-              <div style={{ textAlign: "center", padding: "30px", color: "#9ca3af" }}>
-                No hay lotes con stock disponible para este producto.
-              </div>
+              <div className="inv-empty-state">No hay lotes con stock disponible para este producto.</div>
             )}
           </DataCard>
         </div>
+
+        {/* Modales Inyectados en el Detalle */}
+        <Modal isOpen={modalUmbralesOpen} onClose={() => setModalUmbralesOpen(false)} title="Configurar Umbrales de Stock">
+          <UmbralesForm item={itemSeleccionado} onSubmit={handleGuardarUmbrales} onCancel={() => setModalUmbralesOpen(false)} />
+        </Modal>
+
+        <Modal isOpen={modalLoteOpen} onClose={() => setModalLoteOpen(false)} title={loteEdicion ? "Modificar Lote" : "Nuevo Lote de Ingreso"}>
+          <InventarioForm initialData={loteEdicion} itemPadre={itemSeleccionado} onSubmit={handleGuardarLote} onCancel={() => setModalLoteOpen(false)} />
+        </Modal>
+
       </PageContainer>
     );
   }
@@ -117,49 +175,61 @@ function Inventario() {
   // ==========================================
   return (
     <PageContainer>
-      <div className="dashboard-title">
+      <div className="inventario-header">
         <h1>Inventario general por producto</h1>
         <p>Gestione las existencias globales agrupadas por sucursal y producto.</p>
       </div>
 
-      <div style={{ display: "flex", gap: "16px", marginBottom: "20px" }}>
-        <div className="search-box" style={{ flex: "1", position: "relative" }}>
-          <input 
-            type="text" 
-            placeholder="Buscar por producto, código o almacén..."
-            value={search} 
-            onChange={(e) => setSearch(e.target.value)} 
-            style={{ width: "100%", padding: "10px 35px 10px 12px", borderRadius: "8px", border: "1px solid #ddd" }}
-          />
-          <Search size={18} style={{ position: "absolute", right: "12px", top: "12px", color: "#6b7280" }} />
+      <div className="inventario-controls">
+        <div className="inventario-search-wrapper">
+          <div style={{ position: "relative" }}>
+            <input
+              type="text"
+              placeholder="Buscar por producto, código o almacén..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              style={{ width: "100%", padding: "10px 35px 10px 12px", borderRadius: "8px", border: "1px solid #d1d5db", outline: "none", fontSize: "14px" }}
+            />
+            <Search size={18} style={{ position: "absolute", right: "12px", top: "11px", color: "#9ca3af" }} />
+          </div>
         </div>
       </div>
 
       <DataCard>
         <Table
-          columns={["Ubicación", "Producto", "Código interno", "Categoría", "Stock Total", "Acciones"]}
+          columns={["Ubicación", "Producto", "Código Interno", "Stock Actual", "Estado de Stock", "Acciones"]}
           data={filtrados}
-          renderRow={(item) => (
-            <tr key={item.id}>
-              <td>{item.ubicacion_nombre}</td>
-              <td><strong>{item.producto}</strong></td>
-              <td style={{ color: "#6b7280" }}>{item.codigo_interno}</td>
-              <td><span style={{ background: "#f3f4f6", padding: "4px 8px", borderRadius: "12px", fontSize: "12px", color: "#4b5563" }}>{item.categoria}</span></td>
-              <td>
-                <span style={{ background: "#d1f7e0", color: "#0f9d58", padding: "4px 10px", borderRadius: "12px", fontWeight: "bold", fontSize: "13px" }}>
-                  {item.stock_total} pz
-                </span>
-              </td>
-              <td>
-                <button 
-                  onClick={() => setItemSeleccionado(item)}
-                  style={{ background: "#0ea5e9", color: "white", border: "none", padding: "6px 12px", borderRadius: "6px", cursor: "pointer", display: "flex", alignItems: "center", gap: "6px", fontSize: "13px" }}
-                >
-                  <List size={14} /> Ver Lotes / Desglose
-                </button>
-              </td>
-            </tr>
-          )}
+          renderRow={(item) => {
+            const badgeColors = { "NORMAL": "inv-badge-normal", "MEDIO": "inv-badge-medio", "BAJO": "inv-badge-bajo" };
+            const stockClass = badgeColors[item.estado_stock] || badgeColors["NORMAL"];
+            return (
+              <tr key={`${item.id_producto}-${item.id_ubicacion}`}>
+                <td className="inv-col-texto">{item.ubicacion_nombre}</td>
+                <td className="inv-col-bold">{item.producto}</td>
+                <td className="inv-col-texto">{item.codigo_interno}</td>
+                <td>
+                  <span className={`inv-badge-stock ${stockClass}`}>
+                    {item.stock_total} pz
+                  </span>
+                </td>
+                <td>
+                  <span className={`inv-badge-stock ${stockClass}`} style={{ display: "block", marginBottom: "4px" }}>
+                    {item.estado_stock}
+                  </span>
+                  <small className="inv-col-texto" style={{ fontSize: "11px", display: "block", textAlign: "center" }}>
+                    (Mín: {item.stock_minimo} | Deseado: {item.stock_deseado})
+                  </small>
+                </td>
+                <td>
+                  <div style={{ display: "flex", justifyContent: "flex-end" }}>
+                    <button className="inv-btn-lotes" onClick={() => setItemSeleccionado(item)}>
+                      <List size={14} /> Ver Lotes / Configurar
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            );
+          }}
         />
       </DataCard>
     </PageContainer>
