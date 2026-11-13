@@ -1,20 +1,169 @@
-import { useState } from "react";
-import { ArrowLeft, CheckCircle, Truck, AlertTriangle } from "lucide-react";
+import { useState, useEffect } from "react";
+import { ArrowLeft, CheckCircle, Truck, AlertTriangle, Wand2, Package, CheckSquare } from "lucide-react";
+import Modal from "../../ui/Modal";
+import Button from "../../ui/Button";
 import api from "../../../services/api";
+import "./OrdenDetail.css";
+
+// --- COMPONENTE MODAL INTERNO PARA ASIGNAR LOTES ---
+const ModalLotes = ({ isOpen, onClose, detalle, envios, setEnvios }) => {
+  const [fefoWarning, setFefoWarning] = useState("");
+
+  useEffect(() => {
+    if (!isOpen) {
+      setFefoWarning("");
+    }
+  }, [isOpen]);
+
+  if (!isOpen || !detalle) return null;
+
+  const lotesOrdenados = [...(detalle.lotes_disponibles || [])].sort((a, b) =>
+    new Date(a.fecha_expiracion) - new Date(b.fecha_expiracion)
+  );
+
+  const maxFaltante = parseFloat(detalle.cantidad_pendiente_enviar) || 0;
+
+  const handleInputChange = (idLote, valStr, maxEnLote) => {
+    let value = parseFloat(valStr) || 0;
+    if (value < 0) value = 0;
+    if (value > maxEnLote) value = maxEnLote;
+
+    setEnvios(prev => {
+      const loteActual = prev[detalle.id] || {};
+      let asignadoAOtros = 0;
+
+      Object.entries(loteActual).forEach(([lID, qty]) => {
+        if (lID !== String(idLote)) asignadoAOtros += qty;
+      });
+
+      if (asignadoAOtros + value > maxFaltante) {
+        value = maxFaltante - asignadoAOtros;
+      }
+
+      return {
+        ...prev,
+        [detalle.id]: {
+          ...loteActual,
+          [idLote]: value
+        }
+      };
+    });
+  };
+
+  const handleAutoFEFO = () => {
+    let faltaSurtir = maxFaltante;
+    const nuevaAsignacion = {};
+
+    const fechaLimite = new Date();
+    fechaLimite.setDate(fechaLimite.getDate() + 60);
+
+    lotesOrdenados.forEach(lote => {
+      const fechaLote = new Date(lote.fecha_expiracion);
+
+      if (faltaSurtir > 0 && lote.cantidad > 0 && fechaLote >= fechaLimite) {
+        const tomar = Math.min(faltaSurtir, lote.cantidad);
+        nuevaAsignacion[lote.id] = tomar;
+        faltaSurtir -= tomar;
+      }
+    });
+
+    if (faltaSurtir > 0) {
+      setFefoWarning(`Auto FEFO asignó lo posible. Faltan ${faltaSurtir} pz porque los demás lotes caducan en menos de 60 días.`);
+    } else {
+      setFefoWarning("");
+    }
+
+    setEnvios(prev => ({
+      ...prev,
+      [detalle.id]: nuevaAsignacion
+    }));
+  };
+
+  return (
+    <Modal isOpen={isOpen} onClose={onClose} title="Seleccionar Lotes para Surtir">
+      <div className="modal-lotes-header">
+        <div>
+          <h3 className="modal-lotes-title">{detalle.nombre_producto}</h3>
+          <p className="modal-lotes-subtitle">Máximo faltante a enviar: {maxFaltante} pz</p>
+        </div>
+        <button type="button" onClick={handleAutoFEFO} className="btn-auto-fefo">
+          <Wand2 size={14} /> Auto FEFO
+        </button>
+      </div>
+
+      {fefoWarning && (
+        <div style={{ background: "#fffbeb", color: "#d97706", border: "1px solid #fde68a", padding: "10px 12px", borderRadius: "8px", marginBottom: "15px", display: "flex", alignItems: "center", gap: "8px", fontSize: "13px", fontWeight: "500" }}>
+          <AlertTriangle size={16} /> {fefoWarning}
+        </div>
+      )}
+
+      <table className="modal-lotes-table">
+        <thead>
+          <tr>
+            <th className="text-left">Lote</th>
+            <th className="text-left">Expiración</th>
+            <th className="text-center">Stock Disp.</th>
+            <th className="text-center" style={{ width: "100px" }}>A Enviar</th>
+          </tr>
+        </thead>
+        <tbody>
+          {lotesOrdenados.length === 0 ? (
+            <tr>
+              <td colSpan="4" className="text-center" style={{ color: "#ef4444", padding: "20px" }}>
+                No hay stock disponible para este producto.
+              </td>
+            </tr>
+          ) : (
+            lotesOrdenados.map(lote => {
+              const isWarning = lote.lote.includes("-VENC") || lote.lote.includes("-PROX");
+
+              return (
+                <tr key={lote.id} className={isWarning ? "lote-warning-row" : ""}>
+                  <td className="lote-name">
+                    {lote.lote}
+                  </td>
+                  <td style={{ color: "#64748b" }}>
+                    {new Date(lote.fecha_expiracion).toLocaleDateString('es-MX')}
+                  </td>
+                  <td className="text-center">
+                    <strong>{lote.cantidad} pz</strong>
+                  </td>
+                  <td>
+                    <input
+                      type="number"
+                      min="0"
+                      max={Math.min(lote.cantidad, maxFaltante)}
+                      value={envios[detalle.id]?.[lote.id] || ""}
+                      onChange={(e) => handleInputChange(lote.id, e.target.value, lote.cantidad)}
+                      className="lote-input"
+                      placeholder="0"
+                    />
+                  </td>
+                </tr>
+              );
+            })
+          )}
+        </tbody>
+      </table>
+
+      <div className="modal-footer">
+        <Button variant="primary" onClick={onClose}>Confirmar Selección</Button>
+      </div>
+    </Modal>
+  );
+};
+
 
 const OrdenDetail = ({ orden, onClose, onActionSuccess }) => {
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
 
-  // Estados para capturar la interacción del usuario
-  // envios: { [id_movimiento_detalle]: { [id_lote]: cantidad_a_enviar } }
   const [envios, setEnvios] = useState({});
-  // recepciones: { [id_movimiento_detalle]: cantidad_a_recibir }
   const [recepciones, setRecepciones] = useState({});
+  const [detalleActivo, setDetalleActivo] = useState(null);
 
   if (!orden) return null;
 
-  // Variables de control de flujo
   const estatusNormalizado = orden.estatus?.toLowerCase() || "";
   const esActiva = ["pendiente", "en camino", "incompleta"].includes(estatusNormalizado);
 
@@ -22,13 +171,9 @@ const OrdenDetail = ({ orden, onClose, onActionSuccess }) => {
   const esParaRecibir = orden.tipoFlujo === "recibir" && esActiva;
   const soloLectura = !esParaSurtir && !esParaRecibir;
 
-  // Calculamos si realmente hay mercancía en tránsito para habilitar la recepción
   const totalEnCamino = orden.detalles?.reduce((acc, curr) => acc + (parseFloat(curr.cantidad_en_camino) || 0), 0) || 0;
-
-  // Nueva variable para proteger el botón
   const puedeRecibir = esParaRecibir && totalEnCamino > 0;
 
-  // Helpers visuales
   const getStatusClass = (estatus) => {
     switch (estatus?.toLowerCase()) {
       case "cerrada": return "status-completado";
@@ -45,42 +190,23 @@ const OrdenDetail = ({ orden, onClose, onActionSuccess }) => {
     return new Date(fecha).toLocaleDateString("es-MX", { day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" });
   };
 
-  // --- LÓGICA PARA SURTIR (CON LOTES) ---
-  const handleLoteChange = (idDetalle, idLote, valStr, maxFaltante, maxEnLote) => {
-    let value = parseFloat(valStr) || 0;
-    if (value < 0) value = 0;
-    if (value > maxEnLote) value = maxEnLote; // No sacar más de lo que tiene el lote físico
-
-    setEnvios(prev => {
-      const loteActual = prev[idDetalle] || {};
-
-      // Calcular cuánto ya se asignó a otros lotes de este mismo producto
-      let asignadoAOtros = 0;
-      Object.entries(loteActual).forEach(([lID, qty]) => {
-        if (lID !== String(idLote)) asignadoAOtros += qty;
-      });
-
-      // Bloqueo: No permitir enviar más del total solicitado por la farmacia
-      if (asignadoAOtros + value > maxFaltante) {
-        value = maxFaltante - asignadoAOtros;
+  // --- FUNCIÓN PARA AUTO LLENAR RECEPCIÓN ---
+  const handleAutoLlenarRecepcion = () => {
+    const nuevasRecepciones = {};
+    orden.detalles?.forEach((detalle) => {
+      const enCamino = parseFloat(detalle.cantidad_en_camino) || 0;
+      if (enCamino > 0) {
+        nuevasRecepciones[detalle.id] = enCamino; // Asigna lo que viene en camino al input
       }
-
-      return {
-        ...prev,
-        [idDetalle]: {
-          ...loteActual,
-          [idLote]: value
-        }
-      };
     });
+    setRecepciones(nuevasRecepciones);
   };
 
   const submitSurtir = async () => {
-    // Transformamos el objeto de estado al payload que espera Laravel
     const payloadEnvios = Object.entries(envios).map(([idDetalle, lotesObj]) => ({
       id_movimiento_detalle: parseInt(idDetalle),
       lotes: lotesObj
-    })).filter(envio => Object.values(envio.lotes).some(q => q > 0)); // Solo mandar si hay cantidades > 0
+    })).filter(envio => Object.values(envio.lotes).some(q => q > 0));
 
     if (payloadEnvios.length === 0) {
       setErrorMsg("Debes asignar al menos un lote con cantidad mayor a cero para despachar.");
@@ -90,7 +216,6 @@ const OrdenDetail = ({ orden, onClose, onActionSuccess }) => {
     try {
       setLoading(true);
       setErrorMsg("");
-      // Hacemos POST a la ruta de surtir (ajusta si tu ruta backend usa un prefijo distinto)
       await api.post("/movimientos/surtir", { envios: payloadEnvios });
       onActionSuccess();
     } catch (error) {
@@ -100,12 +225,10 @@ const OrdenDetail = ({ orden, onClose, onActionSuccess }) => {
     }
   };
 
-  // --- LÓGICA PARA RECIBIR ---
   const handleRecepcionChange = (idDetalle, valStr, maxEnCamino) => {
     let value = parseFloat(valStr) || 0;
     if (value < 0) value = 0;
-    if (value > maxEnCamino) value = maxEnCamino; // No puede recibir más de lo que viene en camino
-
+    if (value > maxEnCamino) value = maxEnCamino;
     setRecepciones(prev => ({ ...prev, [idDetalle]: value }));
   };
 
@@ -133,126 +256,132 @@ const OrdenDetail = ({ orden, onClose, onActionSuccess }) => {
   };
 
   return (
-    <div style={{ padding: "20px", background: "white", borderRadius: "12px", border: "1px solid #e5e7eb" }}>
-      {/* Botón de Regreso para la pantalla completa */}
+    <div className="orden-detail-container">
       <button className="btn-volver" onClick={onClose}>
         <ArrowLeft size={16} /> Volver al listado de órdenes
       </button>
 
-      <div className="detail-header" style={{ marginBottom: "20px", borderBottom: "1px solid #eee", paddingBottom: "15px" }}>
+      <div className="orden-detail-header">
         <div>
-          <h2 style={{ margin: "0 0 10px 0", fontSize: "24px" }}>
-            Orden #{orden.id} <span className={`status ${getStatusClass(orden.estatus)}`} style={{ fontSize: "14px", verticalAlign: "middle", marginLeft: "10px" }}>{orden.estatus}</span>
+          <h2 className="orden-title">
+            Orden #{orden.id} <span className={`status orden-status-badge ${getStatusClass(orden.estatus)}`}>{orden.estatus}</span>
           </h2>
-          <p className="provider-info" style={{ margin: 0 }}>
+          <p className="provider-info">
             <strong>Origen (Surtidor):</strong> {orden.origen} &nbsp;|&nbsp; <strong>Destino (Recibidor):</strong> {orden.destino}
           </p>
         </div>
-        <div style={{ textAlign: "right" }}>
-          <small className="text-muted">Generada el: {formatFecha(orden.fecha)}</small>
+        <div className="orden-date-info">
+          Generada el: {formatFecha(orden.fecha)}
         </div>
       </div>
 
       {errorMsg && (
-        <div style={{ background: "#fee2e2", color: "#dc2626", padding: "12px", borderRadius: "8px", marginBottom: "20px", display: "flex", alignItems: "center", gap: "10px" }}>
+        <div className="alert-error">
           <AlertTriangle size={18} /> {errorMsg}
         </div>
       )}
 
-      <h3 style={{ fontSize: "18px", marginBottom: "15px" }}>Detalle de Medicamentos</h3>
+      {/* --- ENCABEZADO DE TABLA CON BOTÓN MÁGICO DE RECEPCIÓN --- */}
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: "20px", marginBottom: "15px" }}>
+        <h3 className="orden-section-title" style={{ margin: 0 }}>Detalle de Medicamentos</h3>
 
-      <div style={{ overflowX: "auto" }}>
-        <table style={{ width: "100%", borderCollapse: "collapse", textAlign: "left" }}>
-          <thead style={{ background: "#f9fafb", borderBottom: "2px solid #e5e7eb" }}>
+        {esParaRecibir && (
+          <button
+            type="button"
+            onClick={handleAutoLlenarRecepcion}
+            style={{
+              background: "#0ea5e9", // Azul distintivo para recepción
+              color: "white",
+              border: "none",
+              padding: "6px 12px",
+              borderRadius: "6px",
+              fontSize: "13px",
+              fontWeight: "bold",
+              cursor: "pointer",
+              display: "flex",
+              alignItems: "center",
+              gap: "6px",
+              boxShadow: "0 1px 2px rgba(0,0,0,0.1)"
+            }}
+          >
+            <CheckSquare size={16} /> Recibir Todo (Auto Llenar)
+          </button>
+        )}
+      </div>
+
+      <div className="orden-table-wrapper">
+        <table className="orden-table">
+          <thead>
             <tr>
-              <th style={{ padding: "12px" }}>Producto</th>
-              <th style={{ padding: "12px", textAlign: "center" }}>Solicitado</th>
+              <th>Producto</th>
+              <th className="text-center">Solicitado</th>
+              {esParaSurtir && <th className="text-center">Ya Enviado</th>}
+              {esParaSurtir && <th className="text-center text-warning">Falta Enviar</th>}
+              {esParaSurtir && <th className="text-center">Asignación de Lotes</th>}
 
-              {esParaSurtir && <th style={{ padding: "12px", textAlign: "center" }}>Falta Enviar</th>}
-              {esParaSurtir && <th style={{ padding: "12px", width: "40%" }}>Despacho por Lotes</th>}
+              {esParaRecibir && <th className="text-center text-info">En Camino</th>}
+              {esParaRecibir && <th className="text-center">Ya Recibido</th>}
+              {esParaRecibir && <th className="text-center">Cant. a Recibir</th>}
 
-              {esParaRecibir && <th style={{ padding: "12px", textAlign: "center", color: "#3b82f6" }}>En Camino</th>}
-              {esParaRecibir && <th style={{ padding: "12px", textAlign: "center" }}>Ya Recibido</th>}
-              {esParaRecibir && <th style={{ padding: "12px", width: "20%" }}>Cant. a Recibir</th>}
-
-              {soloLectura && <th style={{ padding: "12px", textAlign: "center" }}>Enviado</th>}
-              {soloLectura && <th style={{ padding: "12px", textAlign: "center" }}>Recibido</th>}
+              {soloLectura && <th className="text-center">Enviado</th>}
+              {soloLectura && <th className="text-center">Recibido</th>}
             </tr>
           </thead>
           <tbody>
             {orden.detalles?.map((detalle) => {
-              // Cálculos reactivos para la UI
               const asignadoTotalEnVio = envios[detalle.id] ? Object.values(envios[detalle.id]).reduce((a, b) => a + b, 0) : 0;
-              const faltaAsignar = detalle.cantidad_pendiente_enviar - asignadoTotalEnVio;
+              const pendienteNum = parseFloat(detalle.cantidad_pendiente_enviar) || 0;
+              const yaEnviado = detalle.cantidad_enviada || "0.00";
+
+              const isCompletado = asignadoTotalEnVio > 0 && asignadoTotalEnVio === pendienteNum;
 
               return (
-                <tr key={detalle.id} style={{ borderBottom: "1px solid #eee" }}>
-                  <td style={{ padding: "15px 12px" }}>
+                <tr key={detalle.id}>
+                  <td>
                     <strong>{detalle.nombre_producto}</strong>
                   </td>
-                  <td style={{ padding: "15px 12px", textAlign: "center" }}>{detalle.cantidad_solicitada}</td>
+                  <td className="text-center">{detalle.cantidad_solicitada}</td>
 
-                  {/* VISTA DE SURTIDO (ALMACÉN ORIGEN) */}
+                  {/* VISTA DE SURTIDO */}
                   {esParaSurtir && (
                     <>
-                      <td style={{ padding: "15px 12px", textAlign: "center", color: "#f59e0b", fontWeight: "bold" }}>
+                      <td className="text-center">{yaEnviado}</td>
+                      <td className="text-center text-warning">
                         {detalle.cantidad_pendiente_enviar}
                       </td>
-                      <td style={{ padding: "15px 12px" }}>
-                        {detalle.cantidad_pendiente_enviar === 0 ? (
-                          <span style={{ color: "#10b981", fontSize: "13px" }}><CheckCircle size={14} style={{ verticalAlign: "middle" }} /> Surtido completo</span>
+                      <td className="text-center">
+                        {pendienteNum === 0 ? (
+                          <span className="text-success">
+                            <CheckCircle size={14} style={{ verticalAlign: "middle", marginRight: "4px" }} /> Surtido
+                          </span>
                         ) : (
-                          <div style={{ background: "#f8fafc", padding: "10px", borderRadius: "8px", border: "1px solid #e2e8f0" }}>
-                            {detalle.lotes_disponibles?.length > 0 ? (
-                              <table style={{ width: "100%", fontSize: "13px" }}>
-                                <tbody>
-                                  {detalle.lotes_disponibles.map(lote => (
-                                    <tr key={lote.id}>
-                                      <td style={{ paddingBottom: "5px" }}>
-                                        <code>{lote.lote}</code><br />
-                                        <small className="text-muted">Cad: {new Date(lote.fecha_expiracion).toLocaleDateString()}</small>
-                                      </td>
-                                      <td style={{ paddingBottom: "5px", textAlign: "right", paddingRight: "10px" }}>
-                                        Disp: {lote.cantidad}
-                                      </td>
-                                      <td style={{ paddingBottom: "5px", width: "80px" }}>
-                                        <input
-                                          type="number"
-                                          min="0"
-                                          max={Math.min(lote.cantidad, detalle.cantidad_pendiente_enviar)}
-                                          value={envios[detalle.id]?.[lote.id] || ""}
-                                          onChange={(e) => handleLoteChange(detalle.id, lote.id, e.target.value, detalle.cantidad_pendiente_enviar, lote.cantidad)}
-                                          style={{ width: "100%", padding: "4px 8px", borderRadius: "4px", border: "1px solid #cbd5e1" }}
-                                          placeholder="0"
-                                        />
-                                      </td>
-                                    </tr>
-                                  ))}
-                                </tbody>
-                              </table>
-                            ) : (
-                              <span style={{ color: "#ef4444", fontSize: "12px" }}>Sin stock físico disponible</span>
-                            )}
+                          <div>
+                            <button
+                              type="button"
+                              onClick={() => setDetalleActivo(detalle)}
+                              className={`btn-assign-lotes ${isCompletado ? 'btn-assign-lotes-completed' : ''}`}
+                            >
+                              {isCompletado ? <CheckCircle size={14} /> : <Package size={14} />}
+                              {isCompletado ? "Lotes Asignados" : "Asignar Lotes"}
+                            </button>
 
-                            {/* Resumen dinámico de la asignación */}
-                            <div style={{ marginTop: "10px", fontSize: "12px", display: "flex", justifyContent: "space-between", color: faltaAsignar === 0 ? "#10b981" : "#64748b" }}>
-                              <span>Total asignado: <strong>{asignadoTotalEnVio}</strong></span>
-                              {faltaAsignar > 0 && <span>Falta: {faltaAsignar}</span>}
-                            </div>
+                            <small className={`lotes-status-text ${isCompletado ? 'status-assigned' : (asignadoTotalEnVio > 0 ? 'status-partial' : 'status-pending')}`}>
+                              {isCompletado
+                                ? `Listo: ${asignadoTotalEnVio} pz`
+                                : (asignadoTotalEnVio > 0 ? `Parcial: ${asignadoTotalEnVio} / ${pendienteNum} pz` : "Pendiente de seleccionar")}
+                            </small>
                           </div>
                         )}
                       </td>
                     </>
                   )}
 
-                  {/* VISTA DE RECEPCIÓN (FARMACIA DESTINO) */}
+                  {/* VISTA DE RECEPCIÓN */}
                   {esParaRecibir && (
                     <>
-                      <td style={{ padding: "15px 12px", textAlign: "center", color: "#3b82f6", fontWeight: "bold" }}>
-                        {detalle.cantidad_en_camino}
-                      </td>
-                      <td style={{ padding: "15px 12px", textAlign: "center" }}>{detalle.cantidad_recibida}</td>
-                      <td style={{ padding: "15px 12px" }}>
+                      <td className="text-center text-info">{detalle.cantidad_en_camino}</td>
+                      <td className="text-center">{detalle.cantidad_recibida}</td>
+                      <td>
                         {detalle.cantidad_en_camino > 0 ? (
                           <input
                             type="number"
@@ -260,21 +389,21 @@ const OrdenDetail = ({ orden, onClose, onActionSuccess }) => {
                             max={detalle.cantidad_en_camino}
                             value={recepciones[detalle.id] || ""}
                             onChange={(e) => handleRecepcionChange(detalle.id, e.target.value, detalle.cantidad_en_camino)}
-                            style={{ width: "100%", padding: "8px", borderRadius: "6px", border: "1px solid #cbd5e1" }}
-                            placeholder="Piezas OK"
+                            className="input-recepcion"
+                            placeholder="0"
                           />
                         ) : (
-                          <span style={{ fontSize: "12px", color: "#94a3b8" }}>Esperando despacho</span>
+                          <span className="status-pending" style={{ display: "block", textAlign: "center" }}>Esperando despacho</span>
                         )}
                       </td>
                     </>
                   )}
 
-                  {/* VISTA DE SOLO LECTURA (ÓRDENES CERRADAS O CANCELADAS) */}
+                  {/* VISTA SOLO LECTURA */}
                   {soloLectura && (
                     <>
-                      <td style={{ padding: "15px 12px", textAlign: "center" }}>{detalle.cantidad_enviada}</td>
-                      <td style={{ padding: "15px 12px", textAlign: "center" }}>{detalle.cantidad_recibida}</td>
+                      <td className="text-center">{detalle.cantidad_enviada}</td>
+                      <td className="text-center">{detalle.cantidad_recibida}</td>
                     </>
                   )}
                 </tr>
@@ -284,23 +413,25 @@ const OrdenDetail = ({ orden, onClose, onActionSuccess }) => {
         </table>
       </div>
 
-      {/* BOTONES DE ACCIÓN FLOTANTES */}
-      {(esParaSurtir || esParaRecibir) && (
-        <div style={{ marginTop: "25px", display: "flex", justifyContent: "flex-end", gap: "15px", borderTop: "1px solid #eee", paddingTop: "20px" }}>
-          <button className="secondary-btn" onClick={onClose} disabled={loading}>
-            Cancelar
-          </button>
+      <ModalLotes
+        isOpen={!!detalleActivo}
+        onClose={() => setDetalleActivo(null)}
+        detalle={detalleActivo}
+        envios={envios}
+        setEnvios={setEnvios}
+      />
 
+      {(esParaSurtir || esParaRecibir) && (
+        <div className="actions-footer">
           {esParaSurtir && (
-            <button className="primary-btn" onClick={submitSurtir} disabled={loading} style={{ display: "flex", alignItems: "center", gap: "8px", backgroundColor: "#f59e0b" }}>
-              <Truck size={16} /> {loading ? "Procesando..." : "Despachar Lotes Asignados"}
+            <button className="primary-btn btn-despachar" onClick={submitSurtir} disabled={loading}>
+              <Truck size={18} /> {loading ? "Procesando..." : "Despachar Orden"}
             </button>
           )}
 
-          {/* Aquí cambiamos esParaRecibir por puedeRecibir */}
           {puedeRecibir && (
-            <button className="primary-btn" onClick={submitRecibir} disabled={loading} style={{ display: "flex", alignItems: "center", gap: "8px", backgroundColor: "#3b82f6" }}>
-              <CheckCircle size={16} /> {loading ? "Procesando..." : "Registrar Recepción"}
+            <button className="primary-btn btn-recibir" onClick={submitRecibir} disabled={loading}>
+              <CheckCircle size={18} /> {loading ? "Procesando..." : "Registrar Recepción"}
             </button>
           )}
         </div>

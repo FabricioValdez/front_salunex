@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useContext } from "react";
 import { Pencil, Trash2, Plus } from "lucide-react";
 import PageContainer from "../../components/ui/PageContainer";
 import DataCard from "../../components/ui/DataCard";
@@ -7,6 +7,7 @@ import Button from "../../components/ui/Button";
 import Modal from "../../components/ui/Modal";
 import SearchBar from "../../components/ui/SearchBar";
 import { useCatalogos } from "../../context/CatalogosContext";
+import AuthContext from "../../context/AuthContext";
 import api from "../../services/api";
 
 function CatalogoForm({ label, campo, form, setForm, onSubmit, onClose, loading, error }) {
@@ -47,6 +48,8 @@ function DeleteModal({ isOpen, onClose, onConfirm, loading, nombre }) {
 
 function ClasificacionProducto() {
     const { clasificacionesProducto, refreshCatalogo } = useCatalogos();
+    const { user } = useContext(AuthContext);
+
     const [search, setSearch] = useState("");
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
@@ -57,8 +60,11 @@ function ClasificacionProducto() {
     const [deleteOpen, setDeleteOpen] = useState(false);
     const [deleteTarget, setDeleteTarget] = useState(null);
 
-    const filtrados = clasificacionesProducto.filter((c) =>
-        c.clasificacion.toLowerCase().includes(search.toLowerCase())
+    const canManage = user?.permisos?.includes("GPER") || ['Empresa', 'Super Administrador'].includes(user?.rol);
+
+    // Filtro protegido contra nulos
+    const filtrados = (clasificacionesProducto || []).filter((c) =>
+        c?.clasificacion?.toLowerCase().includes(search?.toLowerCase() || "")
     );
 
     const handleNuevo = () => {
@@ -98,33 +104,45 @@ function ClasificacionProducto() {
         finally { setLoading(false); }
     };
 
+    const columns = canManage ? ["#", "Clasificación", "Acciones"] : ["#", "Clasificación"];
+
     return (
         <PageContainer>
             <div className="dashboard-header">
                 <SearchBar placeholder="Buscar clasificación..." value={search}
                     onChange={(e) => setSearch(e.target.value)} />
-                <Button variant="primary" icon={Plus} onClick={handleNuevo}>Nueva clasificación</Button>
+                {canManage && (
+                    <Button variant="primary" icon={Plus} onClick={handleNuevo}>Nueva clasificación</Button>
+                )}
             </div>
             <div className="dashboard-title">
                 <h1>Clasificaciones de Producto</h1>
-                <p>Administra las clasificaciones registradas en el sistema.</p>
+                <p>Consulta las clasificaciones registradas en el sistema.</p>
             </div>
             <DataCard>
-                <Table columns={["#", "Clasificación", "Acciones"]} data={filtrados}
+                <Table columns={columns} data={filtrados}
                     renderRow={(item, index) => (
                         <tr key={item.id}>
                             <td>{index + 1}</td>
                             <td><strong>{item.clasificacion}</strong></td>
-                            <td>
-                                <div className="table-actions">
-                                    <button className="action-btn" onClick={() => handleEditar(item)}>
-                                        <Pencil size={16} color="#3b82f6" />
-                                    </button>
-                                    <button className="action-btn" onClick={() => { setDeleteTarget(item); setDeleteOpen(true); }}>
-                                        <Trash2 size={16} color="#ef4444" />
-                                    </button>
-                                </div>
-                            </td>
+                            {canManage && (
+                                <td>
+                                    <div className="table-actions">
+                                        {item.id_empresa !== null ? (
+                                            <>
+                                                <button className="action-btn" onClick={() => handleEditar(item)}>
+                                                    <Pencil size={16} color="#3b82f6" />
+                                                </button>
+                                                <button className="action-btn" onClick={() => { setDeleteTarget(item); setDeleteOpen(true); }}>
+                                                    <Trash2 size={16} color="#ef4444" />
+                                                </button>
+                                            </>
+                                        ) : (
+                                            <span style={{ fontSize: "12px", color: "#9ca3af" }}>Catálogo Global</span>
+                                        )}
+                                    </div>
+                                </td>
+                            )}
                         </tr>
                     )} />
             </DataCard>

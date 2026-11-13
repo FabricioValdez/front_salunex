@@ -1,0 +1,97 @@
+.buscador-flotante-wrapper {
+    position: relative;
+    margin-bottom: 25px;
+    font-family: inherit;
+}
+
+.buscador-input-group {
+    display: flex;
+    border: 1px solid #1ab394;
+    /* Borde verde del diseño original */
+    border-radius: 2px;
+    overflow: hidden;
+}
+
+.buscador-icon {
+    background: #f8f9fa;
+    padding: 10px 15px;
+    color: #9ca3af;
+    border-right: 1px solid #e5e7eb;
+    display: flex;
+    align-items: center;
+}
+
+.buscador-input {
+    flex: 1;
+    border: none;
+    padding: 12px 15px;
+    font-size: 15px;
+    outline: none;
+}
+
+.buscador-btn {
+    background: #1ab394;
+    color: white;
+    border: none;
+    padding: 0 20px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.buscador-resultados {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    z-index: 9999;
+    background: white;
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.buscador-item {
+    padding: 10px 15px;
+    border-bottom: 1px solid #f3f4f6;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: background 0.2s;
+}
+
+.buscador-item:hover {
+    background: #f9fafb;
+}
+
+.buscador-item-info h4 {
+    margin: 0 0 2px 0;
+    color: #1ab394;
+    /* Título en verde */
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.buscador-item-info small {
+    color: #9ca3af;
+    font-size: 12px;
+}
+
+.buscador-badge {
+    padding: 4px 8px;
+    border-radius: 4px;
+    color: white;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.badge-success {
+    background-color: #1ab394;
+}
+
+.badge-danger {
+    background-color: #ef4444;
+}

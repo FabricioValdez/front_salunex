@@ -7,7 +7,7 @@ const CatalogosContext = createContext();
 export function CatalogosProvider({ children }) {
     const [roles, setRoles] = useState([]);
     const [empresas, setEmpresas] = useState([]);
-    const [ubicaciones, setUbicaciones] = useState([]); // Reemplaza farmacias y almacenes
+    const [ubicaciones, setUbicaciones] = useState([]);
     const [productos, setProductos] = useState([]);
     const [movimientos, setMovimientos] = useState([]);
     const [inventario, setInventario] = useState([]);
@@ -22,6 +22,19 @@ export function CatalogosProvider({ children }) {
 
     const { user } = useContext(AuthContext);
 
+    // 🌟 FUNCIÓN FALTANTE: Permite actualizar los catálogos en vivo al guardar/editar
+    const refreshCatalogo = (catalogo, data) => {
+        const setters = {
+            roles: setRoles, empresas: setEmpresas, ubicaciones: setUbicaciones,
+            productos: setProductos, movimientos: setMovimientos, inventario: setInventario,
+            controlCalidad: setControlCalidad, recepcionAlmacen: setRecepcionAlmacen,
+            categoriasProducto: setCategoriasProducto, clasificacionesProducto: setClasificacionesProducto,
+            presentacionesProducto: setPresentacionesProducto, viasAdministracion: setViasAdministracion,
+            tiposMovimiento: setTiposMovimiento
+        };
+        if (setters[catalogo]) setters[catalogo](data);
+    };
+
     useEffect(() => {
         if (user) fetchCatalogos();
     }, [user]);
@@ -34,7 +47,7 @@ export function CatalogosProvider({ children }) {
         const configuracionCatalogos = [
             { clave: 'GROL', endpoint: '/roles', setter: setRoles },
             { clave: 'GPER', endpoint: '/empresas', setter: setEmpresas },
-            { clave: 'GUBI', endpoint: '/ubicaciones', setter: setUbicaciones }, // Nuevo endpoint unificado
+            { clave: 'GUBI', endpoint: '/ubicaciones', setter: setUbicaciones },
             { clave: 'GMOV', endpoint: '/inventario', setter: setInventario },
             { clave: 'GCDC', endpoint: '/control-calidad', setter: setControlCalidad },
             { clave: 'GORD', endpoint: '/ordenes', setter: setMovimientos },
@@ -58,7 +71,6 @@ export function CatalogosProvider({ children }) {
             resultados.forEach((res, index) => {
                 const configItem = catalogosPermitidos[index];
                 if (res.status === "fulfilled") {
-                    // Extraemos .data.data porque nuestro backend API devuelve { success: true, data: [...] }
                     const dataReal = res.value.data.data || res.value.data;
                     configItem.setter(dataReal);
                 } else {
@@ -77,7 +89,8 @@ export function CatalogosProvider({ children }) {
         <CatalogosContext.Provider value={{
             roles, empresas, ubicaciones, productos, movimientos, inventario,
             controlCalidad, recepcionAlmacen, categoriasProducto, clasificacionesProducto,
-            presentacionesProducto, viasAdministracion, tiposMovimiento, loading
+            presentacionesProducto, viasAdministracion, tiposMovimiento, loading,
+            refreshCatalogo // 🌟 AHORA SÍ ESTÁ DISPONIBLE PARA TUS COMPONENTES
         }}>
             {children}
         </CatalogosContext.Provider>

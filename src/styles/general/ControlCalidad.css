@@ -1,124 +1,116 @@
-/* ── Layout dos paneles ── */
-.control-layout {
-  display: flex;
-  gap: 16px;
-  margin-top: 24px;
-}
-
-/* ── Panel lista header ── */
-.control-lista-header {
-  padding: 16px 20px;
-  border-bottom: 1px solid #e5e7eb;
-}
-
-.control-lista-header h3 {
-  margin: 0;
-  font-size: 15px;
-  font-weight: 600;
-}
-
-/* ── Panel detalle ── */
-.control-detalle {
-  flex: 1;
+.control-calidad-container {
   background: white;
   border-radius: 12px;
   border: 1px solid #e5e7eb;
   padding: 24px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
-.control-detalle-header {
+.control-calidad-header {
+  border-bottom: 2px solid #ef4444;
+  padding-bottom: 12px;
+  margin-bottom: 24px;
+}
+
+.control-calidad-header h2 {
+  margin: 0;
+  font-size: 20px;
+  color: #1f2937;
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
+  gap: 10px;
 }
 
-.control-detalle-header h3 {
-  margin: 0;
-  font-size: 16px;
-  font-weight: 600;
-}
-
-.control-detalle-sub {
-  font-size: 12px;
-  color: #6b7280;
-}
-
-/* ── Grid de datos ── */
-.control-grid {
+.control-calidad-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16px;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
   margin-bottom: 20px;
 }
 
-.control-grid-item p {
-  margin: 0;
-  font-size: 12px;
-  color: #6b7280;
-}
-
-.control-grid-item strong {
+.form-group-calidad label {
+  display: block;
   font-size: 14px;
   font-weight: 600;
-}
-
-/* ── Notas ── */
-.control-notas-label {
-  font-size: 13px;
-  font-weight: 500;
+  color: #4b5563;
   margin-bottom: 6px;
 }
 
-/* ── Botones ── */
-.control-acciones {
-  display: flex;
-  gap: 12px;
-  margin-top: 20px;
+.form-control-calidad {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 14px;
+  background-color: white;
 }
 
-.control-btn-aprobar {
-  flex: 1;
-  padding: 10px 16px;
-  background: #22c55e;
-  color: white;
-  border: none;
-  border-radius: 8px;
+.form-control-calidad:disabled {
+  background-color: #f3f4f6;
+  color: #6b7280;
+}
+
+.input-baja-definitiva {
+  background-color: #fef2f2 !important;
+  color: #dc2626 !important;
+  font-weight: bold;
+  border-color: #fca5a5 !important;
+}
+
+.fila-lote-calidad {
+  display: grid;
+  grid-template-columns: 3fr 3fr 2fr auto;
+  gap: 15px;
+  align-items: end;
+  padding-bottom: 15px;
+  margin-bottom: 15px;
+  border-bottom: 1px dashed #e5e7eb;
+}
+
+.btn-agregar-lote {
+  background: none;
+  border: 1px solid #3b82f6;
+  color: #3b82f6;
+  padding: 6px 12px;
+  border-radius: 6px;
   cursor: pointer;
+  font-size: 13px;
   font-weight: 600;
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 8px;
-  font-family: inherit;
+  gap: 6px;
 }
 
-.control-btn-aprobar:hover {
-  background: #16a34a;
+.btn-agregar-lote:hover {
+  background-color: #eff6ff;
 }
 
-.control-btn-devolucion {
-  flex: 1;
-  padding: 10px 16px;
-  background: #f59e0b;
+.btn-cargar-caducados {
+  background-color: #f59e0b;
   color: white;
   border: none;
-  border-radius: 8px;
+  padding: 8px 16px;
+  border-radius: 6px;
   cursor: pointer;
+  font-size: 13px;
   font-weight: 600;
   display: flex;
   align-items: center;
-  justify-content: center;
+  gap: 6px;
+}
+
+.btn-cargar-caducados:hover {
+  background-color: #d97706;
+}
+
+.alert-roja {
+  background-color: #fef2f2;
+  color: #dc2626;
+  padding: 12px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
   gap: 8px;
-  font-family: inherit;
-}
-
-.control-btn-devolucion:hover {
-  background: #d97706;
-}
-
-.control-btn-aprobar:disabled,
-.control-btn-devolucion:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
+  font-weight: 500;
 }

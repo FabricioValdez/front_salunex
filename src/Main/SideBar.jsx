@@ -3,7 +3,7 @@ import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import {
   House, ClipboardList, Package, LayoutDashboard, Menu, Settings, Tablets,
   Users, Building2, Tag, Layers, FlaskConical, Syringe, ArrowLeftRight,
-  MapPin, ChevronDown, ChevronRight
+  MapPin, ChevronDown, ChevronRight, ShoppingCart
 } from "lucide-react";
 import AuthContext from "../context/AuthContext";
 import { logout } from "../services/authService";
@@ -14,6 +14,8 @@ const menuCompleto = [
   { to: "/", icon: House, label: "Inicio" },
   { to: "/general/inventario", icon: Package, label: "Inventario", clave: "GMOV" },
   { to: "/general/ordenes", icon: ArrowLeftRight, label: "Movimientos", claves_or: ["GMOV", "RECP", "GORD", "GCDC"] },
+  { to: "/general/control", icon: ClipboardList, label: "Control de Calidad", clave: "GCDC" },
+  { to: "/general/punto-venta", icon: ShoppingCart, label: "Punto de Venta", clave: "GPOS" },
 
   // --- 🛠️ PÁGINAS DE ADMINISTRACIÓN (ADMIN) ---
   { to: "/admin/usuarios", icon: Users, label: "Usuarios y Empleados", clave: "GUSU" },

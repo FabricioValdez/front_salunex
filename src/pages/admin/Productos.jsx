@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useContext } from "react";
 import { Pencil, Trash2, Plus } from "lucide-react";
 import PageContainer from "../../components/ui/PageContainer";
 import DataCard from "../../components/ui/DataCard";
@@ -7,14 +7,16 @@ import Button from "../../components/ui/Button";
 import Modal from "../../components/ui/Modal";
 import SearchBar from "../../components/ui/SearchBar";
 import { useCatalogos } from "../../context/CatalogosContext";
+import AuthContext from "../../context/AuthContext";
 import api from "../../services/api";
 import "../../styles/admin/Catalogos.css";
 
-function ProductoForm({ form, setForm, empresas, categoriasProducto, clasificacionesProducto, presentacionesProducto, viasAdministracion, onSubmit, onClose, loading, error }) {
+function ProductoForm({ form, setForm, categoriasProducto, clasificacionesProducto, presentacionesProducto, viasAdministracion, onSubmit, onClose, loading, error }) {
     return (
         <>
             {error && <div className="alert alert-danger py-2 text-center mb-3">{error}</div>}
             <div className="row">
+                {/* COLUMNA IZQUIERDA */}
                 <div className="col-6">
                     <div className="mb-3">
                         <label className="form-label">Nombre</label>
@@ -29,20 +31,14 @@ function ProductoForm({ form, setForm, empresas, categoriasProducto, clasificaci
                             placeholder="Código interno" />
                     </div>
                     <div className="mb-3">
-                        <label className="form-label">Precio</label>
+                        <label className="form-label">Precio (MXN)</label>
                         <input type="number" className="form-control" value={form.precio}
                             onChange={(e) => setForm({ ...form, precio: e.target.value })}
                             placeholder="0.00" />
                     </div>
-                    <div className="mb-3">
-                        <label className="form-label">Descripción</label>
-                        <textarea className="form-control" value={form.descripcion}
-                            onChange={(e) => setForm({ ...form, descripcion: e.target.value })}
-                            placeholder="Descripción del producto" rows={4} />
-                    </div>
                     <div className="row">
                         <div className="col">
-                            <label className="form-label">Cantidad concentración</label>
+                            <label className="form-label">Cant. concentración</label>
                             <input type="number" className="form-control" value={form.cantidad_concentracion}
                                 onChange={(e) => setForm({ ...form, cantidad_concentracion: e.target.value })}
                                 placeholder="Ej. 500" />
@@ -55,15 +51,9 @@ function ProductoForm({ form, setForm, empresas, categoriasProducto, clasificaci
                         </div>
                     </div>
                 </div>
+
+                {/* COLUMNA DERECHA (Catálogos) */}
                 <div className="col-6">
-                    <div className="mb-3">
-                        <label className="form-label">Empresa</label>
-                        <select className="form-select" value={form.id_empresa}
-                            onChange={(e) => setForm({ ...form, id_empresa: e.target.value })}>
-                            <option value="">Selecciona una empresa</option>
-                            {empresas.map((e) => <option key={e.id} value={e.id}>{e.nombre}</option>)}
-                        </select>
-                    </div>
                     <div className="mb-3">
                         <label className="form-label">Categoría</label>
                         <select className="form-select" value={form.id_categoria_producto}
@@ -98,6 +88,19 @@ function ProductoForm({ form, setForm, empresas, categoriasProducto, clasificaci
                     </div>
                 </div>
             </div>
+
+            {/* FILA COMPLETA PARA DESCRIPCIÓN */}
+            <div className="row mt-2">
+                <div className="col-12">
+                    <div className="mb-3">
+                        <label className="form-label">Descripción</label>
+                        <textarea className="form-control" value={form.descripcion}
+                            onChange={(e) => setForm({ ...form, descripcion: e.target.value })}
+                            placeholder="Descripción o indicaciones del producto..." rows={2} />
+                    </div>
+                </div>
+            </div>
+
             <div className="form-actions mt-3">
                 <Button variant="secondary" onClick={onClose}>Cancelar</Button>
                 <Button variant="primary" onClick={onSubmit} disabled={loading}>
@@ -124,26 +127,33 @@ function DeleteModal({ isOpen, onClose, onConfirm, loading, item }) {
     );
 }
 
+// Ya no enviamos id_empresa en el formVacio, el backend lo maneja solo
 const formVacio = {
     nombre: "", codigo_interno: "", precio: "", descripcion: "",
-    cantidad_concentracion: "", unidad_concentracion: "", id_empresa: "",
+    cantidad_concentracion: "", unidad_concentracion: "",
     id_categoria_producto: "", id_clasificacion_producto: "",
     id_presentacion_producto: "", id_via_administracion: "",
 };
 
 function Productos() {
-    const { productos, empresas, categoriasProducto, clasificacionesProducto,
+    const { user } = useContext(AuthContext);
+
+    // Ya no extraemos 'empresas' de useCatalogos porque no lo necesitamos en el select
+    const { productos, categoriasProducto, clasificacionesProducto,
         presentacionesProducto, viasAdministracion, refreshCatalogo } = useCatalogos();
 
-    const [search, setSearch]             = useState("");
-    const [loading, setLoading]           = useState(false);
-    const [error, setError]               = useState("");
-    const [modalOpen, setModalOpen]       = useState(false);
-    const [isEdit, setIsEdit]             = useState(false);
-    const [editId, setEditId]             = useState(null);
-    const [form, setForm]                 = useState(formVacio);
-    const [deleteOpen, setDeleteOpen]     = useState(false);
+    const [search, setSearch] = useState("");
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState("");
+    const [modalOpen, setModalOpen] = useState(false);
+    const [isEdit, setIsEdit] = useState(false);
+    const [editId, setEditId] = useState(null);
+    const [form, setForm] = useState(formVacio);
+    const [deleteOpen, setDeleteOpen] = useState(false);
     const [deleteTarget, setDeleteTarget] = useState(null);
+
+    // Validación de permisos de escritura
+    const canManage = user?.permisos?.includes("GPER") || ['Empresa', 'Super Administrador'].includes(user?.rol);
 
     const filtrados = productos.filter((p) =>
         p.nombre.toLowerCase().includes(search.toLowerCase()) ||
@@ -161,15 +171,16 @@ function Productos() {
 
     const handleEditar = (item) => {
         setForm({
-            nombre: item.nombre, codigo_interno: item.codigo_interno,
-            precio: item.precio, descripcion: item.descripcion,
-            cantidad_concentracion: item.cantidad_concentracion,
-            unidad_concentracion: item.unidad_concentracion,
-            id_empresa: item.id_empresa,
-            id_categoria_producto: item.id_categoria_producto,
-            id_clasificacion_producto: item.id_clasificacion_producto,
-            id_presentacion_producto: item.id_presentacion_producto,
-            id_via_administracion: item.id_via_administracion,
+            nombre: item.nombre || "",
+            codigo_interno: item.codigo_interno || "",
+            precio: item.precio || "",
+            descripcion: item.descripcion || "",
+            cantidad_concentracion: item.cantidad_concentracion || "",
+            unidad_concentracion: item.unidad_concentracion || "",
+            id_categoria_producto: item.id_categoria_producto || "",
+            id_clasificacion_producto: item.id_clasificacion_producto || "",
+            id_presentacion_producto: item.id_presentacion_producto || "",
+            id_via_administracion: item.id_via_administracion || "",
         });
         setIsEdit(true);
         setEditId(item.id);
@@ -193,6 +204,7 @@ function Productos() {
                 ));
             } else {
                 const res = await api.post('/productos', form);
+                // El backend devuelve el producto con todo, pero recargamos o agregamos a la lista
                 refreshCatalogo('productos', [...productos, res.data.producto]);
             }
             setModalOpen(false);
@@ -217,14 +229,22 @@ function Productos() {
         }
     };
 
+    // Columnas condicionales
+    const columns = canManage
+        ? ["#", "Nombre", "Código", "Precio", "Categoría", "Empresa", "Acciones"]
+        : ["#", "Nombre", "Código", "Precio", "Categoría", "Empresa"];
+
     return (
         <PageContainer>
             <div className="dashboard-header">
-                <SearchBar placeholder="Buscar por nombre, código o empresa..." value={search}
+                <SearchBar placeholder="Buscar por nombre o código..." value={search}
                     onChange={(e) => setSearch(e.target.value)} />
-                <Button variant="primary" icon={Plus} onClick={handleNuevo}>
-                    Nuevo producto
-                </Button>
+                {/* Ocultamos el botón a los empleados */}
+                {canManage && (
+                    <Button variant="primary" icon={Plus} onClick={handleNuevo}>
+                        Nuevo producto
+                    </Button>
+                )}
             </div>
 
             <div className="dashboard-title">
@@ -234,7 +254,7 @@ function Productos() {
 
             <DataCard>
                 <Table
-                    columns={["#", "Nombre", "Código", "Precio", "Categoría", "Empresa", "Acciones"]}
+                    columns={columns}
                     data={filtrados}
                     renderRow={(item, index) => (
                         <tr key={item.id}>
@@ -244,16 +264,19 @@ function Productos() {
                             <td>${item.precio}</td>
                             <td>{item.categoria_producto_nombre}</td>
                             <td>{item.empresa_nombre}</td>
-                            <td>
-                                <div className="table-actions">
-                                    <button className="action-btn" onClick={() => handleEditar(item)}>
-                                        <Pencil size={16} color="#3b82f6" />
-                                    </button>
-                                    <button className="action-btn" onClick={() => handleEliminar(item)}>
-                                        <Trash2 size={16} color="#ef4444" />
-                                    </button>
-                                </div>
-                            </td>
+                            {/* Ocultamos los íconos de acción a los empleados */}
+                            {canManage && (
+                                <td>
+                                    <div className="table-actions">
+                                        <button className="action-btn" onClick={() => handleEditar(item)}>
+                                            <Pencil size={16} color="#3b82f6" />
+                                        </button>
+                                        <button className="action-btn" onClick={() => handleEliminar(item)}>
+                                            <Trash2 size={16} color="#ef4444" />
+                                        </button>
+                                    </div>
+                                </td>
+                            )}
                         </tr>
                     )}
                 />
@@ -264,7 +287,6 @@ function Productos() {
                 className="modal-lg">
                 <ProductoForm
                     form={form} setForm={setForm}
-                    empresas={empresas}
                     categoriasProducto={categoriasProducto}
                     clasificacionesProducto={clasificacionesProducto}
                     presentacionesProducto={presentacionesProducto}

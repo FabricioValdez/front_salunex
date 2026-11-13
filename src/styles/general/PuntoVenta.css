@@ -1,0 +1,224 @@
+.pos-container {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 20px;
+    align-items: start;
+}
+
+/* Panel Izquierdo (Buscador y Carrito) */
+.pos-panel {
+    background: white;
+    border-radius: 8px;
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    overflow: visible;
+    /* Importante para el buscador flotante */
+}
+
+.pos-panel-header {
+    background-color: #1ab394;
+    /* Verde SALUNEX */
+    color: white;
+    padding: 15px 20px;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+}
+
+.pos-panel-header h2 {
+    margin: 0;
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.pos-panel-body {
+    padding: 20px;
+    min-height: 480px;
+    position: relative;
+}
+
+/* Buscador Flotante */
+.pos-search-wrapper {
+    position: relative;
+    margin-bottom: 25px;
+}
+
+.pos-search-input-group {
+    display: flex;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.pos-search-icon {
+    background: #f3f4f6;
+    padding: 12px 15px;
+    color: #6b7280;
+    border-right: 1px solid #d1d5db;
+}
+
+.pos-search-input {
+    flex: 1;
+    border: none;
+    padding: 12px 15px;
+    font-size: 16px;
+    outline: none;
+}
+
+.pos-search-btn {
+    background: #1ab394;
+    color: white;
+    border: none;
+    padding: 0 20px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.pos-search-results {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    z-index: 50;
+    background: white;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    max-height: 300px;
+    overflow-y: auto;
+    margin-top: 5px;
+}
+
+.pos-result-item {
+    padding: 12px 15px;
+    border-bottom: 1px solid #f3f4f6;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.pos-result-item:hover {
+    background: #f9fafb;
+}
+
+.pos-result-title {
+    color: #1ab394;
+    font-weight: 600;
+    font-size: 15px;
+}
+
+/* Tabla del Carrito */
+.pos-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.pos-table th {
+    background: #f9fafb;
+    padding: 12px;
+    color: #374151;
+    text-align: left;
+    border: 1px solid #e5e7eb;
+}
+
+.pos-table td {
+    padding: 12px;
+    border: 1px solid #e5e7eb;
+    vertical-align: middle;
+}
+
+.pos-qty-input {
+    width: 70px;
+    padding: 6px;
+    border: 1px solid #d1d5db;
+    border-radius: 4px;
+    text-align: center;
+}
+
+/* Panel Derecho (Cobro) */
+.pos-panel-header-dark {
+    background-color: #2f4050;
+    color: white;
+    padding: 15px 20px;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+}
+
+.pos-total-block {
+    background-color: #1ab394;
+    color: white;
+    text-align: center;
+    padding: 25px 10px;
+    border-radius: 8px;
+    margin-bottom: 25px;
+}
+
+.pos-total-amount {
+    font-size: 42px;
+    font-weight: bold;
+    margin: 10px 0 0 0;
+}
+
+.pos-form-group {
+    margin-bottom: 20px;
+}
+
+.pos-form-group label {
+    display: block;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 8px;
+}
+
+.pos-select,
+.pos-input-money {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 16px;
+}
+
+.pos-cambio-alert {
+    background: #e0f2fe;
+    color: #0369a1;
+    padding: 15px;
+    text-align: center;
+    border-radius: 6px;
+    font-size: 18px;
+    margin-top: 20px;
+}
+
+.btn-cobrar {
+    width: 100%;
+    background: #1ab394;
+    color: white;
+    padding: 15px;
+    border: none;
+    border-radius: 6px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+}
+
+.btn-cobrar:hover {
+    background: #18a689;
+}
+
+.btn-cancelar {
+    width: 100%;
+    background: white;
+    color: #6b7280;
+    border: 1px solid #d1d5db;
+    padding: 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    margin-top: 10px;
+}

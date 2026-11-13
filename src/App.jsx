@@ -11,6 +11,7 @@ import Ordenes from "./pages/general/Ordenes";
 import ControlDeCalidad from "./pages/general/ControlDeCalidad";
 import RecepcionAlmacen from "./pages/general/RecepcionInventario";
 import Dashboard from "./pages/general/Dashboard";
+import PuntoVenta from "./pages/general/PuntoVenta";
 import Suscripcion from "./pages/Suscripcion";
 import SuscripcionExito from "./components/features/suscripcion/SuscripcionExito";
 
@@ -74,6 +75,7 @@ function App() {
             <Route path="dashboard" element={<Dashboard />} />
             <Route path="inventario" element={<RoleRoute requiredPermission="GMOV"><Inventario /></RoleRoute>} />
             <Route path="control" element={<RoleRoute requiredPermission="GCDC"><ControlDeCalidad /></RoleRoute>} />
+            <Route path="punto-venta" element={<RoleRoute requiredPermission="GPOS"><PuntoVenta /></RoleRoute>} />
 
             {/* 🌟 CAMBIO REALIZADO AQUÍ: Reemplazamos GORD por GMOV */}
             <Route path="ordenes" element={<RoleRoute requiredPermission="GMOV"><Ordenes /></RoleRoute>} />
